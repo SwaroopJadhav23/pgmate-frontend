@@ -1,0 +1,576 @@
+/* ============================================================
+   PURCHASE HISTORY DASHBOARD
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-page: #f3f5fb;
+  --bg-card: #ffffff;
+  --bg-header: #1a1f36;
+
+  --accent: #5b4fcf;
+  --accent-light: #ece9ff;
+
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+
+  --text-primary: #1a1f36;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  --border: #e2e8f0;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, .06),
+                 0 8px 28px rgba(0, 0, 0, .05);
+  --shadow-hover: 0 8px 28px rgba(91, 79, 207, .18);
+  --transition: .18s cubic-bezier(.4, 0, .2, 1);
+
+  font-family: 'Sora', sans-serif;
+}
+
+/* ============================================================
+   OUTER CARD
+   ============================================================ */
+
+.history-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+
+.history-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 18px;
+  background: #f8f9fd;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-search {
+  width: 240px;
+  font-size: 13px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  transition: border var(--transition), box-shadow var(--transition);
+}
+
+.history-search:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(91, 79, 207, .15);
+}
+
+.history-filter {
+  width: 190px;
+  font-size: 13px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  cursor: pointer;
+  transition: border var(--transition);
+}
+
+.history-filter:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ============================================================
+   MOBILE CARD LIST
+   Hidden on desktop — shown on mobile (≤768px).
+   Lives OUTSIDE the table-scroll wrapper so overflow/min-width
+   never constrains it.
+   ============================================================ */
+
+.oph-mobile-list {
+  display: none; /* hidden on desktop */
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+}
+
+/* ============================================================
+   DESKTOP TABLE WRAPPER
+   Shown on desktop — hidden on mobile.
+   ============================================================ */
+
+.oph-desktop-table {
+  display: block;
+  overflow-x: auto;
+}
+
+/* ============================================================
+   TABLE BASE
+   ============================================================ */
+
+.history-table table,
+.oph-desktop-table table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.history-table thead,
+.oph-desktop-table thead {
+  background: var(--bg-header);
+}
+
+.history-table th,
+.oph-desktop-table th {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  color: #9ba8c4;
+  padding: 15px 18px;
+  text-align: left;
+}
+
+.history-table td,
+.oph-desktop-table td {
+  padding: 16px 18px;
+  font-size: 13.5px;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.history-table tbody tr,
+.oph-desktop-table tbody tr {
+  transition: background var(--transition);
+}
+
+.history-table tbody tr:hover,
+.oph-desktop-table tbody tr:hover {
+  background: #f8f9fc;
+}
+
+/* ============================================================
+   TABLE CELL HELPERS
+   ============================================================ */
+
+.history-pill {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--accent-light);
+  color: var(--accent);
+  letter-spacing: .4px;
+}
+
+.feature-pill {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.admin-current-pill {
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #dbeafe;
+  color: #1d4ed8;
+  letter-spacing: .4px;
+}
+
+.amount {
+  font-weight: 700;
+  color: var(--green);
+  font-size: 14px;
+}
+
+.date-link {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.upgrade-info {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.upgrade-from {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.history-table tbody tr td[colspan],
+.oph-desktop-table tbody tr td[colspan] {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ============================================================
+   MODERN TABLE (owner side)
+   ============================================================ */
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 750px;
+}
+
+.modern-table th {
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 600;
+  text-align: left;
+  padding: 14px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.modern-table tr:hover {
+  background: #f9fafb;
+}
+
+/* ============================================================
+   BOOKING / BILLING STAT CARDS
+   ============================================================ */
+
+.booking-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.booking-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  border-left: 4px solid transparent;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, .10);
+}
+
+.booking-stat-card .icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.res-stat-icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  stroke: currentColor;
+}
+
+.booking-stat-card .value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1e293b;
+}
+
+.booking-stat-card .label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 2px;
+}
+
+.booking-stat-card.total       { border-left-color: #6366f1; }
+.booking-stat-card.total       .icon-wrap { background: #eef2ff; color: #6366f1; }
+
+.booking-stat-card.monthly     { border-left-color: #22c55e; }
+.booking-stat-card.monthly     .icon-wrap { background: #f0fdf4; color: #22c55e; }
+
+.booking-stat-card.daily       { border-left-color: #f59e0b; }
+.booking-stat-card.daily       .icon-wrap { background: #fffbeb; color: #f59e0b; }
+
+/* ============================================================
+   CHILD TABLE (expanded rows — kept for reuse elsewhere)
+   ============================================================ */
+
+.child-scroll { width: 100%; overflow-x: auto; }
+
+.child-table { min-width: 900px; border-collapse: collapse; }
+.child-inner { background: #fafbff; border-left: 3px solid var(--accent); padding: 12px 0; }
+.child-table th, .child-table td { padding: 12px 16px; font-size: 13px; white-space: nowrap; }
+.child-table tbody tr:hover { background: #f5f6ff; }
+
+/* ============================================================
+   MOBILE  ≤ 768px
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Toolbar */
+  .history-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .history-search,
+  .history-filter {
+    width: 100%;
+  }
+
+  /* Stat cards — keep 3 columns, just tighter */
+  .booking-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .booking-stat-card {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .booking-stat-card .value { font-size: 1.3rem; }
+
+  /* Show cards, hide table */
+  .oph-mobile-list  { display: flex; }
+  .oph-desktop-table { display: none !important; }
+
+  /* ── CARD SHELL ── */
+  .oph-card {
+    background: #fff;
+    border: 1px solid #e5e7f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 14px rgba(91, 79, 207, .09);
+  }
+
+  .oph-card--current {
+    border-color: #bfdbfe;
+    box-shadow: 0 2px 14px rgba(37, 99, 235, .12);
+  }
+
+  .oph-card--feature {
+    border-color: #ddd6fe;
+    box-shadow: 0 2px 14px rgba(124, 58, 237, .10);
+  }
+
+  /* ── CARD HEADER ── */
+  .oph-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 16px 12px;
+    background: linear-gradient(135deg, #1a1f36 0%, #2d3561 100%);
+  }
+
+  .oph-card--current .oph-card-header {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  }
+
+  .oph-card--feature .oph-card-header {
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+  }
+
+  .oph-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .oph-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .18);
+    border: 1.5px solid rgba(255, 255, 255, .35);
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .oph-card-plan-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .oph-card-transaction {
+    font-size: 12px;
+    color: rgba(255, 255, 255, .72);
+    margin-top: 2px;
+  }
+
+  .oph-card-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .oph-card-amount {
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: .2px;
+  }
+
+  .oph-badge--current {
+    background: rgba(255, 255, 255, .2);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .35);
+    letter-spacing: .4px;
+  }
+
+  /* ── CARD BODY ── */
+  .oph-card-body {
+    padding: 10px 16px 4px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .oph-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 0;
+    border-bottom: 1px dashed #f0f0f5;
+  }
+
+  .oph-card-row:last-child { border-bottom: none; }
+
+  .oph-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .oph-card-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1f2937;
+    text-align: right;
+  }
+
+  .oph-card-value--date {
+    color: #2563eb;
+    font-weight: 600;
+  }
+
+  .oph-upgrade-arrow {
+    display: block;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+  }
+
+  /* ── CARD FOOTER ── */
+  .oph-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 14px;
+    border-top: 1px solid #f0f0f5;
+    background: #f8f9fd;
+  }
+
+  .oph-fin-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 3px;
+  }
+
+  .oph-fin-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .oph-fin-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .oph-fin-value--paid     { color: #16a34a; }
+  .oph-fin-value--discount { color: #d97706; }
+
+  .oph-fin-divider {
+    width: 1px;
+    height: 28px;
+    background: #e5e7eb;
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================================
+   EXTRA SMALL  ≤ 480px
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+  .booking-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .booking-stat-card .icon-wrap {
+    width: 38px;
+    height: 38px;
+  }
+
+  .res-stat-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .booking-stat-card .value { font-size: 1.2rem; }
+
+  .child-table { min-width: 650px; }
+  .child-table th,
+  .child-table td { font-size: 11px; padding: 8px; }
+}

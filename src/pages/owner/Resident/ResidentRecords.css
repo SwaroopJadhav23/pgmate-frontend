@@ -1,0 +1,733 @@
+/* =========================================
+   FILTER CARD — desktop
+========================================= */
+
+.records-filter-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+}
+
+.records-filter-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.records-filter-grid-simple {
+  grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+}
+
+.records-filter-grid input,
+.records-filter-grid select {
+  height: 42px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #1f2937;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.records-filter-grid input:focus,
+.records-filter-grid select:focus {
+  border-color: #c7d2fe;
+  box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.45);
+  outline: none;
+}
+
+.records-filter-reset {
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+
+.records-filter-reset:hover { background: #f8fafc; }
+
+/* =========================================
+   MODERN TABLE
+========================================= */
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* min-width scoped only to ResidentRecords */
+.rr-table-scope .modern-table {
+  min-width: 1200px;
+}
+
+.modern-table th {
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 14px;
+  font-weight: 600;
+  text-align: center;   /* ← centered */
+  white-space: nowrap;
+}
+
+.modern-table td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;   /* ← centered */
+  border-right: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 0.93rem;
+}
+
+.modern-table th:last-child,
+.modern-table td:last-child { border-right: none; }
+
+.modern-table tr:hover { background: #f9fafb; }
+
+.rrc-table-empty {
+  height: 120px;
+  text-align: center !important;
+  vertical-align: middle;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: #f8faff;
+}
+
+.table-responsive { overflow-x: auto; }
+
+/* =========================================
+   LOAD MORE
+========================================= */
+
+.records-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.records-load-more {
+  min-width: 160px;
+  border: 1px solid #dbe4ff;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 11px 22px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.records-load-more:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #c7d2fe;
+}
+
+.records-load-more:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   DESKTOP FILTER BREAKPOINTS
+========================================= */
+
+@media (max-width: 1024px) {
+  .records-filter-grid,
+  .records-filter-grid-simple {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+/* =========================================
+   STATS CARDS
+========================================= */
+
+.booking-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.booking-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  border-left: 4px solid transparent;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.10);
+}
+
+.booking-stat-card .icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.res-stat-icon { width: 22px; height: 22px; stroke-width: 2; }
+
+.booking-stat-card .value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1e293b;
+}
+
+.booking-stat-card .label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 2px;
+}
+
+.booking-stat-card.total     { border-left-color: #6366f1; }
+.booking-stat-card.total .icon-wrap   { background: #eef2ff; color: #6366f1; }
+
+.booking-stat-card.monthly   { border-left-color: #22c55e; }
+.booking-stat-card.monthly .icon-wrap { background: #f0fdf4; color: #22c55e; }
+
+.booking-stat-card.daily     { border-left-color: #3b82f6; }
+.booking-stat-card.daily .icon-wrap   { background: #eff6ff; color: #3b82f6; }
+
+.booking-stat-card.rejected  { border-left-color: #ef4444; }
+.booking-stat-card.rejected .icon-wrap { background: #fef2f2; color: #ef4444; }
+
+@media (max-width: 1024px) { .booking-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 768px) {
+  .booking-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .booking-stat-card { padding: 12px 14px; gap: 10px; }
+  .booking-stat-card .value { font-size: 1.3rem; }
+}
+
+@media (max-width: 480px) {
+  .booking-stats-grid { gap: 8px; }
+  .booking-stat-card .icon-wrap { width: 38px; height: 38px; }
+  .res-stat-icon { width: 18px; height: 18px; }
+  .booking-stat-card .value { font-size: 1.2rem; }
+}
+
+/* =========================================
+   DESKTOP / MOBILE VISIBILITY SPLIT
+========================================= */
+
+/* Desktop filter + table: shown above 768px */
+.rrc-desktop-filters  { display: block; }
+.rrc-desktop-table-wrap { display: block; }
+
+/* Mobile filter bar + card list: hidden above 768px */
+.rrc-mobile-filter-bar { display: none; }
+.rrcm-card-list        { display: none; }
+
+@media (max-width: 768px) {
+  .rrc-desktop-filters    { display: none !important; }
+  .rrc-desktop-table-wrap { display: none !important; }
+  .rrc-mobile-filter-bar  { display: block; }
+  .rrcm-card-list         { display: flex; flex-direction: column; gap: 10px; }
+}
+
+/* =========================================
+   MOBILE FILTER BAR  (rrc-mobile-)
+========================================= */
+
+.rrc-mobile-filter-bar {
+  margin-bottom: 14px;
+}
+
+/* Search + toggle button row */
+.rrc-mobile-search-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.rrc-mobile-search-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rrc-search-icon {
+  position: absolute;
+  left: 11px;
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  pointer-events: none;
+  stroke: currentColor;
+}
+
+.rrc-mobile-search {
+  width: 100%;
+  height: 42px;
+  padding: 0 36px 0 36px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.rrc-mobile-search:focus { border-color: #6366f1; }
+
+.rrc-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+/* Filter toggle button */
+.rrc-filter-toggle {
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.rrc-filter-toggle--active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+/* Active-filters dot indicator */
+.rrc-filter-toggle--dot::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 1.5px solid #fff;
+}
+
+/* Expandable filter panel */
+.rrc-mobile-filter-panel {
+  margin-top: 10px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+.rrc-mobile-filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rrc-mf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rrc-mf-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rrc-mf-input {
+  height: 40px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid #e5e7eb !important;
+  font-size: 13px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  background: #fafafa !important;
+}
+
+.rrc-mf-input:focus {
+  border-color: #6366f1 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  background: #fff !important;
+}
+
+/* Panel action buttons */
+.rrc-mf-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.rrc-mf-reset,
+.rrc-mf-apply {
+  flex: 1;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.rrc-mf-reset {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.rrc-mf-reset:hover { background: #e5e7eb; }
+
+.rrc-mf-apply {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+}
+
+.rrc-mf-apply:hover {
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 380px) {
+  .rrc-mobile-filter-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================================
+   MOBILE CARD LIST STATES
+========================================= */
+
+.rrcm-empty {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: #f8faff;
+  border-radius: 14px;
+}
+
+.rrcm-skeleton {
+  height: 220px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e9eaf0 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: rrcm-shimmer 1.4s infinite;
+}
+
+@keyframes rrcm-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =========================================
+   MOBILE RESIDENT CARDS  (rrcm- prefix)
+   Completely outside the table scroll wrapper
+========================================= */
+
+.rrcm-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid transparent;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.2s;
+}
+
+.rrcm-card--monthly { border-left-color: #6366f1; }
+.rrcm-card--daily   { border-left-color: #f59e0b; }
+
+/* ── Header ── */
+.rrcm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 13px 14px 10px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 10px;
+}
+
+.rrcm-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rrcm-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rrcm-sub {
+  font-size: 11px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rrcm-badge {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.rrcm-badge--monthly { background: #eef2ff; color: #3730a3; }
+.rrcm-badge--daily   { background: #fffbeb; color: #92400e; }
+
+/* ── Phone row ── */
+.rrcm-phone-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rrcm-phone {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.rrcm-phone-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rrcm-copy-pill {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid #d1d5db;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rrcm-copy-pill:hover { background: #f3f4f6; color: #111827; }
+
+.rrcm-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 0.15s;
+  color: #374151;
+}
+
+.rrcm-icon-btn:hover { background: #e5e7eb; }
+.rrcm-icon-btn--call { color: #16a34a; }
+.rrcm-icon-btn--wa   { color: #15803d; }
+
+/* ── Rent grid ── */
+.rrcm-rent-grid {
+  display: flex;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rrcm-rent-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+}
+
+.rrcm-rent-cell--right {
+  border-left: 1px solid #f3f4f6;
+}
+
+.rrcm-rent-label {
+  font-size: 9px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.rrcm-rent-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ── Dates ── */
+.rrcm-dates-grid {
+  display: flex;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rrcm-date-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 14px;
+}
+
+.rrcm-date-cell--right { border-left: 1px solid #f3f4f6; }
+
+.rrcm-date-label {
+  font-size: 9px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.rrcm-date-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* ── Finance grid — 3 cols ── */
+.rrcm-finance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rrcm-finance-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 12px;
+}
+
+.rrcm-finance-cell--mid {
+  border-left: 1px solid #f3f4f6;
+  border-right: 1px solid #f3f4f6;
+}
+
+.rrcm-finance-label {
+  font-size: 9px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.rrcm-finance-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rrcm-finance-val--deduct { color: #dc2626; }
+.rrcm-finance-val--refund { color: #16a34a; }
+
+/* ── Footer ── */
+.rrcm-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #fafafa;
+}
+
+.rrcm-settlement {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rrcm-settlement-label {
+  font-size: 9px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.rrcm-settlement-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.rrcm-proof-btn {
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rrcm-proof-btn:hover { background: #e0e7ff; }

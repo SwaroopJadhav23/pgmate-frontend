@@ -1,0 +1,199 @@
+/* ===============================
+   HARD RESET & BASICS
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #fdfcff;
+  color: #231942;
+  line-height: 1.6; /* You need this for readability! */
+}
+
+:root {
+  --c1: #e0b1cb;
+  --c2: #be95c4;
+  --c3: #9f86c0;
+  --c4: #5e548e;
+  --c5: #231942;
+  --white: #ffffff;
+}
+
+
+
+/* ===============================
+   HERO SECTION - PROFESSIONAL POLISH
+================================ */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.hero {
+  background: linear-gradient(135deg, #f5e6f0 0%, var(--c1) 100%); /* Lighter gradient for professionalism */
+  padding: 5rem 4rem; /* More vertical padding */
+  border-radius: 24px;
+  margin: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero h1 {
+  font-size: 3.5rem; /* Make it bold. Make it seen. */
+  font-weight: 800;
+  color: var(--c5);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.hero p {
+  max-width: 550px;
+  font-size: 1.15rem;
+  color: var(--c5);
+  margin-bottom: 2.5rem;
+  opacity: 0.8;
+}
+
+/* ===============================
+   BUTTONS - STOP BEING GENERIC
+================================ */
+.hero-actions {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.btn-primary {
+  background: var(--c5);
+  color: var(--white);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #000;
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--c5);
+  color: var(--c5);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background: rgba(35, 25, 66, 0.05);
+}
+
+/* ===============================
+   FEATURES - GRID SPACING
+================================ */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Force 3 columns for desktop */
+  gap: 2.5rem;
+  margin: 5rem 0;
+}
+
+.feature-card {
+  background: var(--white);
+  border: 1px solid rgba(224, 177, 203, 0.4);
+  border-radius: 20px;
+  padding: 2.5rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  box-shadow: 0 10px 30px rgba(35, 25, 66, 0.08);
+}
+
+.feature-card h3 {
+  margin-bottom: 0.75rem;
+  color: var(--c5);
+  font-size: 1.3rem;
+}.footer {
+  background: #ffffff;
+  border-top: 1px solid #e0b1cb;
+  padding: 4rem 2rem;
+  margin-top: 5rem;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-logo {
+  font-weight: 700;
+  color: #231942;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+.footer-links a {
+  color: #5e548e;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.footer-copy {
+  font-size: 0.8rem;
+  color: #9f86c0;
+  margin-top: 2rem;
+}
+html {
+  scroll-behavior: auto;
+}
+html, body {
+  overflow-x: hidden;
+}
+
+.swal2-container {
+  z-index: 30000 !important;
+}
+
+/* smooth thin scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f7ff;
+}
+
+.global-toast {
+  border-radius: 10px !important;
+  background: #1e1e2e !important;
+  color: #e2e8f0 !important;
+  font-size: 14px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+  --primary: #10b981;
+  --secondary: #fff;
+}

@@ -1,0 +1,1082 @@
+/* ========================================
+CARD
+======================================== */
+
+.card{
+  background:#ffffff;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.05);
+}
+
+/* ========================================
+TABLE
+======================================== */
+
+.manager-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.manager-table th{
+  background:#eef2ff;
+  color:#4338ca;
+  padding:14px;
+  font-weight:600;
+}
+
+.manager-table td{
+  padding:14px;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.manager-table tr:hover{
+  background:#f9fafb;
+}
+.primary-btn {
+  background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+  border: none;
+}
+/* STATUS */
+
+.status{
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+
+.status.active{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.status.inactive{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+/* ========================================
+FILTER BAR
+======================================== */
+
+.filter-card{
+  margin-bottom:16px;
+  padding:14px;
+}
+
+.filter-bar{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.filter-search{
+  flex:1;
+}
+
+.filter-select{
+  width:180px;
+}
+
+/* ========================================
+ACTION BUTTONS (RECTANGLE)
+======================================== */
+
+.actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:nowrap;     
+  overflow-x:auto;      
+}
+
+
+.action-btn{
+  border:none;
+  padding:12px 60px;
+  font-size:12px;
+  font-weight:600;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+
+/* COLORS */
+
+.action-btn.manage{
+  background:#EEF2FF;
+  color:#4338ca;
+}
+
+.action-btn.reset{
+  background:#FEF3C7;
+  color:#92400e;
+}
+
+.action-btn.toggle{
+  background:#ECFDF5;
+  color:#166534;
+}
+
+.action-btn.delete{
+  background:#FEE2E2;
+  color:#991b1b;
+}
+
+.action-btn:hover{
+  transform:translateY(-1px);
+  opacity:.9;
+}
+
+/* ========================================
+ASSIGNED PG LIST
+======================================== */
+
+.assigned-pg-list{
+  margin-bottom:15px;
+}
+
+.assigned-pg-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 12px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  margin-bottom:8px;
+  background:#fafafa;
+}
+
+.pg-name{
+  font-size:14px !important;
+  font-weight:500;
+}
+
+.remove-pg-btn{
+  width:26px;
+  height:26px;
+  border:none;
+  border-radius:6px;
+  background:#ef4444;
+  color:white;
+  font-size:14px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.remove-pg-btn:hover{
+  background:#dc2626;
+}
+
+/* ========================================
+MODAL
+======================================== */
+
+.modal-backdrop-custom{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+
+.modal-box{
+  background:#fff;
+  border-radius:14px;
+  width:500px;
+  max-width:95%;
+  padding:20px;
+  animation:modalFade .25s ease;
+}
+
+@keyframes modalFade{
+  from{opacity:0; transform:scale(.95);}
+  to{opacity:1; transform:scale(1);}
+}
+
+/* ========================================
+MODAL BUTTONS
+======================================== */
+
+.modal-btn{
+  border:none;
+  padding:10px 18px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.modal-btn.primary{
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:white;
+}
+
+.modal-btn.secondary{
+  background:#6b7280;
+  color:white;
+}
+/* ===============================
+TABLE SCROLL FOR MOBILE
+=============================== */
+
+.table-scroll{
+  width:100%;
+  overflow-x:auto;
+}
+
+/* Smooth mobile scroll */
+.table-scroll::-webkit-scrollbar{
+  height:6px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb{
+  background:#c7d2fe;
+  border-radius:10px;
+}
+/* ===============================
+TABLE COLUMN DIVIDERS
+================================ */
+
+.manager-table th,
+.manager-table td{
+  border-right: 1px solid #e5e7eb;
+}
+
+/* remove last column border */
+.manager-table th:last-child,
+.manager-table td:last-child{
+  border-right: none;
+}
+.manager-table{
+  width:100%;
+  border-collapse:collapse;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.manager-table th{
+  background:#eef2ff;
+  color:#4338ca;
+  padding:14px;
+  font-weight:600;
+  text-align:left;
+}
+
+.manager-table td{
+  padding:14px;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.manager-table tr:hover{
+  background:#f9fafb;
+}
+.modal-actions{
+  display:flex;
+  gap:16px;
+  margin-top:20px;
+}
+
+.modal-actions .modal-btn{
+  flex:1;
+  height:46px;
+  font-size:15px;
+}
+
+/* ===============================
+MOBILE MANAGER CARDS
+=============================== */
+
+.manager-cards{
+  display:none;
+}
+
+.manager-card{
+  background:white;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.manager-card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.manager-card-header h4{
+  font-size:16px;
+  font-weight:600;
+}
+
+.manager-card p{
+  font-size:14px;
+  margin:4px 0;
+}
+
+.manager-card-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.manager-card-actions .action-btn{
+  flex:1;
+  min-width:80px;
+}
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 45px; /* space for eye */
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.toggle-eye:hover {
+  color: #4f46e5;
+}
+/* ========================================
+MOBILE RESPONSIVE
+======================================== */
+
+@media (max-width:768px){
+
+.manager-table{
+  min-width:700px;
+}
+
+  .manager-table th,
+  .manager-table td{
+    padding:10px;
+  }
+
+  .filter-bar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .filter-search,
+  .filter-select{
+    width:100%;
+  }
+
+  .actions{
+    gap:6px;
+  }
+
+  .action-btn{
+    font-size:11px;
+    padding:4px 10px;
+  }
+
+  .modal-box{
+    width:92%;
+    max-width:420px;
+  }
+
+}
+
+/* ========================================
+SMALL PHONES
+======================================== */
+
+@media (max-width:480px){
+
+  .action-btn{
+    font-size:10px;
+    padding:3px 8px;
+  }
+
+  .assigned-pg-item{
+    font-size:13px;
+    padding:8px 10px;
+  }
+
+}
+@media (max-width:768px){
+
+  .manager-table th,
+  .manager-table td{
+    font-size:13px;
+    padding:10px;
+    white-space:nowrap;
+  }
+
+}
+/* ===============================
+TOPBAR RESPONSIVE FIX
+================================ */
+
+@media (max-width: 768px){
+
+  /* Dashboard header container */
+  .dashboard-header{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Title */
+  .dashboard-header h1{
+    font-size: 22px;
+    margin: 0;
+  }
+
+  /* Subtitle */
+  .dashboard-header p{
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* Right action (button container) */
+  .dashboard-header-right{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* Button */
+  .primary-btn{
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+    width: auto;
+  }
+
+}
+
+/* ======================================
+   STAT CARDS
+====================================== */
+.owners-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.owners-stat-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid #5B5BD6;
+  border-radius: 12px;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.owners-stat-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  transform: translateY(-2px);
+}
+
+.owners-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.owners-stat-info {
+  min-width: 0;
+}
+
+.owners-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.1;
+}
+
+.owners-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-top: 4px;
+}
+
+.owners-stat-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===============================
+   PREVENT LEAKED OVERFLOW FROM OTHER PAGES
+================================ */
+
+@media (max-width: 768px) {
+  .owners-stats-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    overflow-x: visible !important;
+    flex-wrap: unset !important;
+  }
+
+  .owners-stat-card {
+    flex: unset !important;
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  .owners-stat-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .owners-stat-value {
+    font-size: 20px;
+  }
+
+  .owners-stat-label {
+    font-size: 12px;
+  }
+
+  .owners-stat-sub {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .owners-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================
+   MANAGER PAGE — scoped mobile card system
+   All classes prefixed mgr- to avoid conflicts
+========================================= */
+
+.mgr-table-scope { width: 100%; }
+
+/* ── Desktop table ── */
+.mgr-desktop-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  border: 1px solid #e8edff;
+}
+
+.mgr-desktop-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  min-width: 760px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mgr-desktop-table thead th {
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e0e7ff;
+  white-space: nowrap;
+}
+
+.mgr-dt-row td {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.mgr-dt-row:last-child td { border-bottom: none; }
+.mgr-dt-row:hover td { background: #f8faff; }
+
+.mgr-dt-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* ── Mobile cards hidden on desktop ── */
+.mgr-cards-wrap { display: none; }
+
+/* ── Empty state ── */
+.mgr-empty {
+  text-align: center;
+  padding: 28px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* =========================================
+   MOBILE — swap at 768px
+========================================= */
+
+@media (max-width: 768px) {
+  .mgr-desktop-wrap { display: none; }
+
+  .mgr-cards-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+}
+
+/* =========================================
+   CARD SHELL
+========================================= */
+
+.mgr-card {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #c7d2fe;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.mgr-card--active   { border-left-color: #16a34a; }
+.mgr-card--inactive { border-left-color: #dc2626; }
+
+/* ── Header ── */
+.mgr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: #f9fafb;
+  border-bottom: 0.5px solid #f0f0f0;
+  gap: 10px;
+}
+
+.mgr-title-block { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.mgr-name { font-size: 14px; font-weight: 700; color: #111827; }
+.mgr-sub  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+/* ── Badge ── */
+.mgr-badge {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+.mgr-badge--active   { background: #dcfce7; color: #166534; }
+.mgr-badge--inactive { background: #fee2e2; color: #991b1b; }
+
+/* ── Info row ── */
+.mgr-info-row {
+  display: flex;
+  border-bottom: 0.5px solid #f3f4f6;
+}
+
+.mgr-info-cell {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mgr-info-cell--right {
+  border-left: 0.5px solid #f3f4f6;
+  align-items: flex-end;
+}
+
+.mgr-info-label {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.mgr-info-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ── Action rows ── */
+.mgr-actions {
+  display: flex;
+  border-top: 0.5px solid #f3f4f6;
+  margin: 4px;
+}
+
+.mgr-actions--bottom {
+  border-top: 0.5px solid #f3f4f6;
+}
+
+.mgr-act-btn {
+  flex: 1;
+  padding: 11px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+  min-height: 42px;
+}
+
+.mgr-act-btn + .mgr-act-btn { border-left: 0.5px solid #f3f4f6; }
+.mgr-act-btn:hover { filter: brightness(0.95); }
+
+.mgr-act-btn--manage { background: #eef2ff; color: #4338ca; }
+.mgr-act-btn--reset  { background: #fef9c3; color: #854d0e; }
+.mgr-act-btn--toggle { background: #f0fdf4; color: #166534; }
+.mgr-act-btn--delete { background: #fef2f2; color: #991b1b; }
+
+/* =========================================
+   OWNER MANAGERS PAGE — MODAL CENTERING FIX
+   
+   ActiveResidents.css sets align-items: flex-end
+   on .modal-backdrop-custom inside a media query,
+   which leaks globally and pushes these modals
+   to the bottom of the screen on mobile.
+   
+   This rule re-centers all modals on this page
+   and overrides any leaked styles.
+========================================= */
+
+/* =========================================
+   MODAL FORM FIELDS
+   Match the same look as ActiveResidents
+   edit form: label above, visible border,
+   proper padding on inputs/selects.
+========================================= */
+
+.modal-box h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 20px;
+}
+
+.modal-box h6 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Wrap each field in a label+input pair */
+.modal-box .form-control,
+.modal-box .form-select,
+.modal-box input[type="text"],
+.modal-box input[type="tel"],
+.modal-box input[type="email"],
+.modal-box input[type="password"],
+.modal-box input[type="number"],
+.modal-box select,
+.modal-box textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #111827;
+  background: #ffffff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+}
+
+.modal-box .form-control:focus,
+.modal-box input[type="text"]:focus,
+.modal-box input[type="tel"]:focus,
+.modal-box input[type="email"]:focus,
+.modal-box input[type="password"]:focus,
+.modal-box input[type="number"]:focus,
+.modal-box select:focus,
+.modal-box textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* Field labels */
+.modal-box label,
+.modal-box .form-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+/* Password field eye icon stays aligned */
+.modal-box .password-field {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.modal-box .password-field input {
+  padding-right: 44px;
+  margin-bottom: 14px;
+}
+
+.modal-box .password-field .toggle-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%; /* below the label */
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 17px;
+}
+
+/* =========================================
+   MOBILE CENTERING FIX
+   
+   ActiveResidents.css sets align-items: flex-end
+   on .modal-backdrop-custom inside a media query,
+   which leaks globally and pushes these modals
+   to the bottom of the screen on mobile.
+   
+   This rule re-centers all modals on this page
+   and overrides any leaked styles.
+========================================= */
+
+@media (max-width: 768px) {
+  /* Force ALL modals on this page to be centered, not bottom-anchored */
+  .modal-backdrop-custom {
+    align-items: center !important;
+    padding: 16px !important;
+  }
+
+  /* Compact, centered modal — not full-screen */
+  .modal-backdrop-custom .modal-box {
+    width: 92% !important;
+    max-width: 420px !important;
+    max-height: 90dvh !important;
+    border-radius: 16px !important;
+    margin: 0 auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Slightly larger inputs on mobile to prevent iOS zoom */
+  .modal-box .form-control,
+  .modal-box input,
+  .modal-box select,
+  .modal-box textarea {
+    font-size: 16px !important;
+    min-height: 46px;
+  }
+}
+
+
+/* =========================================
+   TABLET SMALL: 601–900px (portrait tablets)
+========================================= */
+@media (min-width: 601px) and (max-width: 900px) {
+  .modal-backdrop-custom {
+    align-items: center;
+    padding: 20px;
+  }
+
+  .modal-backdrop-custom .modal-box {
+    width: 75vw !important;
+    max-width: 540px !important;
+    min-width: 340px !important;
+    padding: 24px !important;
+    border-radius: 16px !important;
+  }
+
+  .modal-box h4 {
+    font-size: 19px;
+  }
+
+  .modal-box .form-control,
+  .modal-box input,
+  .modal-box select,
+  .modal-box textarea {
+    font-size: 15px !important;
+    padding: 11px 14px !important;
+    min-height: 46px;
+  }
+
+  .modal-actions .modal-btn {
+    height: 48px;
+    font-size: 15px;
+  }
+}
+
+/* =========================================
+   TABLET LARGE: 901–1024px (landscape tablets)
+========================================= */
+@media (min-width: 901px) and (max-width: 1024px) {
+  .modal-backdrop-custom {
+    align-items: center;
+    padding: 20px;
+  }
+
+  .modal-backdrop-custom .modal-box {
+    width: 65vw !important;
+    max-width: 600px !important;
+    min-width: 400px !important;
+    padding: 28px !important;
+    border-radius: 18px !important;
+  }
+
+  .modal-box h4 {
+    font-size: 20px;
+  }
+
+  .modal-box .form-control,
+  .modal-box input,
+  .modal-box select,
+  .modal-box textarea {
+    font-size: 15px !important;
+    padding: 12px 16px !important;
+    min-height: 48px;
+  }
+
+  .modal-actions .modal-btn {
+    height: 50px;
+    font-size: 15px;
+  }
+}
+
+/* =========================================
+   X CLOSE BUTTON
+========================================= */
+.modal-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-header-row h4 {
+  margin-bottom: 0 !important;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+/* ── Three-dot action menu ── */
+.mgr-menu-wrap {
+  position: relative;
+}
+
+.action-btn-dots {
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4338ca;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.action-btn-dots:hover {
+  background: #e0e7ff;
+}
+
+.mgr-dropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  min-width: 170px;
+  z-index: 30;
+  overflow: hidden;
+  animation: modalFade 0.15s ease;
+}
+
+.mgr-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.mgr-dropdown button:hover {
+  background: #f9fafb;
+}
+
+.mgr-dropdown button.danger {
+  color: #dc2626;
+}

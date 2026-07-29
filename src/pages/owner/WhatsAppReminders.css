@@ -1,0 +1,230 @@
+.war-stats-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.war-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  flex: 1;
+  min-width: 220px;
+}
+.war-stat-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fef3c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.war-stat-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+}
+.war-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+.war-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.war-stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.war-search-row {
+  margin-bottom: 16px;
+}
+.war-search-wrap {
+  position: relative;
+  max-width: 360px;
+}
+.war-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+}
+.war-search-input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13.5px;
+  outline: none;
+  transition: border 0.2s;
+}
+.war-search-input:focus {
+  border-color: #25d366;
+}
+
+.war-loading,
+.war-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+.war-empty svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+.war-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.war-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+}
+
+.war-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+  flex: 1;
+}
+.war-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eeedfe;
+  color: #3c3489;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.war-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.war-card-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+.war-card-meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+.war-card-phone {
+  font-size: 12.5px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.war-card-middle {
+  display: flex;
+  gap: 10px;
+}
+.war-rent-chip,
+.war-due-chip {
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 6px 12px;
+  min-width: 100px;
+}
+.war-rent-label,
+.war-due-label {
+  font-size: 10.5px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.war-rent-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.war-due-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #d97706;
+}
+
+.war-send-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #25d366;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.1s;
+  white-space: nowrap;
+}
+.war-send-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.war-send-btn:hover {
+  background: #1ebe5a;
+}
+.war-send-btn:active {
+  transform: scale(0.97);
+}
+.war-send-btn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+.war-send-btn--sent {
+  background: #e2e8f0;
+  color: #475569;
+}
+.war-send-btn--sent:hover {
+  background: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .war-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .war-card-middle {
+    justify-content: space-between;
+  }
+  .war-send-btn {
+    justify-content: center;
+  }
+}

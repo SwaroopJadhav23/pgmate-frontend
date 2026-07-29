@@ -1,0 +1,45 @@
+:root{
+
+/* PRIMARY GRADIENT */
+--gradient-primary-start:#6A5AE0;
+--gradient-primary-end:#5C6DDC;
+
+/* ICONS */
+--icon-color:#5856D6;
+
+/* FOOTER */
+--footer-color:#5A57C8;
+
+/* SECONDARY GRADIENT */
+--gradient-secondary-start:#5AA0D6;
+--gradient-secondary-end:#4A88C2;
+
+/* TEXT */
+--text-small:#7A7A7A;
+--text-dark:#1E1E1E;
+
+/* CONTACT CARDS */
+--contact-card-bg:#F2F3F5;
+
+/* GENDER COLORS */
+--male-color:#4B88C1;
+--female-color:#C83E7A;
+
+/* CARD STATES */
+--card-hover:#C8CEDA;
+--card-bg:#E8C75C;
+
+/* SLIDER */
+--slider-color:#E5C15B;
+
+/* CARD GRADIENTS */
+--card-gradient-1:#A9C9C2;
+--card-gradient-2:#C5BDE0;
+--card-gradient-3:#8DA6C8;
+--card-gradient-4:#C6D3C0;
+--card-gradient-5:#D7C6CF;
+
+/* ICON SECONDARY */
+--icon-secondary:#E4B548;
+
+}

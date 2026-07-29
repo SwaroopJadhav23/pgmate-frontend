@@ -1,0 +1,208 @@
+/* ================================================
+   MANAGER DASHBOARD — Owner-style
+   Standalone file, mgr- prefixed, no clash w/ OwnerDashboard.css
+================================================ */
+
+:root {
+  --mgr-indigo: #4F46E5;
+  --mgr-indigo-lt: #EEF2FF;
+  --mgr-lavender: #7B74F0;
+  --mgr-green: #22C55E;
+  --mgr-green-lt: #DCFCE7;
+  --mgr-orange: #F97316;
+  --mgr-orange-lt: #FFF7ED;
+  --mgr-bg: #F4F5FB;
+  --mgr-card: #FFFFFF;
+  --mgr-border: #E8ECF4;
+  --mgr-text: #1E1B4B;
+  --mgr-muted: #6B7280;
+  --mgr-accent: #E8E7FD;
+}
+
+/* ── QUICK ACTIONS — one row, top ─────────────── */
+.mgr-quick-col {
+  display: flex;
+  flex-direction: column;
+  background: var(--mgr-card);
+  border: 1px solid var(--mgr-border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+}
+
+.mgr-quick-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mgr-quick-header h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--mgr-indigo);
+  margin: 0;
+}
+
+.mgr-quick-header span {
+  font-size: 12px;
+  color: var(--mgr-muted);
+  font-weight: 500;
+}
+
+.mgr-quick-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.mgr-quick-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: transform .2s, box-shadow .2s;
+  flex: 1 1 0;
+  min-width: 0;
+  line-height: 1;
+}
+
+.mgr-quick-btn i { font-size: 22px; }
+
+.mgr-quick-btn span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.mgr-quick-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .1);
+}
+
+.mgr-qb-purple { background: #f3f0ff; color: var(--mgr-lavender); }
+.mgr-qb-green { background: var(--mgr-green-lt); color: #16a34a; }
+.mgr-qb-orange { background: var(--mgr-orange-lt); color: var(--mgr-orange); }
+
+/* ── OVERVIEW SECTION ─────────────────────────── */
+.mgr-overview-section {
+  background: var(--mgr-card);
+  border: 1px solid var(--mgr-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.mgr-overview-header {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--mgr-text);
+  margin-bottom: 18px;
+}
+
+.mgr-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.mgr-overview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--mgr-border);
+  background: #FAFBFF;
+  cursor: pointer;
+  transition: box-shadow .2s, transform .2s;
+  text-align: center;
+}
+
+.mgr-overview-card:hover {
+  box-shadow: 0 6px 20px rgba(79, 70, 229, .1);
+  transform: translateY(-2px);
+}
+
+.mgr-overview-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mgr-overview-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mgr-muted);
+  line-height: 1.3;
+}
+
+.mgr-overview-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--mgr-text);
+  letter-spacing: -.5px;
+  line-height: 1;
+}
+
+/* ── RESPONSIVE ────────────────────────────────── */
+@media (max-width: 768px) {
+  .mgr-quick-col { padding: 14px 12px; border-radius: 14px; }
+  .mgr-quick-header { margin-bottom: 10px; }
+  .mgr-quick-row { gap: 8px; }
+  .mgr-quick-btn { padding: 12px 4px; border-radius: 12px; gap: 5px; }
+  .mgr-quick-btn i { font-size: 19px; }
+  .mgr-quick-btn span { font-size: 10.5px; }
+
+  .mgr-overview-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mgr-overview-card { padding: 10px 4px; }
+  .mgr-overview-icon { width: 32px; height: 32px; }
+  .mgr-overview-label { font-size: 9px; }
+  .mgr-overview-value { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+  .mgr-quick-col { padding: 10px 8px; border-radius: 13px; }
+  .mgr-quick-header { margin-bottom: 8px; }
+  .mgr-quick-header span { font-size: 10.5px; }
+  .mgr-quick-row { gap: 5px; }
+  .mgr-quick-btn { padding: 9px 2px; border-radius: 10px; gap: 4px; }
+  .mgr-quick-btn i { font-size: 16px; }
+  .mgr-quick-btn span { font-size: 8.5px; }
+
+  .mgr-overview-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .mgr-overview-card { padding: 7px 2px; }
+  .mgr-overview-icon { width: 26px; height: 26px; }
+  .mgr-overview-value { font-size: 12px; }
+  .mgr-overview-label { font-size: 7.5px; }
+}
+
+/* ── Inline CSS Extraction ── */
+.custom-tooltip { background: #fff; border: 1px solid #e8ecf4; border-radius: 10px; padding: 10px 14px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+.custom-tooltip-label { font-weight: 700; color: #1e1b4b; margin-bottom: 4px; }
+.custom-tooltip-item { margin: 2px 0; font-weight: 600; }
+.dash-chart-card-empty { justify-content: center; align-items: center; }
+.dash-chart-title-empty { color: #9CA3AF; }
+.dash-chart-empty-text { flex: 1; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 13px; }
+.dash-bh-circle-anim { transition: stroke-dasharray 0.9s ease, stroke 0.5s; }
+.dash-lang-menu { position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1.5px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 9999; min-width: 150px; padding: 6px; }
+.dash-lang-header { padding: 8px 14px 6px; font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #f1f2f6; margin-bottom: 4px; }
+.dash-lang-item { padding: 6px 14px; font-size: 13px; cursor: pointer; border-radius: 8px; color: #374151; }
+.dash-lang-item:hover { background: #f8fafc; }
+.dash-pie-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
+.dash-pie-text { position: absolute; text-align: center; font-size: 11px; color: #6B7280; font-weight: 600; line-height: 1.2; }
+.dash-pie-value { font-size: 20px; font-weight: 800; color: #1E1B4B; }

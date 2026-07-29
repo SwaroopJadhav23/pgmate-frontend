@@ -1,0 +1,229 @@
+/* ================= HERO ================= */
+
+.terms-hero {
+  position: relative;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-image: url("https://images.unsplash.com/photo-1557804506-669a67965ba0");
+  background-size: cover;
+  background-position: center;
+}
+
+.terms-hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(92,84,246,0.95),
+    rgba(123,97,255,0.92)
+  );
+}
+
+.terms-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.terms-hero-content h1 {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.terms-hero-content p {
+  margin: 10px auto 50px;
+  max-width: 640px;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  opacity: 0.95;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+
+/* ================= CONTENT ================= */
+
+.terms-content {
+  max-width: 900px;
+  margin: auto;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+
+/* INTRO PARAGRAPH */
+
+.terms-content .intro {
+  font-size: 19px;
+  line-height: 1.85;
+
+  color: #444;
+  margin-bottom: 40px;
+}
+
+.terms-content .intro strong {
+  color: #5c54f6;
+  font-weight: 700;
+}
+
+
+/* SECTION HEADINGS */
+
+.terms-content h4 {
+  margin-top: 38px;
+  margin-bottom: 10px;
+
+  font-size: 21px;
+  font-weight: 800;
+
+  color: #1f1f1f;
+}
+
+
+/* PARAGRAPH TEXT */
+
+.terms-content p {
+  font-size: 17px;
+  color: #555;
+
+  line-height: 1.85;
+}
+
+
+/* LIST STYLE */
+
+.terms-content ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 22px;
+}
+
+.terms-content li {
+  font-size: 16.5px;
+  color: #555;
+
+  margin-bottom: 7px;
+  line-height: 1.8;
+}
+
+
+/* CONTACT BOX */
+
+.terms-contact {
+  margin-top: 26px;
+
+  padding: 24px 26px;
+
+  background: #f7f8ff;
+  border-left: 4px solid #5c54f6;
+
+  border-radius: 10px;
+}
+
+.terms-contact p {
+  margin-bottom: 8px;
+  font-size: 16.5px;
+}
+
+.terms-contact strong {
+  color: #5c54f6;
+}
+
+
+/* ================= TEXT POLISH ================= */
+
+.terms-content p strong {
+  color: #5c54f6;
+  font-weight: 700;
+}
+
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeUp {
+
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .terms-hero {
+    height: 260px;
+  }
+
+  .terms-hero-content h1 {
+    font-size: 32px;
+  }
+
+  .terms-hero-content p {
+    font-size: 15px;
+  }
+
+  .terms-content {
+    padding: 0 12px;
+  }
+
+  .terms-content .intro {
+    font-size: 17px;
+  }
+
+  .terms-content p {
+    font-size: 16px;
+  }
+
+  .terms-content li {
+    font-size: 15.5px;
+  }
+
+}
+
+:target {
+  background-color: transparent !important;
+}
+
+#auto-cancellation,
+#no-refund {
+  --bs-highlight-bg: transparent;
+}
+
+#auto-cancellation:target,
+#no-refund:target {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+.highlight-section {
+  animation: highlightFade 2s ease forwards;
+  border-radius: 8px;
+  outline: none;
+  scroll-margin-top: 80px;
+}
+
+@keyframes highlightFade {
+  0%   { background-color: #456ea4 !important; }
+  100% { background-color:  #5285c9 !important; }
+}
+
+.highlight-section h4 {
+  outline: none;
+}

@@ -1,0 +1,987 @@
+/* =========================================
+   FILTER BAR
+========================================= */
+
+.room-filter-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  background: #ffffff;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  width: 100%;
+}
+
+.room-filter-bar select {
+  height: 40px;
+  font-size: .95rem;
+  border-radius: 8px;
+  padding: 0 12px;
+}
+
+/* ADD ROOM BUTTON */
+
+.add-room-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s;
+  white-space: nowrap;
+}
+
+.add-room-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(79, 70, 229, .35);
+}
+
+.add-room-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* =========================================
+   TABLE STYLE
+========================================= */
+
+.room-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .08);
+}
+
+.room-table th {
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.room-table td {
+  padding: 14px;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+  border-right: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: .95rem;
+}
+
+.room-table tr:hover {
+  background: #f9fafb;
+}
+
+.room-table th,
+.room-table td {
+  border-right: 1px solid #e5e7eb;
+}
+
+.room-table th:last-child,
+.room-table td:last-child {
+  border-right: none;
+}
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.action-btn {
+  border: none;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: .2s;
+}
+
+.action-btn.edit {
+  background: #FEF3C7;
+  color: #92400e;
+}
+
+.action-btn.delete {
+  background: #FEE2E2;
+  color: #991b1b;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  opacity: .9;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.empty-state {
+  height: 120px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: #f8faff;
+}
+
+/* =========================================
+   MODAL — base
+========================================= */
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modal-box {
+  background: #ffffff;
+  padding: 26px;
+  border-radius: 16px;
+  width: 420px;
+  max-width: 100%;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .25), 0 8px 20px rgba(0, 0, 0, .08);
+  box-sizing: border-box;
+}
+
+.modal-box h5 {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modal-box input,
+.modal-box select {
+  border-radius: 8px;
+  height: 40px;
+}
+
+/* =========================================
+   TABLE SCROLL
+========================================= */
+
+.table-responsive-x {
+  overflow-x: auto;
+}
+
+/* =========================================
+   MODAL BUTTONS
+========================================= */
+
+.modal-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+  flex-wrap: nowrap !important;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.modal-btn.cancel {
+  background: #e5e8f7;
+  color: rgb(101, 105, 109);
+}
+
+.modal-btn.cancel:hover {
+  background: #f0f2fa;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+}
+
+.modal-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, .35);
+}
+
+/* =========================================
+   MOBILE RESPONSIVE — filter bar
+========================================= */
+
+@media (max-width: 768px) {
+  .room-filter-bar {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 10px;
+  }
+
+  .room-filter-bar select,
+  .room-filter-bar .form-control {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .add-room-btn {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    justify-self: stretch !important;
+    padding: 11px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+}
+
+/* =========================================
+   ROOM MANAGER STATS
+========================================= */
+
+.rm-stats-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+  margin-bottom: 22px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  /* show thin scrollbar desktop */
+  -ms-overflow-style: none;
+  padding-bottom: 0;
+  /* space for scrollbar */
+}
+
+/* AFTER — also add this new block */
+
+
+.rm-stats-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.rm-stat-card {
+  flex: 0 0 220px;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: #ffffff;
+  border-left: 2px solid transparent;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  transition: 0.2s ease;
+}
+
+.rm-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.10);
+}
+
+.rm-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rm-icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  stroke: currentColor;
+}
+
+.rm-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.rm-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.rm-stat-card.total {
+  border-left-color: #6366f1;
+}
+
+.rm-stat-card.total .rm-icon-wrap {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.rm-stat-card.rooms {
+  border-left-color: #0ea5e9;
+}
+
+.rm-stat-card.rooms .rm-icon-wrap {
+  background: #ecfeff;
+  color: #0ea5e9;
+}
+
+.rm-stat-card.single {
+  border-left-color: #22c55e;
+}
+
+.rm-stat-card.single .rm-icon-wrap {
+  background: #f0fdf4;
+  color: #22c55e;
+}
+
+.rm-stat-card.double {
+  border-left-color: #f59e0b;
+}
+
+.rm-stat-card.double .rm-icon-wrap {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+.rm-stat-card.triple {
+  border-left-color: #ef4444;
+}
+
+.rm-stat-card.triple .rm-icon-wrap {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.rm-stat-card.quadruple {
+  border-left-color: #8b5cf6;
+}
+
+.rm-stat-card.quadruple .rm-icon-wrap {
+  background: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.rm-stat-card.custom {
+  border-left-color: #f43f5e;
+}
+
+.rm-stat-card.custom .rm-icon-wrap {
+  background: #fff1f2;
+  color: #f43f5e;
+}
+
+@media (max-width: 600px) {
+  .rm-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    overflow: auto;
+  }
+
+  .rm-stat-card {
+    min-width: unset;
+    flex: unset;
+    width: 100%;
+  }
+
+  .rm-value {
+    font-size: 1.3rem;
+  }
+
+  .rm-icon-wrap {
+    width: 38px;
+    height: 38px;
+  }
+
+  .rm-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* =========================================
+   DESKTOP / MOBILE VISIBILITY SPLIT
+   Desktop table: shown above 768px
+   Mobile card list: shown below 768px
+========================================= */
+
+/* Desktop table wrapper — hide on mobile */
+.rm-desktop-table-wrap {
+  display: block;
+}
+
+/* Mobile card list — hide on desktop */
+.rmm-card-list {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .rm-desktop-table-wrap {
+    display: none !important;
+  }
+
+  .rmm-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* =========================================
+   MOBILE EMPTY STATE
+========================================= */
+
+.rmm-empty {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: #f8faff;
+  border-radius: 14px;
+}
+
+/* =========================================
+   MOBILE ROOM CARDS  (rmm- prefix)
+   Completely outside the table scroll wrapper
+========================================= */
+
+.rmm-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid transparent;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rmm-card:active {
+  transform: scale(0.99);
+}
+
+/* Sharing-type accent colours */
+.rmm-card--single {
+  border-left-color: #22c55e;
+}
+
+.rmm-card--double {
+  border-left-color: #6366f1;
+}
+
+.rmm-card--triple {
+  border-left-color: #f59e0b;
+}
+
+.rmm-card--quadruple {
+  border-left-color: #8b5cf6;
+}
+
+.rmm-card--custom {
+  border-left-color: #f43f5e;
+}
+
+/* ── Card Header ── */
+.rmm-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px 10px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rmm-card__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rmm-card__room-num {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.rmm-card__unit-code {
+  font-size: 11px;
+  color: #6b7280;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.04em;
+}
+
+.rmm-card__header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.rmm-card__beds {
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* ── Badge ── */
+.rmm-badge {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.rmm-badge--single {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.rmm-badge--double {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.rmm-badge--triple {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.rmm-badge--quadruple {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.rmm-badge--custom {
+  background: #fff1f2;
+  color: #f43f5e;
+}
+
+
+/* ── Rent Grid ── */
+.rmm-card__rent-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rmm-card__rent-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+}
+
+.rmm-card__rent-cell--mid {
+  border-left: 1px solid #f3f4f6;
+  border-right: 1px solid #f3f4f6;
+}
+
+.rmm-card__rent-label {
+  font-size: 9px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.rmm-card__rent-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.rmm-card__rent-val--muted {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ── Card Footer ── */
+.rmm-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #fafafa;
+}
+
+/* ── Room Type Pill ── */
+.rmm-type-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rmm-type-pill--ac {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.rmm-type-pill--nonac {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+/* ── Card Action Buttons ── */
+.rmm-card__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.rmm-btn {
+  border: none;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.15s;
+  min-height: 34px;
+  min-width: 60px;
+}
+
+.rmm-btn:active {
+  transform: scale(0.96);
+}
+
+.rmm-btn--edit {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.rmm-btn--delete {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.rmm-btn:hover {
+  filter: brightness(0.95);
+}
+
+/* =========================================
+   IMPROVED MODAL — mobile-first redesign
+   Uses rmm- prefix for new styles,
+   existing .modal-backdrop-custom / .modal-box
+   base styles remain intact above.
+========================================= */
+
+/* Override modal-box when paired with rmm-modal-box */
+.rmm-modal-box {
+  padding: 0 !important;
+  border-radius: 20px !important;
+  width: 440px !important;
+  max-width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  max-height: 92dvh;
+  overflow: hidden;
+}
+
+/* Modal Header */
+.rmm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+  border-radius: 20px 20px 0 0;
+  flex-shrink: 0;
+}
+
+.rmm-modal-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+}
+
+.rmm-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.rmm-modal-close:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* Scrollable body */
+.rmm-modal-body {
+  padding: 18px 22px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Field groups */
+.rmm-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rmm-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+.rmm-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.rmm-optional {
+  color: #9ca3af;
+  font-weight: 400;
+  font-size: 11px;
+}
+
+.rmm-input {
+  height: 42px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  padding: 0 12px !important;
+  border: 1.5px solid #e5e7eb !important;
+  transition: border-color 0.2s !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rmm-input:focus {
+  border-color: #6366f1 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Unit code preview pill */
+.rmm-preview-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px dashed #c7d2fe;
+  flex-wrap: wrap;
+}
+
+.rmm-preview-pill strong {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Modal footer / actions override */
+.rmm-modal-actions {
+  margin: 0 !important;
+  padding: 14px 22px 18px !important;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  border-radius: 0 0 20px 20px;
+  flex-shrink: 0;
+}
+
+/* ── Mobile overrides for modal ── */
+@media (max-width: 480px) {
+  .modal-backdrop-custom {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .rmm-modal-box {
+    width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 90dvh !important;
+  }
+
+  .rmm-modal-header {
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  .rmm-modal-actions {
+    border-radius: 0 !important;
+    padding-bottom: max(18px, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/*Add Room Form - Tablet View*/
+
+/* AFTER — add at end of file */
+
+/* ── Small Tablet (601px – 900px) ── */
+@media (min-width: 601px) and (max-width: 900px) {
+  .rmm-modal-box {
+    width: 520px !important;
+    max-height: 88dvh !important;
+    border-radius: 22px !important;
+  }
+
+  .rmm-modal-header {
+    padding: 22px 28px 18px !important;
+    border-radius: 22px 22px 0 0 !important;
+  }
+
+  .rmm-modal-title {
+    font-size: 18px !important;
+  }
+
+  .rmm-modal-close {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 15px !important;
+  }
+
+  .rmm-modal-body {
+    padding: 22px 28px !important;
+    gap: 16px !important;
+  }
+
+  .rmm-label {
+    font-size: 13px !important;
+  }
+
+  .rmm-input {
+    height: 48px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+  }
+
+  .rmm-preview-pill {
+    font-size: 13px !important;
+    padding: 9px 14px !important;
+  }
+
+  .rmm-preview-pill strong {
+    font-size: 14px !important;
+  }
+
+  .rmm-modal-actions {
+    padding: 16px 28px 22px !important;
+  }
+
+  .modal-btn {
+    height: 50px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+  }
+}
+
+/* ── Large Tablet / iPad Pro (901px – 1024px) ── */
+@media (min-width: 901px) and (max-width: 1024px) {
+  .rmm-modal-box {
+    width: 580px !important;
+    max-height: 90dvh !important;
+    border-radius: 24px !important;
+  }
+
+  .rmm-modal-header {
+    padding: 26px 32px 20px !important;
+    border-radius: 24px 24px 0 0 !important;
+  }
+
+  .rmm-modal-title {
+    font-size: 20px !important;
+  }
+
+  .rmm-modal-close {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 16px !important;
+  }
+
+  .rmm-modal-body {
+    padding: 24px 32px !important;
+    gap: 18px !important;
+  }
+
+  .rmm-label {
+    font-size: 14px !important;
+  }
+
+  .rmm-input {
+    height: 52px !important;
+    font-size: 16px !important;
+    border-radius: 13px !important;
+  }
+
+  .rmm-preview-pill {
+    font-size: 14px !important;
+    padding: 10px 16px !important;
+  }
+
+  .rmm-preview-pill strong {
+    font-size: 15px !important;
+  }
+
+  .rmm-modal-actions {
+    padding: 18px 32px 26px !important;
+  }
+
+  .modal-btn {
+    height: 54px !important;
+    font-size: 16px !important;
+    border-radius: 13px !important;
+  }
+}
+.rm-single-pg-display {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  font-size: .95rem;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  box-sizing: border-box;
+}

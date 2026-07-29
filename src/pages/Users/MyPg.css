@@ -1,0 +1,801 @@
+/* =====================================================
+   MY PG BOOKING HISTORY — redesigned
+===================================================== */
+
+.my-pg-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -5%, rgba(99,102,241,0.1) 0%, transparent 60%),
+    linear-gradient(180deg, #f4f6ff 0%, #eef2ff 50%, #6366f1 100%);
+}
+
+.my-pg-history {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 52px 24px 90px;
+}
+
+/* =====================================================
+   HERO HEADER SECTION
+===================================================== */
+
+.history-hero {
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1e1b4b;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 28px;
+}
+
+/* =====================================================
+   FILTER + TABS ROW — desktop
+===================================================== */
+
+.filter-tabs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.filter-bar {
+  flex-shrink: 0;
+}
+
+.filter-bar input {
+  width: 280px;
+  max-width: 100%;
+  padding: 11px 16px 11px 42px;
+  border-radius: 12px;
+  border: 1.5px solid #c7d2fe;
+  font-size: 14px;
+  outline: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 14px center no-repeat;
+  transition: all 0.22s ease;
+  color: #1e293b;
+}
+
+.filter-bar input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.filter-bar input::placeholder {
+  color: #94a3b8;
+}
+
+/* =====================================================
+   STATUS TABS — desktop pill group
+===================================================== */
+
+.status-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1.5px solid #e0e7ff;
+  border-radius: 14px;
+  padding: 5px;
+}
+
+.status-btn {
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.status-btn:hover {
+  background: #f1f5ff;
+  color: #4338ca;
+}
+
+.status-btn.active {
+  background: #4f46e5;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+/* =====================================================
+   SHOW / HIDE HELPERS
+===================================================== */
+
+.mobile-view  { display: none !important; }
+.desktop-view { display: block; }
+
+/* =====================================================
+   TABLE WRAPPER — desktop
+===================================================== */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #e8ecff;
+  box-shadow:
+    0 0 0 1px rgba(99,102,241,0.05),
+    0 8px 24px rgba(99,102,241,0.08),
+    0 24px 48px rgba(0,0,0,0.05);
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.booking-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.booking-table thead {
+  background: linear-gradient(90deg, #f5f3ff, #eef2ff);
+  border-bottom: 1.5px solid #e0e7ff;
+}
+
+.booking-table th {
+  padding: 14px 18px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6366f1;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.booking-table td {
+  padding: 15px 18px;
+  font-size: 14px;
+  color: #1e293b;
+  border-top: 1px solid #f1f5ff;
+}
+
+.booking-table tbody tr { transition: background 0.15s ease; }
+.booking-table tbody tr:hover { background: #f8f9ff; }
+.booking-table tbody tr:last-child td { border-bottom: none; }
+
+.booking-table a { color: #4f46e5; font-weight: 500; text-decoration: none; }
+.booking-table a:hover { text-decoration: underline; }
+
+/* =====================================================
+   BOOKING CARDS — mobile
+===================================================== */
+
+.booking-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.booking-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8ecff;
+  box-shadow:
+    0 2px 8px rgba(99,102,241,0.07),
+    0 8px 24px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.booking-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px 11px;
+  border-bottom: 1px solid #f0f3ff;
+  background: linear-gradient(135deg, #f5f3ff, #fff);
+}
+
+.booking-card-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+.booking-card-body {
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.booking-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.bcard-label {
+  color: #94a3b8;
+  font-weight: 500;
+  min-width: 88px;
+}
+
+.bcard-val {
+  color: #1e293b;
+  font-weight: 500;
+  text-align: right;
+}
+
+.bcard-val--money {
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+/* =====================================================
+   STATUS BADGES
+===================================================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.status-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.badge-active    { background: #dcfce7; color: #15803d; }
+.badge-active::before { background: #22c55e; }
+
+.badge-pending   { background: #fef9c3; color: #92400e; }
+.badge-pending::before { background: #f59e0b; }
+
+.badge-inactive  { background: #f1f5f9; color: #475569; }
+.badge-inactive::before { background: #94a3b8; }
+
+.badge-cancelled { background: #fee2e2; color: #991b1b; }
+.badge-cancelled::before { background: #ef4444; }
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-box {
+  text-align: center;
+  padding: 72px 40px;
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #e8ecff;
+  box-shadow: 0 8px 24px rgba(99,102,241,0.06);
+}
+
+.empty-box-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.5; }
+.empty-box-text { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.empty-box-sub  { font-size: 13.5px; color: #94a3b8; }
+
+/* =====================================================
+   CANCEL BOOKING BUTTON
+===================================================== */
+
+.cancel-booking-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1.5px solid #fca5a5;
+  background: #fff1f1;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cancel-booking-btn:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220,38,38,0.28);
+}
+
+.cancel-booking-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.cancel-btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fca5a5;
+  border-top-color: #dc2626;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =====================================================
+   LOADER
+===================================================== */
+
+.table-loader {
+  text-align: center;
+  padding: 70px;
+  font-weight: 500;
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+/* ── Large Tablet (901px – 1024px) ── */
+@media (min-width: 901px) and (max-width: 1024px) {
+  .my-pg-history       { padding: 80px 24px 70px; }
+  .history-hero        { padding-top: 16px; }
+  .page-title          { font-size: 34px; }
+
+  .filter-bar input    { width: 320px; }
+
+  .status-tabs {
+    background: #fff;
+    border: 1.5px solid #e0e7ff;
+    border-radius: 14px;
+    padding: 5px;
+    flex-wrap: wrap;
+  }
+  .status-btn          { border-radius: 10px; border: none; background: transparent; color: #6b7280; }
+  .status-btn.active   { background: #4f46e5; color: #fff; border-color: transparent; }
+
+  .table-wrapper       { overflow-x: auto; }
+  .booking-table       { min-width: 700px; }
+  .booking-table th    { padding: 16px 20px; font-size: 13px; }
+  .booking-table td    { padding: 18px 20px; font-size: 15px; }
+}
+
+/* ── Small Tablet (769px – 900px) ── */
+@media (min-width: 768px) and (max-width: 900px) {
+  .my-pg-history       { padding: 80px 18px 60px; }
+  .history-hero        { padding-top: 12px; }
+  .page-title          { font-size: 28px; }
+
+  .filter-bar input    { width: 260px; }
+
+  .status-tabs {
+    background: #fff;
+    border: 1.5px solid #e0e7ff;
+    border-radius: 12px;
+    padding: 4px;
+    flex-wrap: wrap;
+  }
+  .status-btn          { border-radius: 9px; border: none; background: transparent; color: #6b7280; font-size: 13px; padding: 7px 14px; }
+  .status-btn.active   { background: #4f46e5; color: #fff; border-color: transparent; }
+
+  .filter-tabs-row     { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  .table-wrapper       { overflow-x: auto; }
+  .booking-table       { min-width: 640px; }
+  .booking-table th    { padding: 13px 14px; font-size: 11.5px; }
+  .booking-table td    { padding: 14px 14px; font-size: 13.5px; }
+}
+/* =====================================================
+   MOBILE — switch to cards + scrollable tabs
+===================================================== */
+
+@media (max-width: 768px) {
+  .mobile-view  { display: block !important; }
+  .desktop-view { display: none !important; }
+
+  .my-pg-history { padding: 28px 14px 60px; }
+  .page-title { font-size: 24px; margin-bottom: 4px; }
+
+  /* full-width search */
+  .filter-bar { width: 100%; }
+  .filter-bar input { width: 100%; box-sizing: border-box; }
+
+  /* make tabs row scrollable and edge-to-edge */
+  .filter-tabs-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .status-tabs-scroll-wrap {
+    width: calc(100% + 28px);
+    margin-left: -14px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px 14px 6px;
+  }
+  .status-tabs-scroll-wrap::-webkit-scrollbar { display: none; }
+
+  /* override desktop pill-group style for mobile */
+  .status-tabs {
+    flex-wrap: nowrap;
+    width: max-content;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    gap: 8px;
+  }
+
+  .status-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: 1.5px solid #c7d2fe;
+    background: #fff;
+    color: #4338ca;
+    flex-shrink: 0;
+  }
+
+  .status-btn:hover { background: #eef2ff; }
+
+  .status-btn.active {
+    background: #4f46e5;
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+  }
+
+  .empty-box { padding: 50px 20px; }
+}
+
+/* =====================================================
+   SMALL PHONES
+===================================================== */
+
+@media (max-width: 480px) {
+  .my-pg-history { padding: 22px 12px 50px; }
+  .page-title { font-size: 21px; }
+  .page-subtitle { font-size: 13px; }
+
+  .status-tabs-scroll-wrap {
+    width: calc(100% + 24px);
+    margin-left: -12px;
+    padding-left: 12px;
+  }
+
+  .booking-card-name { font-size: 14px; }
+  .booking-card-row  { font-size: 12.5px; }
+  .bcard-label       { min-width: 80px; }
+  .empty-box         { padding: 44px 16px; }
+}
+
+/* =====================================================
+   MOBILE CARD — cancel action row
+===================================================== */
+
+.booking-card-cancel-row {
+  justify-content: flex-end;
+  padding-top: 6px;
+  border-top: 1px solid #f0f3ff;
+  margin-top: 4px;
+}
+/* =====================================================
+   RESERVATION STATUS BADGE
+===================================================== */
+
+.res-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.res-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* RESERVED — blue */
+.res-badge--reserved  { background: #eff6ff; color: #1d4ed8; }
+.res-badge--reserved::before { background: #3b82f6; }
+
+/* ACTIVE — green */
+.res-badge--active    { background: #dcfce7; color: #15803d; }
+.res-badge--active::before { background: #22c55e; }
+
+/* EXITED — slate */
+.res-badge--exited    { background: #f1f5f9; color: #475569; }
+.res-badge--exited::before { background: #94a3b8; }
+
+/* CANCELLED — red */
+.res-badge--cancelled { background: #fee2e2; color: #991b1b; }
+.res-badge--cancelled::before { background: #ef4444; }
+
+/* =====================================================
+   ACTION CELL (desktop table)
+===================================================== */
+
+.action-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+/* =====================================================
+   DOWNLOAD INVOICE BUTTON
+===================================================== */
+
+.invoice-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #a5b4fc;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.invoice-download-btn:hover:not(:disabled) {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79,70,229,0.28);
+}
+
+.invoice-download-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.invoice-spinner {
+  border-color: #a5b4fc;
+  border-top-color: #4f46e5;
+}
+
+/* =====================================================
+   RESERVATION STATUS CELL (badge + i btn inline)
+===================================================== */
+
+.res-status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =====================================================
+   INFO (i) BUTTON
+===================================================== */
+
+.info-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #a5b4fc;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 800;
+  font-style: italic;
+  font-family: Georgia, serif;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+}
+
+.info-btn:hover {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+}
+
+/* =====================================================
+   HORIZONTAL INFO POPOVER
+===================================================== */
+
+.info-popover {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%);
+  z-index: 999;
+  width: 280px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1.5px solid #e0e7ff;
+  box-shadow:
+    0 4px 16px rgba(99,102,241,0.14),
+    0 12px 32px rgba(0,0,0,0.10);
+  overflow: hidden;
+  animation: info-pop-in 0.16s ease;
+}
+
+@keyframes info-pop-in {
+  from { opacity: 0; transform: translateY(-50%) translateX(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(-50%) translateX(0)    scale(1); }
+}
+
+/* Arrow pointing left */
+.info-popover-arrow {
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid #e0e7ff;
+}
+.info-popover-arrow::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: -6px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 6px solid #fff;
+}
+
+.info-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px 8px;
+  background: linear-gradient(90deg, #f5f3ff, #eef2ff);
+  border-bottom: 1px solid #e0e7ff;
+}
+
+.info-popover-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.info-popover-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+  line-height: 1;
+}
+.info-popover-close:hover { background: #fee2e2; color: #dc2626; }
+
+.info-popover-body {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.info-empty {
+  text-align: center;
+  padding: 18px;
+  color: #94a3b8;
+  font-size: 12px;
+  margin: 0;
+}
+
+.info-msg-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f1f5ff;
+}
+.info-msg-item:last-child { border-bottom: none; }
+
+.info-msg-subject {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin-bottom: 3px;
+}
+
+.info-msg-text {
+  font-size: 11.5px;
+  color: #374151;
+  line-height: 1.5;
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.info-msg-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.info-msg-category {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.info-msg-date {
+  font-size: 10px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* Mobile: popover opens downward instead */
+@media (max-width: 768px) {
+  .info-popover {
+    left: 0;
+    top: calc(100% + 8px);
+    transform: none;
+    width: 250px;
+    animation: info-pop-in-mobile 0.16s ease;
+  }
+  @keyframes info-pop-in-mobile {
+    from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  .info-popover-arrow { display: none; }
+}
+
+/* ── PAYMENT STATUS BADGE — pending ── */
+.pay-badge--pending {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}

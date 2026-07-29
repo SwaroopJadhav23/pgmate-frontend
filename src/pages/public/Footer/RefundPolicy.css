@@ -1,0 +1,198 @@
+/* ================= HERO ================= */
+
+.policy-hero {
+  position: relative;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-image: url("https://images.unsplash.com/photo-1521791136064-7986c2920216");
+  background-size: cover;
+  background-position: center;
+}
+
+.policy-hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(92,84,246,0.95),
+    rgba(123,97,255,0.92)
+  );
+}
+
+.policy-hero-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  text-align: center;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.policy-hero-content h1 {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.policy-hero-content p {
+  margin: 10px auto 50px;
+  max-width: 640px;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  opacity: 0.95;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+
+/* ================= CONTENT ================= */
+
+.policy-content {
+  max-width: 900px;
+  margin: auto;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+
+/* INTRO TEXT */
+
+.policy-content .intro {
+  font-size: 19px;
+  line-height: 1.85;
+
+  color: #444;
+  margin-bottom: 40px;
+}
+
+.policy-content .intro strong {
+  color: #5c54f6;
+  font-weight: 700;
+}
+
+
+/* SECTION HEADINGS */
+
+.policy-content h4 {
+  margin-top: 38px;
+  margin-bottom: 10px;
+
+  font-size: 21px;
+  font-weight: 800;
+
+  color: #1f1f1f;
+}
+
+
+/* PARAGRAPH TEXT */
+
+.policy-content p {
+  font-size: 17px;
+  color: #555;
+
+  line-height: 1.85;
+}
+
+
+/* LISTS */
+
+.policy-content ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 22px;
+}
+
+.policy-content li {
+  font-size: 16.5px;
+  color: #555;
+
+  margin-bottom: 7px;
+  line-height: 1.8;
+}
+
+
+/* CONTACT BOX */
+
+.policy-contact {
+  margin-top: 26px;
+
+  padding: 24px 26px;
+
+  background: #f7f8ff;
+  border-left: 4px solid #5c54f6;
+
+  border-radius: 10px;
+}
+
+.policy-contact p {
+  margin-bottom: 8px;
+  font-size: 16.5px;
+}
+
+.policy-contact strong {
+  color: #5c54f6;
+}
+
+
+/* ================= TEXT POLISH ================= */
+
+.policy-content strong {
+  color: #5c54f6;
+  font-weight: 700;
+}
+
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeUp {
+
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .policy-hero {
+    height: 260px;
+  }
+
+  .policy-hero-content h1 {
+    font-size: 32px;
+  }
+
+  .policy-hero-content p {
+    font-size: 15px;
+  }
+
+  .policy-content {
+    padding: 0 12px;
+  }
+
+  .policy-content .intro {
+    font-size: 17px;
+  }
+
+  .policy-content p {
+    font-size: 16px;
+  }
+
+  .policy-content li {
+    font-size: 15.5px;
+  }
+
+}

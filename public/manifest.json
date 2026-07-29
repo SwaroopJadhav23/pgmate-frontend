@@ -1,0 +1,20 @@
+{
+  "short_name": "PGMate",
+  "name": "PGMate — Smart PG & Co-Living Platform in India",
+  "icons": [
+    {
+      "src": "PGMate.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "PGMate.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#5c54f6",
+  "background_color": "#ffffff"
+}

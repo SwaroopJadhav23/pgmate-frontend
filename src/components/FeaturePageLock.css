@@ -1,0 +1,111 @@
+/* PAGE BLUR */
+.page-locked{
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* OVERLAY */
+.feature-lock-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;             
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+
+  z-index: 2000;
+  padding: 16px;          
+}
+/* LOCK CARD */
+.feature-lock-box{
+  background:#ffffff;
+  padding:38px;
+  width:420px;
+  border-radius:18px;
+
+ text-align:center; 
+
+  box-shadow:0 30px 70px rgba(0,0,0,0.25);
+
+  animation: lockFade .25s ease;
+}
+
+@keyframes lockFade{
+  from{
+    transform: scale(.92);
+    opacity:0;
+  }
+  to{
+    transform: scale(1);
+    opacity:1;
+  }
+}
+/* LOCK ICON */
+.feature-lock-icon{
+  font-size:46px;
+  margin-bottom:12px;
+}
+
+/* TITLE */
+.feature-lock-box h3{
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+/* TEXT */
+.feature-lock-box p{
+  color:#6b7280;
+  font-size:14px;
+  margin-bottom:20px;
+}
+
+/* BUTTON */
+.unlock-feature-btn{
+  background:#16a34a;
+  border:none;
+  padding:11px 20px;
+  font-weight:600;
+  border-radius:10px;
+  transition:.2s;
+  display:block;
+  margin:0 auto;  
+}
+
+.unlock-feature-btn:hover{
+  background:#15803d;
+  transform:translateY(-1px);
+}
+.offer-page-wrapper{
+  position: relative;
+}
+
+
+/* wrapper so blur doesn't affect sidebar */
+.page-content-wrapper{
+  position: relative;
+}
+
+/* blur only content */
+.page-locked{
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+.feature-lock-overlay{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+@media (min-width: 768px) {
+  .feature-lock-overlay {
+    left: 260px;
+    width: calc(100% - 260px);
+  }
+}

@@ -1,0 +1,165 @@
+/* =========================================
+   PREMIUM STATS SECTION – SaaS LEVEL UI
+========================================= */
+
+/* SECTION WRAPPER */
+.pg-stats {
+  padding: 90px 0;
+  background: linear-gradient(to bottom, #f9fbff, #f3f6ff);
+}
+
+.pg-stats .container {
+  max-width: 1100px;
+}
+
+/* CARD GRID FIX */
+.pg-stats .row {
+  row-gap: 30px;
+}
+
+/* =========================================
+   STAT CARD
+========================================= */
+
+.stat-card {
+  background: #ffffff;
+  padding: 40px 28px;
+  border-radius: 16px;
+  text-align: center;
+
+  border: 1px solid #eef1ff;
+
+  box-shadow:
+    0 10px 30px rgba(16, 24, 40, 0.05);
+
+  transition: all 0.35s cubic-bezier(.4,0,.2,1);
+
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle top gradient accent */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #5c54f6, #7c6dfb);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover */
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 45px rgba(16, 24, 40, 0.08);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* =========================================
+   NUMBER
+========================================= */
+
+.stat-card h2 {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+
+  background: linear-gradient(135deg, #5c54f6, #7c6dfb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-card h2 span {
+  font-size: 22px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+/* =========================================
+   LABEL
+========================================= */
+
+.stat-card p {
+  font-size: 15px;
+  font-weight: 500;
+  color: #667085;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+/* =========================================
+   ADMIN VALUE (edit mode)
+========================================= */
+
+.stat-card small {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #98a2b3;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+/* Tablet */
+@media (max-width: 992px) {
+
+  .pg-stats {
+    padding: 70px 0;
+  }
+
+  .stat-card {
+    padding: 34px 22px;
+  }
+
+  .stat-card h2 {
+    font-size: 32px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+
+  .pg-stats {
+    padding: 55px 16px;
+  }
+
+  .stat-card {
+    padding: 28px 20px;
+    border-radius: 14px;
+  }
+
+  .stat-card h2 {
+    font-size: 28px;
+  }
+
+  .stat-card p {
+    font-size: 14px;
+  }
+}
+
+/* Extra Small Devices */
+@media (max-width: 400px) {
+
+  .stat-card {
+    padding: 24px 16px;
+  }
+
+  .stat-card h2 {
+    font-size: 24px;
+  }
+
+  .stat-card p {
+    font-size: 13px;
+  }
+}

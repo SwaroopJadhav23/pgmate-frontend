@@ -1,0 +1,277 @@
+/* ===============================
+   FORM CONTAINER
+================================ */
+
+.pg-form {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 8px 4px;
+}
+
+
+/* ===============================
+   TITLE
+================================ */
+
+.pg-form-title {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+}
+
+
+/* ===============================
+   FORM GROUP
+================================ */
+
+.form-group {
+  margin-bottom: 0.75rem;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+  color: #374151;
+}
+
+
+/* Inputs */
+
+.pg-form .form-control {
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.pg-form textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+
+/* ===============================
+   AMENITIES
+================================ */
+
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.amenity-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.amenity-chip:hover {
+  background: #f1f5ff;
+  border-color: #6366f1;
+}
+
+
+/* ===============================
+   IMAGE PREVIEW
+================================ */
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 72px);
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.preview-img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+
+/* ===============================
+   ACTION BUTTONS
+================================ */
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.form-actions .btn {
+  flex: 1;
+}
+
+
+/* Manage Floors Button */
+
+.pg-form > .btn-outline-primary {
+  width: 100%;
+  margin-top: 8px;
+}
+
+
+/* ===============================
+   MODAL RESPONSIVE
+================================ */
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+} 
+
+/* ===============================
+   TABLET VIEW
+================================ */
+
+@media (max-width: 1024px) {
+
+  .pg-form {
+    max-width: 480px;
+  }
+
+  .amenities-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+}
+
+
+/* ===============================
+   MOBILE VIEW
+================================ */
+
+@media (max-width: 768px) {
+
+  .pg-form {
+    max-width: 100%;
+    padding: 4px;
+  }
+
+  .pg-form-title {
+    font-size: 17px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .pg-form .form-control {
+    font-size: 14px;
+  }
+
+  /* Stack buttons */
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .amenities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .preview-grid {
+    grid-template-columns: repeat(auto-fill, 64px);
+  }
+
+  .preview-img {
+    width: 64px;
+    height: 64px;
+  }
+
+}
+
+
+/* ===============================
+   SMALL PHONES
+================================ */
+
+@media (max-width: 420px) {
+
+  .pg-form-title {
+    font-size: 16px;
+  }
+
+  .amenity-chip {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .preview-img {
+    width: 58px;
+    height: 58px;
+  }
+
+}
+/* ===============================
+   PG CARD BUTTON FIX
+================================ */
+
+.pg-card .btn {
+  white-space: nowrap;
+  min-width: 90px;
+  font-size: 13px;
+  padding: 5px 10px;
+}
+
+
+/* Tablet & Mobile */
+@media (max-width: 1024px) {
+
+  .pg-card .mt-3 {
+    flex-wrap: wrap;
+  }
+
+  .pg-card .btn {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+
+/* Mobile: Stack Buttons */
+@media (max-width: 768px) {
+
+  .pg-card .mt-3 {
+    flex-direction: column;
+  }
+
+  .pg-card .btn {
+    width: 100%;
+  }
+
+}

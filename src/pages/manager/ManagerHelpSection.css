@@ -1,0 +1,547 @@
+.owner-support {
+  font-family: "Poppins", sans-serif;
+  background: #f5f7fc;
+}
+
+/* =====================
+   HERO – HELP & SUPPORT (NEW LOOK)
+===================== */
+.support-hero {
+  height: 320px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 🌿 Green–Teal Support Theme */
+  background:
+    linear-gradient(
+      135deg,
+      rgba(43, 63, 144, 0.85),
+      rgba(97, 116, 192, 0.85)
+    ),
+url("https://images.unsplash.com/photo-1560264280-88b68371db39?auto=format&fit=crop&w=1600&q=80");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* CONTENT */
+.hero-overlay {
+  text-align: center;
+  color: #ecfeff;
+  max-width: 720px;
+  padding: 0 20px;
+  animation: heroFade 0.9s ease both;
+}
+
+.hero-overlay h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: 0.4px;
+}
+
+.hero-overlay p {
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+/* ENTRY ANIMATION */
+@keyframes heroFade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* STEP SECTION */
+.step-video-section {
+  max-width: 1000px;
+  margin: 80px auto;
+  padding: 0 24px;
+}
+
+
+.step-row {
+  display: flex;
+  gap: 60px;
+  margin-bottom: 90px;
+  align-items: center;
+}
+
+.step-row.reverse {
+  flex-direction: row-reverse;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-badge {
+  background: #e9efff;
+  color: #5a5fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.step-points {
+  list-style: none;
+  padding-left: 0;
+}
+
+.step-points li {
+  margin-bottom: 6px;
+}
+
+/* VIDEO */
+.step-video {
+  flex: 1;
+  background: white;
+  padding: 0.5%;
+  border-radius: 22px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+.step-video video {
+  width: 85%;
+  border-radius: 14px;
+  width: 100%;
+  max-height: 320px;
+  border-radius: 14px;
+}
+
+/* QUICK TIPS */
+.quick-tips {
+  text-align: center;
+  margin: 80px auto;
+}
+
+.tips-subtext {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.tip-card {
+  background: white;
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.tip-card:hover {
+  transform: translateY(-8px);
+}
+/* FAQ SECTION */
+.faq-section {
+  max-width: 800px;
+  margin: 80px auto;
+}
+
+.faq-item {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.faq-item.open {
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+.faq-question {
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 🔥 IMPORTANT FIX */
+.faq-answer {
+  max-height: 0;
+  margin-left:20px;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  color: #555;
+}
+
+/* OPEN STATE */
+.faq-item.open .faq-answer {
+  max-height: 1000px;/* BIG VALUE */
+  opacity: 1;
+  margin-top: 10px;
+}
+
+
+/* HELP SECTION */
+.help-section {
+  max-width: 1100px;
+  margin: 120px auto;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.help-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.help-card {
+  padding: 36px;
+  border-radius: 22px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.help-card:hover {
+  transform: translateY(-8px);
+}
+
+.help-card.whatsapp { background: #e9fbf1; }
+.help-card.email { background: #eef4ff; }
+.help-card.call { background: #fff7df; }
+
+/* ANIMATIONS */
+.animate-fade {
+  animation: fadeIn 0.8s ease both;
+}
+
+.animate-slide {
+  animation: slideUp 0.8s ease both;
+}
+
+.hover-float:hover {
+  transform: translateY(-6px);
+}
+
+.new-owner-box { background: #ffffff; padding: 14px; 
+  text-align: center; font-size: 15px;
+ } 
+ .new-owner-box span { 
+  color: #5a5fff; 
+ 
+  font-weight: 600; }
+  
+
+/* ===============================
+   QUICK TIPS – COLORFUL + ANIMATED
+================================ */
+
+.quick-tips {
+  margin: 90px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.quick-tips h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: #1f2a44;
+}
+
+.tips-subtext {
+  color: #6b7280;
+  margin-bottom: 36px;
+}
+
+/* GRID */
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* CARD */
+.tip-card {
+  position: relative;
+  padding: 28px 24px;
+  border-radius: 22px;
+  color: #1f2937;
+  background: linear-gradient(135deg, #eef2ff, #ffffff);
+  box-shadow: 0 20px 45px rgba(90, 95, 255, 0.18);
+  transition: all 0.4s ease;
+  overflow: hidden;
+  animation: tipFadeUp 0.8s ease both;
+}
+
+/* COLOR VARIATIONS */
+.tip-card:nth-child(1) {
+  background: linear-gradient(135deg, #e0f2fe, #ffffff);
+}
+.tip-card:nth-child(2) {
+  background: linear-gradient(135deg, #ecfeff, #ffffff);
+}
+.tip-card:nth-child(3) {
+  background: linear-gradient(135deg, #fef3c7, #ffffff);
+}
+
+/* ICON */
+.tip-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+/* HOVER EFFECT */
+.tip-card:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 35px 80px rgba(90, 95, 255, 0.35);
+}
+
+/* SUBTLE GLOW */
+.tip-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(90,95,255,0.15), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.tip-card:hover::after {
+  opacity: 1;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .tips-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .tip-card {
+    padding: 24px;
+  }
+}
+
+/* ENTRY ANIMATION */
+@keyframes tipFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+/* ===============================
+   FULL WIDTH HERO FIX
+================================ */
+
+/* Break out of .content padding */
+.support-hero {
+ 
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+.step-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #1f2937;
+}
+.help-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 40px;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* Reuse same contact box styling */
+.help-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .help-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ======================================
+   RESPONSIVE FIXES – OWNER HELP SECTION
+====================================== */
+
+/* ---------- TABLETS (iPad & below) ---------- */
+@media (max-width: 1024px) {
+
+  /* Hero */
+  .support-hero {
+    height: 260px;
+  }
+
+  .hero-overlay h1 {
+    font-size: 34px;
+  }
+
+  .hero-overlay p {
+    font-size: 15px;
+  }
+
+  /* Video Rows */
+  .step-row {
+    gap: 30px;
+  }
+
+  .step-video video {
+    max-height: 260px;
+  }
+
+  /* Help Cards */
+  .help-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+/* ---------- MOBILE (Phones) ---------- */
+@media (max-width: 768px) {
+
+  /* Hero */
+  .support-hero {
+    height: 220px;
+    padding: 0 12px;
+  }
+
+  .hero-overlay h1 {
+    font-size: 26px;
+    line-height: 1.3;
+  }
+
+  .hero-overlay p {
+    font-size: 14px;
+  }
+
+  /* Videos → Stack */
+  .step-row,
+  .step-row.reverse {
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+
+  .step-content {
+    text-align: center;
+  }
+
+  .step-badge {
+    margin: auto;
+    margin-bottom: 10px;
+  }
+
+  .step-video video {
+    max-height: 220px;
+  }
+
+  /* Quick Tips */
+  .quick-tips h2 {
+    font-size: 22px;
+  }
+
+  /* FAQ */
+  .faq-section h2 {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  /* Help Cards */
+  .help-cards {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .help-card {
+    padding: 26px;
+  }
+
+  /* New Owner Banner */
+  .new-owner-box {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
+
+
+/* ---------- SMALL PHONES ---------- */
+@media (max-width: 420px) {
+
+  /* Hero */
+  .hero-overlay h1 {
+    font-size: 22px;
+  }
+
+  .hero-overlay p {
+    font-size: 13px;
+  }
+
+  /* Step Section */
+  .step-video-section {
+    margin: 50px auto;
+  }
+
+  .step-content h2 {
+    font-size: 18px;
+  }
+
+  .step-points {
+    font-size: 13px;
+  }
+
+  /* Tip Cards */
+  .tip-card {
+    padding: 20px;
+  }
+
+  .tip-icon {
+    font-size: 32px;
+  }
+
+  /* FAQ */
+  .faq-question {
+    font-size: 14px;
+  }
+
+  .faq-answer {
+    font-size: 13px;
+  }
+
+  /* Help */
+  .help-card {
+    font-size: 14px;
+    
+  }
+}

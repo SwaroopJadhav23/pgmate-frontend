@@ -1,0 +1,270 @@
+/* ===============================
+   CITY WISE PG SECTION
+   Clean design matching PGMate standards
+================================ */
+
+.citywise-wrapper {
+  background: #ffffff;
+  padding: 80px 0 100px;
+  overflow: hidden;
+}
+
+.citywise-wrapper .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===============================
+   TITLE & SUBTITLE
+================================ */
+
+.citywise-title {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.citywise-title span {
+  background: linear-gradient(135deg, #5b63f5, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.citywise-subtitle {
+  text-align: center;
+  margin: 0 auto 50px;
+  max-width: 600px;
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* ===============================
+   SCROLL CONTAINER
+================================ */
+
+.city-scroll {
+  display: flex;
+  gap: 20px;
+  width: fit-content;
+  padding: 20px 0;
+  
+  animation: cityMarquee 40s linear infinite;
+  will-change: transform;
+}
+
+.city-scroll:hover {
+  animation-play-state: paused;
+}
+
+@keyframes cityMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ===============================
+   CITY CARD
+================================ */
+
+.city-card {
+  min-width: 140px;
+  max-width: 140px;
+  height: 160px;
+  
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  
+  cursor: pointer;
+  position: relative;
+  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.city-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+/* ===============================
+   CITY ICON/IMAGE
+================================ */
+
+.city-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  overflow: hidden;
+  
+  transition: transform 0.3s ease;
+}
+
+.city-card:hover .city-icon {
+  transform: scale(1.05);
+}
+
+.city-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* ===============================
+   CITY NAME
+================================ */
+
+.city-card p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+  
+  transition: color 0.3s ease;
+}
+
+.city-card:hover p {
+  color: #5b63f5;
+}
+
+/* ===============================
+   ACTIVE STATE
+================================ */
+
+.city-card.active {
+  border-color: #5b63f5;
+  box-shadow: 0 8px 24px rgba(91, 99, 245, 0.15);
+}
+
+.city-card.active .city-icon {
+  background: #eef2ff;
+  transform: scale(1.05);
+}
+
+.city-card.active p {
+  color: #5b63f5;
+  font-weight: 700;
+}
+
+/* ===============================
+   RESPONSIVE - TABLET
+================================ */
+
+@media (max-width: 992px) {
+  .citywise-wrapper {
+    padding: 60px 0 80px;
+  }
+  
+  .citywise-title {
+    font-size: 32px;
+  }
+  
+  .city-scroll {
+    gap: 16px;
+    animation-duration: 45s;
+  }
+  
+  .city-card {
+    min-width: 130px;
+    max-width: 130px;
+    height: 150px;
+  }
+  
+  .city-icon {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+/* ===============================
+   RESPONSIVE - MOBILE
+================================ */
+
+@media (max-width: 768px) {
+  .citywise-wrapper {
+    padding: 50px 0 60px;
+  }
+  
+  .citywise-title {
+    font-size: 28px;
+  }
+  
+  .citywise-subtitle {
+    font-size: 15px;
+    margin-bottom: 40px;
+  }
+  
+  .city-scroll {
+    gap: 14px;
+    padding: 16px 0;
+  }
+  
+  .city-card {
+    min-width: 120px;
+    max-width: 120px;
+    height: 140px;
+  }
+  
+  .city-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .city-card p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .city-card {
+    min-width: 110px;
+    max-width: 110px;
+    height: 130px;
+  }
+  
+  .city-icon {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* ===============================
+   ACCESSIBILITY
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .city-scroll {
+    animation: none;
+  }
+  
+  .city-card,
+  .city-icon {
+    transition: none;
+  }
+}

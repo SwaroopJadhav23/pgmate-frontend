@@ -1,0 +1,757 @@
+/* HERO */
+.about-hero {
+  height: 420px;
+  background-image: url("https://images.unsplash.com/photo-1522071820081-009f0129c71c");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.about-hero-overlay {
+  background: linear-gradient(
+    rgba(88, 86, 214, 0.9),
+    rgba(88, 86, 214, 0.85)
+  );
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.about-hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  animation: fadeDown 1s ease;
+}
+
+.about-hero-subtitle {
+  text-align: center;      
+   margin: 8px auto 50px;
+  max-width: 620px;
+  font-size: 15.5px;
+  font-weight: 500;
+
+  color: #ffffff;          
+  opacity: 0.95;
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+
+
+/* CONTENT */
+.section-title {
+  font-weight: 700;
+  font-size: 30px;
+  margin-bottom: 16px;
+}
+
+.section-text {
+  color: #555;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* CARDS */
+.about-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  height: 100%;
+}
+
+.about-card i {
+  font-size: 40px;
+  color: #5856d6;
+  margin-bottom: 16px;
+}
+
+.about-card h5 {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.about-card p {
+  font-size: 14px;
+  color: #666;
+}
+
+.about-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(88, 86, 214, 0.25);
+}
+
+/* ANIMATION */
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .about-hero-title {
+    font-size: 34px;
+  }
+
+  .about-hero {
+    height: 340px;
+  }
+
+  .section-text.mx-auto.w-75 {
+    width: 100% !important;
+  }
+}
+/* MISSION & VISION */
+.pg-mission-vision {
+  margin-top: 80px;
+}
+
+.pg-mv-card {
+  height: 100%;
+  padding: 40px 36px;
+  border-radius: 22px;
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.pg-mv-card h3 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.pg-mv-card h3 span {
+  font-weight: 800;
+}
+
+.pg-mv-card p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #333;
+  max-width: 90%;
+}
+
+/* MISSION STYLE */
+.mission-card {
+  background: #fbe3ff;
+  clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%);
+}
+
+.mission-card h3 span {
+  color: #7b61ff;
+}
+
+/* VISION STYLE */
+.vision-card {
+  background: #dbefff;
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 8% 100%, 0 50%);
+}
+
+.vision-card h3 span {
+  color: #7b61ff;
+}
+
+/* =========================================
+   THE WHAT – VIDEO STYLE SECTION
+========================================= */
+
+/* ===== THE WHAT SECTION ===== */
+
+/* reduce bottom space of WHAT section */
+.the-what-pro {
+  padding: 100px 0 40px;
+}
+
+.what-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 80px;
+}
+
+/* NAV */
+.what-nav {
+  position: sticky;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.what-nav-item {
+  border: none;
+  background: #f3f3fa;
+  padding: 14px 20px;
+  border-radius: 30px;
+  text-align: left;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.what-nav-item.active {
+  background: linear-gradient(135deg,#5c54f6,#7b61ff);
+  color: #fff;
+  transform: translateX(8px);
+}
+/* ---------- SMOOTH TRANSITION FIX ---------- */
+/* ---------- PERFECT TRANSITION FIX ---------- */
+
+.what-steps {
+  position: relative;
+  min-height: 520px;
+}
+
+/* all steps stacked */
+.what-step {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(20px);
+
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease,
+    visibility 0.45s;
+}
+
+/* active step */
+.what-step.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform: translateY(0);
+
+  z-index: 2;
+}
+.what-step-content {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.45s ease;
+}
+
+.what-step.active .what-step-content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.what-step-image img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 22px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.15);
+  transition: transform .5s ease;
+}
+
+.what-step.active .what-step-image img {
+  transform: scale(1.02);
+}
+
+
+/* INNER LAYOUT */
+.what-step-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+
+.what-step-content h3 {
+  font-size: 42px;
+  color: #5856d6;
+  margin-bottom: 16px;
+}
+
+.what-step-content p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #555;
+}
+
+/* =====================================
+   WHAT SECTION — PERFECT RESPONSIVE FIX
+===================================== */
+
+@media (max-width: 992px) {
+
+  /* layout becomes vertical */
+  .what-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  /* NAV becomes horizontal scroll */
+  .what-nav {
+    position: relative;
+    top: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+
+  .what-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .what-nav-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  /* content wrapper */
+  .what-steps {
+    min-height: auto;
+    position: relative;
+  }
+
+  /* show ONLY active step on mobile */
+  .what-step {
+    position: relative;
+    inset: auto;
+    display: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .what-step.active {
+    display: block;
+  }
+
+  /* stack image + text */
+  .what-step-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  /* image */
+  .what-step-image img {
+    width: 100%;
+    height: 240px;
+    border-radius: 16px;
+  }
+
+  /* text sizing */
+  .what-step-content h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .what-step-content p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* remove scale animation on mobile */
+  .what-step.active .what-step-image img {
+    transform: none;
+  }
+}
+
+/* extra small phones */
+@media (max-width: 576px) {
+
+  .what-main-title {
+    font-size: 30px;
+  }
+
+  .what-subtitle {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .what-step-image img {
+    height: 210px;
+  }
+
+  .what-step-content h3 {
+    font-size: 24px;
+  }
+
+  .what-step-content p {
+    font-size: 14px;
+  }
+}
+
+/* ===== INTERACTIVE HEADING ===== */
+
+.what-heading-wrap {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.what-main-title {
+  font-size: 52px;
+  font-weight: 800;
+  color: #2d2a4a;
+  margin-bottom: 14px;
+  line-height: 1.2;
+}
+
+.what-main-title span {
+  background: linear-gradient(135deg,#5c54f6,#7b61ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+/* animated underline */
+.what-main-title span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(135deg,#5c54f6,#7b61ff);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: lineGrow 1.2s ease forwards;
+}
+
+.what-subtitle {
+  max-width: 700px;
+  margin: auto;
+  font-size: 18px;
+  color: #666;
+  line-height: 1.7;
+}
+
+@keyframes lineGrow {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .what-main-title {
+    font-size: 34px;
+  }
+
+  .what-subtitle {
+    font-size: 16px;
+  }
+}
+
+/* ========================
+   Slide Animations
+======================== */
+
+.slide-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  animation: slideLeftAnim 1s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.slide-right {
+  opacity: 0;
+  transform: translateX(80px);
+  animation: slideRightAnim 1s ease forwards;
+  animation-delay: 0.4s;
+}
+
+@keyframes slideLeftAnim {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideRightAnim {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* HOVER EFFECT */
+.pg-mv-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+/* =========================================
+   WHY PGMATE – IMAGE EXPAND CARDS
+========================================= */
+.why-pgmate-section {
+  padding: 60px 0 120px;
+}
+
+/* ===== WHY TITLE (same as WHAT title) ===== */
+.why-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #2d2a4a;
+  margin-bottom: 60px;
+  line-height: 1.2;
+}
+.why-title span {
+  background: linear-gradient(135deg,#5c54f6,#7b61ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Wrapper */
+.why-wrapper {
+  display: flex;
+  gap: 25px;
+  height: 480px;
+}
+
+/* Card */
+.why-card {
+  flex: 1;
+  border-radius: 30px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  align-items: flex-end;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* Background image */
+.why-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.7s ease;
+  z-index: 0;
+}
+
+/* Assign different images */
+.why-card:nth-child(1)::before {
+  background-image: url("https://images.unsplash.com/photo-1556742049-0cfed4f6a45d");
+}
+
+.why-card:nth-child(2)::before {
+  background-image: url("https://images.unsplash.com/photo-1504639725590-34d0984388bd");
+}
+
+.why-card:nth-child(3)::before {
+  background-image: url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3");
+}
+
+/* Dark overlay */
+.why-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.75)
+  );
+  z-index: 1;
+}
+
+/* Zoom effect */
+.why-card:hover::before {
+  transform: scale(1.08);
+}
+
+/* Expand active */
+.why-card.active {
+  flex: 2.3;
+}
+
+/* Content */
+.why-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+  color: #ffffff;
+  width: 100%;
+  transition: all 0.5s ease;
+}
+
+.why-icon {
+  font-size: 42px;
+  margin-bottom: 18px;
+}
+
+.why-content h4 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+/* Hide text initially */
+.why-content p {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.5s ease;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* Show only active */
+.why-card.active .why-content p {
+  opacity: 1;
+  max-height: 200px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+  .why-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .why-card,
+  .why-card.active {
+    flex: none;
+    height: 350px;
+  }
+
+  .why-content p {
+    opacity: 1;
+    max-height: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .why-title {
+    font-size: 30px;
+  }
+
+  .why-card {
+    height: 280px;
+    border-radius: 20px;
+  }
+
+  .why-content {
+    padding: 25px;
+  }
+
+  .why-content h4 {
+    font-size: 20px;
+  }
+
+  .why-content p {
+    font-size: 14px;
+  }
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .pg-mv-card {
+    clip-path: none;
+    border-radius: 18px;
+  }
+
+  .pg-mv-card p {
+    max-width: 100%;
+  }
+}
+/* ===== MOBILE SLIDER ===== */
+@media (max-width: 768px) {
+
+  .what-layout {
+    display: block;
+  }
+
+  .what-nav {
+    display: none; /* hide tabs */
+  }
+
+  .what-carousel {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .what-slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .what-slide {
+    min-width: 100%;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .what-slide img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 15px;
+  }
+
+  .what-slide h3 {
+    font-size: 22px;
+    color: #5856d6;
+    margin-bottom: 10px;
+  }
+
+  .what-slide p {
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* DOTS */
+  .what-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .what-dots span {
+    width: 8px;
+    height: 8px;
+    background: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .what-dots span.active {
+    background: #5856d6;
+    transform: scale(1.2);
+  }
+}
+
+
+.changing-word {
+  display: inline-block;
+  animation: fadeSlide 0.6s ease;
+}
+
+@keyframes fadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

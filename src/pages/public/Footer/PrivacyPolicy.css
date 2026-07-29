@@ -1,0 +1,238 @@
+/* ================= PAGE WRAPPER ================= */
+.policy-page-wrapper {
+  position: relative;
+  min-height: calc(100vh - 80px);
+  background: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  z-index: 1;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ================= HERO ================= */
+.policy-hero {
+  position: relative;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-image: url("https://images.unsplash.com/photo-1521791136064-7986c2920216");
+  background-size: cover;
+  background-position: center;
+}
+
+.policy-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(92,84,246,0.95), rgba(123,97,255,0.92));
+  z-index: 1;
+}
+
+.policy-hero-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.policy-hero-content h1 {
+  font-size: 42px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+
+.policy-hero-content p {
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ================= CONTENT ================= */
+.policy-content-section {
+  max-width: 900px;
+  margin: 40px auto 80px;
+  position: relative;
+  z-index: 5;
+  padding: 0 20px;
+}
+
+.policy-content-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  margin-bottom: 30px;
+}
+
+.policy-content-card .intro {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #374151;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.policy-content-card .intro strong {
+  color: #6366f1;
+  font-weight: 700;
+}
+
+.policy-section {
+  padding: 24px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.policy-section.border-none {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.policy-section h4 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.policy-section p {
+  font-size: 16px;
+  color: #4b5563;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ================= CONTACT CARD ================= */
+.policy-contact-card {
+  background: linear-gradient(145deg, #6366f1, #4f46e5);
+  border-radius: 20px;
+  padding: 40px;
+  color: #ffffff;
+  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+}
+
+.policy-contact-card h4 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.policy-contact-card p {
+  font-size: 15px;
+  opacity: 0.9;
+  margin-bottom: 24px;
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.policy-contact-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.contact-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s ease, background 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.contact-detail-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.contact-detail-item i {
+  font-size: 24px;
+  color: #e0e7ff;
+  margin-top: 2px;
+}
+
+.contact-detail-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-detail-item strong {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
+}
+
+.contact-detail-item span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .policy-hero {
+    padding: 60px 16px 80px;
+  }
+
+  .policy-hero-content h1 {
+    font-size: 34px;
+  }
+
+  .policy-hero-content p {
+    font-size: 15px;
+  }
+
+  .policy-content-section {
+    margin-top: -40px;
+    padding: 0 16px;
+  }
+
+  .policy-content-card {
+    padding: 24px;
+  }
+
+  .policy-section h4 {
+    font-size: 18px;
+  }
+
+  .policy-section p {
+    font-size: 15px;
+  }
+
+  .policy-contact-card {
+    padding: 30px 24px;
+  }
+
+  .policy-contact-details {
+    grid-template-columns: 1fr;
+  }
+}

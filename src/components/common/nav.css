@@ -1,0 +1,637 @@
+/* ============================================================
+   PGMATE NAVBAR
+   ============================================================ */
+
+.pg-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #eef0f5;
+  font-family: inherit;
+}
+
+.pg-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 80px);
+  height: 60px;
+  gap: 20px;
+  position: relative;
+}
+
+/* ── LOGO ── */
+.pg-logo-img {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+
+.pg-logo-img img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── CENTER NAV LINKS (desktop) ── */
+.pg-nav-links-center {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.pg-center-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: color 0.18s ease, background-color 0.18s ease;
+  white-space: nowrap;
+}
+
+.pg-center-link:hover {
+  color: #1a1f3c;
+  background: #f5f6fb;
+}
+
+.pg-center-link.active {
+  color: #1a1f3c;
+  font-weight: 600;
+  position: relative;
+}
+
+.pg-center-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: #4f46e5;
+}
+
+/* ── RIGHT SIDE ── */
+.pg-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Need help? link */
+.pg-nav-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.pg-nav-help:hover {
+  color: #4f46e5;
+}
+
+.pg-nav-help i {
+  font-size: 14px;
+}
+
+/* ── LIST YOUR PG BUTTON (solid, matches screenshot) ── */
+.pg-list-pg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pg-list-pg-btn:hover {
+  background: #4338ca;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* Bell / icon button */
+.pg-nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.pg-nav-icon-btn:hover {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+/* ── LOGIN BUTTON (logged-out state) ── */
+.pg-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #4f46e5;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.pg-login-btn:hover {
+  background: #4f46e5;
+  color: #fff;
+  border-color: #4f46e5;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+/* Avatar (logged-in state) */
+.pg-profile {
+  position: relative;
+  cursor: pointer;
+}
+
+.pg-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 16px;
+  transition: filter 0.18s ease;
+}
+
+.pg-avatar:hover {
+  filter: brightness(1.12);
+}
+
+/* Profile dropdown */
+.pg-profile-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid #e5eaf4;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pg-profile-menu .pg-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pg-profile-menu .pg-menu-link:hover {
+  background: #f6f8ff;
+  color: #4338ca;
+}
+
+/* ── CTA buttons ── */
+.pg-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: filter 0.18s ease;
+  white-space: nowrap;
+}
+
+.pg-cta-btn:hover {
+  filter: brightness(1.1);
+}
+
+.pg-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1px solid #dbe3ee;
+  background: #fff;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.pg-auth-btn:hover {
+  border-color: #6366f1;
+  background: #f6f8ff;
+}
+
+/* ── Logout button ── */
+.mobile-logout {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease;
+}
+
+.mobile-logout:hover {
+  background: #fee2e2;
+}
+
+/* ── HAMBURGER (mobile) ── */
+.pg-hamburger {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #1a1f3c;
+  padding: 4px;
+}
+
+/* ── OVERLAY ── */
+.pg-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 998;
+}
+
+/* ── MOBILE MENU ── */
+.pg-nav-menu {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 20px 16px 24px;
+  position: fixed;
+  top: 0;
+  right: -100%;
+  bottom: auto;
+  width: min(300px, 85vw);
+  height: auto;
+  min-height: unset;
+  max-height: 100dvh;
+  background: #fff;
+  z-index: 999;
+  overflow-y: auto;
+  gap: 2px;
+  border-radius: 0 0 0 20px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.pg-nav-menu.active {
+  right: 0;
+}
+
+/* ── CLOSE BUTTON ── */
+.pg-mobile-close {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0 0 16px;
+  line-height: 1;
+}
+
+/* ── MENU LINKS ── */
+.pg-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  text-decoration: none;
+  line-height: 1;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pg-menu-link i {
+  font-size: 16px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pg-menu-link:hover,
+.pg-menu-link.active {
+  background: #f6f8ff;
+  color: #4338ca;
+}
+
+/* ── MOBILE AUTH SECTION ── */
+.mobile-auth {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 10px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── MOBILE LOGIN BTN ── */
+.mobile-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #dbe3ee;
+  background: transparent;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.mobile-login-btn:hover {
+  background: #f6f8ff;
+  color: #4338ca;
+  border-color: #6366f1;
+}
+
+/* ── MOBILE CTA ── */
+.pg-mobile-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: transparent;
+  color: #334155;
+  border: 1px solid #dbe3ee;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-top: 0;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.pg-mobile-cta:hover {
+  background: #f6f8ff;
+  color: #4338ca;
+  border-color: #6366f1;
+}
+
+
+/* ── Utility ── */
+.desktop-only {
+  display: flex;
+}
+
+
+
+/* ============================================================
+   EXPORT BUTTON & DROPDOWN
+   ============================================================ */
+.export-wrapper {
+  position: relative;
+}
+
+.export-btn-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid #dbe3ee;
+  background: #fff;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.export-btn-modern:hover {
+  border-color: #6366f1;
+  background: #f6f8ff;
+  color: #4338ca;
+}
+
+.export-dropdown-modern {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 175px;
+  background: #fff;
+  border: 1px solid #e5eaf4;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.export-dropdown-modern button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.export-dropdown-modern button:hover {
+  background: #f6f8ff;
+  color: #4338ca;
+}
+
+/* ── MOBILE EXPORT ── */
+.pg-mobile-export {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.pg-mobile-export-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pg-mobile-export-item:hover {
+  background: #f6f8ff;
+  color: #4338ca;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .pg-nav-links-center {
+    display: none;
+  }
+
+  .pg-hamburger {
+    display: flex;
+  }
+
+  .pg-nav-overlay {
+    display: block;
+  }
+
+  .pg-nav-right {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+
+  .pg-hamburger {
+    display: none;
+    position: static;
+    transform: none;
+  }
+
+  .pg-nav-menu {
+    display: none;
+  }
+}
+
+
+.pg-nav-menu-horizontal {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.pg-nav-menu-horizontal .pg-menu-link {
+  flex: 1 1 calc(50% - 4px);
+  justify-content: center;
+  font-size: 0.82rem;
+  border: 1px solid #f1f5f9;
+  background: #fafbff;
+}
+.pg-new-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0px 7px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #6366F1;
+  background: #EEF2FF;
+  border: 1px solid #6366F1;
+  border-radius: 20px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}

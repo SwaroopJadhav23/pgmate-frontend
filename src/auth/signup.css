@@ -1,0 +1,331 @@
+/* ================================================================
+   signup.css
+   Same bg image as login, dark card, brand purple #5B5BD6
+   Creative: step progress indicator, animated transitions
+================================================================ */
+
+/* ══════════════════════════════
+   PAGE
+══════════════════════════════ */
+
+.signup-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 16px;
+  position: relative;
+  overflow: hidden;
+
+  background-image:
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url("https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1800&q=80");
+  background-size: cover;
+  background-position: center 58%;
+  background-repeat: no-repeat;
+}
+
+/* same subtle purple glow as login */
+.signup-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at 60% 30%, rgba(91,91,214,0.12), transparent 60%);
+  pointer-events: none;
+}
+
+/* ══════════════════════════════
+   CARD
+══════════════════════════════ */
+
+.signup-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 460px;
+
+  background: linear-gradient(145deg, rgba(15,15,24,0.97), rgba(10,10,20,0.97));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(91,91,214,0.2);
+  border-radius: 22px;
+  padding: 32px 36px 28px;
+
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.55),
+    0 0 60px rgba(91,91,214,0.06);
+
+  animation: cardUp 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+@keyframes cardUp {
+  from { opacity:0; transform:translateY(30px) scale(0.96); }
+  to   { opacity:1; transform:translateY(0)    scale(1); }
+}
+
+/* no top bar — clean card edges */
+
+/* ══════════════════════════════
+   BACK BUTTON
+══════════════════════════════ */
+
+.signup-back {
+  position: absolute;
+  top: 14px; left: 16px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: color 0.15s;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.signup-back:hover { color: #818cf8; }
+
+/* ══════════════════════════════
+   TITLE
+══════════════════════════════ */
+
+.signup-box h4 {
+  text-align: center;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 10px 0 18px;
+  letter-spacing: -0.3px;
+}
+
+/* ══════════════════════════════
+   ROLE TOGGLE
+══════════════════════════════ */
+
+.role-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.role-toggle button {
+  flex: 1;
+  padding: 10px 0;
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.role-toggle button.active {
+  background: #5B5BD6;
+  color: #fff;
+  font-weight: 600;
+}
+
+.role-toggle button:not(.active):hover {
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.04);
+}
+
+/* ══════════════════════════════
+   INPUTS
+══════════════════════════════ */
+
+.signup-box .form-control {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  margin-bottom: 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+  background: #fff;
+  color: #000;
+  -webkit-text-fill-color: #000;
+  caret-color: #000;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: block;
+}
+
+.signup-box .form-control::placeholder { color: #9ca3af; }
+
+.signup-box .form-control:focus {
+  border-color: #5B5BD6;
+  box-shadow: 0 0 0 3px rgba(91,91,214,0.2);
+}
+
+.signup-box .form-control:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset;
+  -webkit-text-fill-color: #000;
+}
+
+/* ══════════════════════════════
+   PASSWORD WRAPPER
+══════════════════════════════ */
+
+.password-wrapper {
+  position: relative;
+  margin-bottom: 11px;
+}
+
+.password-wrapper .form-control {
+  margin-bottom: 0;
+  padding-right: 60px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #5B5BD6;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.toggle-password:hover { color: #818cf8; }
+
+/* ══════════════════════════════
+   SEND OTP BUTTON
+══════════════════════════════ */
+
+.signup-box .btn-otp {
+  width: 100%;
+  height: 44px;
+  margin-bottom: 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(91,91,214,0.4);
+  background: rgba(91,91,214,0.12);
+  color: #818cf8;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.signup-box .btn-otp:hover:not(:disabled) {
+  background: rgba(91,91,214,0.22);
+  border-color: #5B5BD6;
+  color: #a5b4fc;
+}
+
+.signup-box .btn-otp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Bootstrap btn-primary override */
+.signup-box .btn-primary,
+.signup-box .btn.btn-primary {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: none;
+  background: #5B5BD6;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  margin-top: 4px;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  box-shadow: none;
+}
+
+.signup-box .btn-primary:hover:not(:disabled),
+.signup-box .btn.btn-primary:hover:not(:disabled) {
+  background: #4a4abf;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(91,91,214,0.4);
+}
+
+.signup-box .btn-primary:disabled,
+.signup-box .btn.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ══════════════════════════════
+   OTP FIELD ENTRANCE
+══════════════════════════════ */
+
+.otp-section {
+  animation: fadeSlide 0.35s ease forwards;
+}
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ══════════════════════════════
+   PHONE VERIFIED BADGE
+══════════════════════════════ */
+
+.phone-verified-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(22,163,74,0.1);
+  border: 1px solid rgba(22,163,74,0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 11px;
+  animation: fadeSlide 0.3s ease;
+}
+
+.phone-verified-text {
+  font-size: 13px;
+  color: #4ade80;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.phone-change-btn {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.phone-change-btn:hover { color: #818cf8; }
+
+/* ══════════════════════════════
+   MOBILE
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  .signup-page {
+    padding: 36px 14px;
+    align-items: flex-start;
+    padding-top: 48px;
+  }
+
+  .signup-box {
+    padding: 28px 20px 24px;
+    border-radius: 18px;
+    max-width: 100%;
+  }
+
+  .signup-box h4       { font-size: 18px; }
+  .signup-box .form-control { height: 42px; font-size: 15px; }
+  .signup-box .btn-primary  { height: 46px; font-size: 15px; }
+}

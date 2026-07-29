@@ -1,0 +1,310 @@
+/* ================================================================
+   Login.css — all spacing issues fixed
+================================================================ */
+
+/* ══════════════════════════════
+   KILL ANY LAYOUT WRAPPER MARGIN
+   HomeLayout adds margin/padding — override it here
+══════════════════════════════ */
+
+.login-page {
+  /* fill full viewport minus navbar so NO white gap before footer */
+  min-height: calc(100vh - 80px);
+  margin: 0;
+  padding: 60px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  background-image:
+    linear-gradient(rgba(0,0,0,0.38), rgba(0,0,0,0.38)),
+    url("https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1800&q=80");
+  background-size: cover;
+  background-position: center 58%;
+  background-repeat: no-repeat;
+}
+
+/* also kill footer's margin-top on login page so it sits flush */
+.login-page ~ footer,
+.login-page + footer {
+  margin-top: 0 !important;
+}
+
+/* soft purple glow — very subtle, matches brand */
+.login-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(91,91,214,0.1), transparent 65%);
+  animation: softGlow 14s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes softGlow {
+  0%,100% { opacity: 0.5; }
+  50%      { opacity: 1;   }
+}
+
+/* ══════════════════════════════
+   CARD
+══════════════════════════════ */
+
+.login-box {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+
+  background: linear-gradient(145deg, rgba(18,18,28,0.97), rgba(12,12,22,0.97));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(91,91,214,0.2);
+  border-radius: 20px;
+
+  padding: 36px 38px 28px;
+  max-width: 440px;
+  width: 100%;
+
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.5),
+    0 0 60px rgba(91,91,214,0.07);
+
+  animation: slideFade 0.5s ease forwards;
+}
+
+@keyframes slideFade {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ══════════════════════════════
+   HEADINGS
+══════════════════════════════ */
+
+.login-box h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 5px;
+  letter-spacing: -0.3px;
+}
+
+.login-text {
+  text-align: center;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.4);
+  margin: 0 0 22px;
+}
+
+/* ══════════════════════════════
+   FORM — no extra margin
+══════════════════════════════ */
+
+.login-box form { margin: 0; }
+
+/* ══════════════════════════════
+   INPUTS
+══════════════════════════════ */
+
+.login-input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+  background: #fff;
+  color: #000;
+  caret-color: #000;
+  outline: none;
+  -webkit-text-fill-color: #000;
+  text-shadow: none;
+  mix-blend-mode: normal;
+  filter: none;
+  display: block;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-input::placeholder { color: #9ca3af; }
+
+.login-input:focus {
+  border-color: #5B5BD6;
+  box-shadow: 0 0 0 3px rgba(91,91,214,0.2);
+}
+
+.login-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset;
+  -webkit-text-fill-color: #000;
+  caret-color: #000;
+}
+
+/* ══════════════════════════════
+   PASSWORD WRAPPER
+   — gives same vertical rhythm as .login-input
+══════════════════════════════ */
+
+.password-wrapper {
+  position: relative;
+  margin-bottom: 11px; /* matches .login-input margin-bottom */
+}
+
+/* the input inside wrapper must NOT add its own bottom margin */
+.password-wrapper .login-input {
+  margin-bottom: 0;
+  padding-right: 60px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #5B5BD6;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.toggle-password:hover { color: #818cf8; }
+
+/* ══════════════════════════════
+   FORGOT
+══════════════════════════════ */
+
+.forgot-text {
+  text-align: right;
+  margin: 7px 0 16px;
+}
+
+.forgot-link {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.forgot-link:hover { color: #818cf8; }
+
+/* ══════════════════════════════
+   LOGIN BUTTON
+══════════════════════════════ */
+
+.login-button {
+  width: 100%;
+  padding: 13px;
+  margin: 0 0 14px;
+  border-radius: 10px;
+  border: none;
+  background: #5B5BD6;
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+}
+
+.login-button:hover:not(:disabled) {
+  background: #4a4abf;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(91,91,214,0.4);
+}
+
+.login-button:active   { transform: translateY(0); }
+.login-button:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.login-button.success {
+  background: #16a34a;
+  box-shadow: 0 6px 20px rgba(22,163,74,0.3);
+}
+
+/* ══════════════════════════════
+   SIGNUP TEXT
+══════════════════════════════ */
+
+.signup-text {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.38);
+  text-align: center;
+  margin: 0;
+}
+
+.signup-link {
+  color: #818cf8;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 3px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.signup-link:hover { color: #a5b4fc; }
+
+/* ══════════════════════════════
+   GHOST / OTP BUTTON
+══════════════════════════════ */
+
+.login-ghost-btn {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0 11px; /* top gap + bottom gap matching input rhythm */
+  border-radius: 10px;
+  border: none;
+  background: #5B5BD6;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+}
+
+.login-ghost-btn:hover:not(:disabled) {
+  background: #4a4abf;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(91,91,214,0.35);
+}
+
+.login-ghost-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ══════════════════════════════
+   BACK BUTTON
+══════════════════════════════ */
+
+.login-back {
+  position: absolute;
+  top: 16px; left: 18px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: color 0.15s;
+  padding: 0;
+}
+
+.login-back:hover { color: #818cf8; }
+
+/* ══════════════════════════════
+   MOBILE
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  .login-page   { padding: 40px 16px; }
+  .login-box    { padding: 28px 20px 22px; border-radius: 16px; }
+  .login-box h2 { font-size: 20px; }
+  .login-input  { font-size: 15px; }
+  .login-button { font-size: 15px; }
+}

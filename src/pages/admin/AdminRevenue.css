@@ -1,0 +1,516 @@
+.analytics-toolbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:12px;
+margin-bottom:26px;
+padding:14px 18px;
+background:white;
+border-radius:14px;
+border:1px solid #e5e7eb;
+box-shadow:0 6px 20px rgba(0,0,0,0.04);
+}
+.admin-revenue-container{
+background:#f8fafc;
+border-radius:18px;
+}
+.export-wrapper{
+position:relative;
+}
+.admin-revenue-container {
+  padding: 30px;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.kpi-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:22px;
+margin-bottom:30px;
+}
+
+.kpi-card{
+background:white;
+padding:24px;
+border-radius:18px;
+border:1px solid #eef2f7;
+box-shadow:0 8px 28px rgba(0,0,0,0.05);
+transition:all .25s ease;
+position:relative;
+overflow:hidden;
+}
+.kpi-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:4px;
+background:linear-gradient(90deg,#6366f1,#8b5cf6);
+opacity:.85;
+}
+
+.kpi-card:hover{
+transform:translateY(-4px);
+box-shadow:0 18px 40px rgba(0,0,0,0.08);
+}
+
+
+.kpi-card span{
+font-size:12px;
+color:#64748b;
+font-weight:600;
+letter-spacing:.3px;
+text-transform:uppercase;
+}
+.kpi-card h2{
+font-size:30px;
+margin-top:6px;
+font-weight:800;
+color:#0f172a;
+letter-spacing:-0.5px;
+}
+
+.chart-card{
+background:white;
+padding:28px;
+border-radius:22px;
+border:1px solid #eef2f7;
+box-shadow:0 12px 35px rgba(0,0,0,0.06);
+margin-top:10px;
+transition:.3s ease;
+}
+
+.chart-card h3{
+font-size:18px;
+font-weight:700;
+color:#0f172a;
+margin-bottom:16px;
+}
+
+.revenue-chart-shell{
+  width:100%;
+  min-height:0;
+}
+
+.chart-card:hover{
+box-shadow:0 18px 50px rgba(0,0,0,0.08);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+.filter-row button{
+padding:8px 16px;
+border-radius:10px;
+border:1px solid #e2e8f0;
+background:white;
+font-weight:600;
+font-size:13px;
+color:#334155;
+transition:.2s ease;
+}
+
+.filter-row button:hover{
+border-color:#6366f1;
+color:#6366f1;
+}
+
+.filter-row button.active{
+background:#6366f1;
+color:white;
+border-color:#6366f1;
+box-shadow:0 4px 14px rgba(99,102,241,0.35);
+}
+/* ================= EXPORT BUTTON ================= */
+
+.export-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 25px;
+}
+
+.export-wrapper {
+  position: relative;
+}
+
+.export-btn-modern {
+  background: #2b1e57;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 12px;
+  border: 2px solid #2563eb;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s ease;
+}
+
+.export-btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.5);
+}
+
+.export-dropdown-modern {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.export-dropdown-modern button {
+  border: none;
+  background: none;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.export-dropdown-modern button:hover {
+  background: #f3f4f6;
+}
+/* ================= FILTER SELECT DROPDOWN ================= */
+
+.admin-revenue-container .form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 40px 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s ease;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+/* Hover */
+.admin-revenue-container .form-select:hover {
+  border-color: #6366f1;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.15);
+}
+
+/* Focus */
+.admin-revenue-container .form-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Custom dropdown arrow */
+.form-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.form-select-wrapper::after {
+  content: "▼";
+  font-size: 11px;
+  color: #64748b;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+/* ================= CALENDAR ================= */
+
+.calendar-wrapper{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+/* DATE BUTTON */
+
+.date-trigger-btn{
+  padding:10px 16px;
+  border-radius:10px;
+  border:1px solid #e2e8f0;
+  background:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s ease;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  min-width:180px;  
+  height:40px;
+
+  font-size:14px;
+  color:#334155;
+}
+.date-trigger-btn:hover{
+  border-color:#6366f1;
+  box-shadow:0 4px 12px rgba(99,102,241,0.15);
+}
+
+/* CALENDAR POPUP */
+
+.calendar-popup{
+  position:absolute;
+  top:50px;
+  right:0;
+  width:320px;
+
+  background:white;
+  padding:18px;
+  border-radius:16px;
+
+  box-shadow:0 20px 50px rgba(0,0,0,0.18);
+  border:1px solid #f1f5f9;
+
+  z-index:9999;
+}
+
+/* FROM TO HEADER */
+
+.range-preview{
+  display:flex;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.range-preview label{
+  font-size:12px;
+  color:#64748b;
+  font-weight:600;
+}
+
+.range-box{
+  padding:7px 10px;
+  border:1px solid #e2e8f0; 
+  border-radius:8px;
+  background:#f8fafc;
+  font-size:13px;
+  min-width:120px;
+  text-align:center;
+}
+
+.chart-card {
+  overflow-x: hidden;
+}
+
+.recharts-wrapper {
+  font-size: 12px;
+}
+/* ================= MOBILE RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .admin-revenue-container{
+    padding:16px;
+  }
+
+  /* KPI GRID */
+  .kpi-grid{
+    grid-template-columns: 1fr;
+    gap:16px;
+  }
+
+  .kpi-card{
+    padding:18px;
+  }
+
+  .kpi-card h2{
+    font-size:22px;
+  }
+
+  /* CHART */
+  .chart-card{
+    padding:16px 14px;
+    border-radius:18px;
+  }
+
+  .chart-card h3{
+    font-size:15px;
+    margin-bottom:12px;
+  }
+
+  .chart-card .recharts-responsive-container{
+    height:260px !important;
+  }
+
+  .revenue-chart-shell{
+    margin-left:-6px;
+  }
+
+  .recharts-cartesian-axis-tick-value{
+    font-size:11px;
+  }
+
+  /* FILTER BAR */
+  .top-bar{
+    flex-direction:column;
+    gap:12px;
+    align-items:flex-start;
+  }
+
+  .filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    width:100%;
+  }
+
+  .filter-row button{
+    flex:1;
+    min-width:70px;
+    padding:8px 10px;
+    font-size:13px;
+  }
+
+  /* EXPORT BUTTON */
+  .export-container{
+    justify-content:flex-start;
+  }
+
+  .export-label { display: none; }
+  .export-icon  { display: inline; }
+  .export-btn-modern{
+    width: 38px; height: 38px; min-width: 38px;
+    padding: 0; gap: 0;
+    border-radius: 50%;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  /* CALENDAR */
+  .calendar-popup{
+    width:100%;
+    left:0;
+    right:0;
+  }
+
+  .date-trigger-btn{
+    width:100%;
+    justify-content:center;
+  }
+ /* RANGE BOX */
+  .range-preview{
+    flex-direction:column;
+  }
+
+  .range-box{
+    width:100%;
+  }
+
+}
+
+/* ================= SMALL PHONES ================= */
+
+@media (max-width: 480px){
+
+  .kpi-card h2{
+    font-size:20px;
+  }
+
+  .date-trigger-btn{
+    font-size:13px;
+  }
+
+  .chart-card .recharts-responsive-container{
+    height:240px !important;
+  }
+
+  .revenue-chart-shell{
+    margin-left:-8px;
+  }
+
+}
+
+@media (max-width: 768px){
+
+  .calendar-popup{
+    position: fixed;     /* detach from container */
+    left: 50%;
+    transform: translateX(-50%);
+    top: 120px;
+
+    width: 92vw;         /* almost full screen */
+    max-width: 360px;
+
+    z-index: 9999;
+  }
+
+}
+@media (max-width: 768px){
+
+  .top-bar{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filter-row{
+    justify-content: space-between;
+  }
+
+  .date-trigger-btn{
+    width: 100%;
+  }
+
+}
+.calendar-popup .rdp{
+  width:100%;
+}
+@media (max-width:768px){
+
+  .calendar-popup{
+    position:absolute;       /* important: not fixed */
+    top:48px;
+    right:0;
+
+    width:92vw;
+    max-width:340px;
+
+    max-height:70vh;        /* prevent huge popup */
+    overflow-y:auto;        /* allow scroll */
+
+    padding:16px;
+    border-radius:16px;
+
+    box-shadow:0 18px 40px rgba(0,0,0,0.18);
+  }
+
+}
+.calendar-popup .rdp{
+  width:100%;
+  font-size:14px;
+}
+@media (max-width:768px){
+
+  .range-preview{
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .range-box{
+    width:100%;
+  }
+
+}

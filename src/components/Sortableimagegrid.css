@@ -1,0 +1,124 @@
+/* ================================================
+   SortableImageGrid — drag-and-drop image grid
+   ================================================ */
+
+.sortable-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ---- individual tile ---- */
+.sortable-image-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: visible; /* allow badge/button to bleed outside */
+  background: #f3f4f6;
+  aspect-ratio: 1;
+  border: 2px dashed transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  touch-action: none; /* required for dnd-kit on mobile */
+}
+
+.sortable-image-item:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+}
+
+.sortable-image-item[aria-pressed="true"],
+.sortable-image-item[data-dragging="true"] {
+  border-color: #6366f1;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.sortable-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 6px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---- order badge (top-left) ---- */
+.sortable-image-badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ---- remove button (top-right) ---- */
+.sortable-image-remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.sortable-image-remove-btn:hover {
+  background: #dc2626;
+  transform: scale(1.15);
+}
+
+/* ---- drag handle hint (bottom-right overlay) ---- */
+.sortable-image-drag-hint {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.sortable-image-item:hover .sortable-image-drag-hint {
+  opacity: 1;
+}
+
+/* ---- drag-over slot placeholder ---- */
+.sortable-image-item[data-over="true"] {
+  background: #e0e7ff;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 480px) {
+  .sortable-image-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+  }
+}

@@ -1,0 +1,651 @@
+/* =========================================
+   SPONSORSHIP STAT CARDS
+========================================= */
+
+.spon-stats-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.spon-stats-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.spon-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  border-left: 4px solid transparent;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex: 0 0 200px;
+  min-width: 200px;
+}
+
+.spon-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.10);
+}
+
+/* Icon wrapper */
+.spon-stat-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spon-stat-icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Text block */
+.spon-stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.spon-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1e293b;
+}
+
+.spon-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 2px;
+}
+
+.spon-stat-sub {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 1px;
+}
+
+/* ── Colour themes ── */
+
+.spon-stat--total {
+  border-left-color: #6366f1;
+}
+.spon-stat--total .spon-stat-icon-wrap {
+  background: #eef2ff;
+}
+.spon-stat--total .spon-stat-icon {
+  stroke: #6366f1;
+}
+
+.spon-stat--approved {
+  border-left-color: #22c55e;
+}
+.spon-stat--approved .spon-stat-icon-wrap {
+  background: #f0fdf4;
+}
+.spon-stat--approved .spon-stat-icon {
+  stroke: #22c55e;
+}
+
+.spon-stat--pending {
+  border-left-color: #f59e0b;
+}
+.spon-stat--pending .spon-stat-icon-wrap {
+  background: #fffbeb;
+}
+.spon-stat--pending .spon-stat-icon {
+  stroke: #f59e0b;
+}
+
+.spon-stat--rejected {
+  border-left-color: #ef4444;
+}
+.spon-stat--rejected .spon-stat-icon-wrap {
+  background: #fef2f2;
+}
+.spon-stat--rejected .spon-stat-icon {
+  stroke: #ef4444;
+}
+
+.spon-stat--expired {
+  border-left-color: #64748b;
+}
+.spon-stat--expired .spon-stat-icon-wrap {
+  background: #f1f5f9;
+}
+.spon-stat--expired .spon-stat-icon {
+  stroke: #64748b;
+}
+
+.spon-stat--priority {
+  border-left-color: #a855f7;
+}
+.spon-stat--priority .spon-stat-icon-wrap {
+  background: #faf5ff;
+}
+.spon-stat--priority .spon-stat-icon {
+  stroke: #a855f7;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+
+@media (max-width: 768px) {
+  .spon-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    flex-wrap: unset !important;
+    overflow-x: visible !important;
+    gap: 10px;
+  }
+
+  .owner-sponsorship-page .steps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* ✅ 2 cards per row */
+  gap: 10px;
+  padding: 2px;
+}
+
+.owner-sponsorship-page .step-card {
+  width: 100%;
+  min-height: 136px;
+}
+
+  .spon-stat-card {
+    flex: unset !important;
+    min-width: unset !important;
+    width: 100% !important;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .spon-stat-value {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .spon-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .spon-stat-icon-wrap {
+    width: 38px;
+    height: 38px;
+  }
+
+  .spon-stat-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .spon-stat-value {
+    font-size: 1.2rem;
+  }
+
+  .spon-stat-sub {
+    display: none;
+  }
+}
+
+
+/* Fix parent overflow blocking scroll — desktop only */
+@media (min-width: 769px) {
+  .spon-stats-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+
+  .spon-stat-card {
+    flex: 0 0 200px !important;
+    min-width: 200px !important;
+  }
+}
+
+/* Override layout.css content overflow — scoped to this page only */
+@media (min-width: 769px) {
+  .content:has(.spon-stats-grid) {
+    overflow-x: visible !important;
+  }
+}
+
+/* =========================================
+   SPONSORSHIP TABLE — scoped mobile cards
+   All classes prefixed spon- (table scope)
+========================================= */
+
+.spon-table-scope { width: 100%; }
+
+/* ── Desktop table ── */
+.spon-desktop-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+.spon-desktop-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+  background: transparent;
+}
+
+.spon-desktop-table thead th {
+  background: linear-gradient(135deg, #ddd8f8, #ccc4f5);
+  color: #3730a3;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 13px 14px;
+  text-align: left;
+  border-right: 1px solid #c4b8f0;
+  border-bottom: 1px solid #c4b8f0;
+  white-space: nowrap;
+}
+
+.spon-desktop-table thead th:last-child { border-right: none; }
+
+.spon-dt-row td {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: #1e1b4b;
+  border-bottom: 1px solid #e4dff5;
+  border-right: 1px solid #e4dff5;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.spon-dt-row td:last-child { border-right: none; }
+.spon-dt-row:hover td { background: #ede9f8; }
+
+/* ── Mobile cards hidden on desktop ── */
+.spon-cards-wrap { display: none; }
+
+/* ── Empty ── */
+.spon-empty {
+  text-align: center;
+  padding: 28px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* =========================================
+   MOBILE — swap at 768px
+========================================= */
+
+@media (max-width: 768px) {
+  .spon-desktop-wrap { display: none; }
+
+  .spon-cards-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+}
+
+/* =========================================
+   CARD SHELL
+========================================= */
+
+.spon-card {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  border-radius: 14px;
+  border: 0.5px solid #e4dff5;
+  border-left: 3px solid #c4b8f0;
+  background: #ffffff;
+  overflow: hidden;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.07);
+}
+
+.spon-card--approved  { border-left-color: #22c55e; }
+.spon-card--pending   { border-left-color: #f59e0b; }
+.spon-card--rejected  { border-left-color: #ef4444; }
+.spon-card--expired   { border-left-color: #64748b; }
+
+/* ── Header ── */
+.spon-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: #f5f3fd;
+  border-bottom: 0.5px solid #ede9f8;
+  gap: 10px;
+}
+
+.spon-card-title-block { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.spon-card-name { font-size: 14px; font-weight: 700; color: #1e1b4b; }
+.spon-card-sub  { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+/* ── Badge ── */
+.spon-card-badge {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+
+.spon-card-badge--approved { background: #dcfce7; color: #166534; }
+.spon-card-badge--pending  { background: #fef9c3; color: #854d0e; }
+.spon-card-badge--rejected { background: #fee2e2; color: #991b1b; }
+.spon-card-badge--expired  { background: #f1f5f9; color: #475569; }
+
+/* ── Dates row ── */
+.spon-card-money-row {
+  display: flex;
+  border-bottom: 0.5px solid #f3f4f6;
+}
+
+.spon-card-money-cell {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spon-card-money-cell + .spon-card-money-cell {
+  border-left: 0.5px solid #f3f4f6;
+}
+
+.spon-card-money-label {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.spon-card-money-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+/* ── Section row ── */
+.spon-card-section-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 0.5px solid #f3f4f6;
+}
+
+.spon-card-detail-cell { display: flex; flex-direction: column; gap: 2px; }
+.spon-card-detail-cell--right { text-align: right; align-items: flex-end; }
+
+.spon-card-detail-label {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.spon-card-detail-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e1b4b;
+}
+
+/* ── Rejection reason ── */
+.spon-card-reason-row {
+  padding: 9px 14px;
+  border-bottom: 0.5px solid #f3f4f6;
+  background: #fff5f5;
+}
+
+/* ── Actions ── */
+.spon-card-actions {
+  display: flex;
+  padding: 10px 14px;
+  background: #f5f3fd;
+}
+
+.spon-card-act-btn {
+  flex: 1;
+  padding: 9px 0;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid #a78bfa;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ede9f8, #ddd6f2);
+  color: #4f46e5;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 40px;
+}
+
+.spon-card-act-btn:hover {
+  background: linear-gradient(135deg, #ddd6f2, #c4b5fd);
+  color: #3730a3;
+}
+
+@media (max-width: 767px) {
+
+  .owner-sponsorship-page .modal-backdrop-custom {
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .owner-sponsorship-page .modal-box {
+    width: 100%;
+    max-width: 400px;
+    max-height: 85vh;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+}
+
+.spon-tab-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.spon-tab-btn {
+  padding: 7px 22px;
+  border-radius: 999px;
+  border: 1.5px solid #d1d5db;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.spon-tab-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.spon-tab-btn:hover:not(.active) {
+  border-color: #a5b4fc;
+  color: #4f46e5;
+}
+
+
+/*Apply sponsership form Tablet view*/
+
+/* Tablet 769px–1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .owner-sponsorship-page .modal-backdrop-custom {
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: rgba(15, 10, 40, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .owner-sponsorship-page .modal-box.sponsorship-modal {
+    width: 62%;
+    max-width: 620px;
+    min-width: 500px;
+    max-height: 92vh;
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow:
+      0 32px 64px rgba(99, 102, 241, 0.18),
+      0 8px 24px rgba(0, 0, 0, 0.14);
+    border: 1px solid rgba(196, 184, 240, 0.4);
+  }
+
+  /* Header stripe */
+  .owner-sponsorship-page .modal-header-custom {
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: none;
+  }
+
+  .owner-sponsorship-page .modal-header-custom h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .owner-sponsorship-page .modal-close-btn {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .owner-sponsorship-page .modal-close-btn:hover {
+    background: rgba(255,255,255,0.28);
+  }
+
+  /* Body */
+  .owner-sponsorship-page .modal-box .modal-body {
+    padding: 28px 28px 8px;
+    background: #ffffff;
+  }
+
+  .owner-sponsorship-page .modal-box .modal-body label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 7px;
+    display: block;
+  }
+
+  .owner-sponsorship-page .modal-box .form-control {
+    font-size: 15px;
+    padding: 12px 16px;
+    min-height: 48px;
+    border: 1.5px solid #e0d9f7;
+    border-radius: 10px;
+    background: #faf9ff;
+    color: #1e1b4b;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .owner-sponsorship-page .modal-box .form-control:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    outline: none;
+    background: #ffffff;
+  }
+
+  .owner-sponsorship-page .modal-box textarea.form-control {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  /* Footer */
+  .owner-sponsorship-page .modal-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px 28px 24px;
+    background: #f8f7fd;
+    border-top: 1px solid #ede9f8;
+    justify-content: flex-end;
+  }
+
+  .owner-sponsorship-page .modal-btn {
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    min-height: 46px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .owner-sponsorship-page .modal-btn.cancel {
+    background: #ffffff;
+    border: 1.5px solid #d1d5db;
+    color: #6b7280;
+  }
+
+  .owner-sponsorship-page .modal-btn.cancel:hover {
+    border-color: #a78bfa;
+    color: #4f46e5;
+  }
+
+  .owner-sponsorship-page .modal-btn.primary {
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  }
+
+  .owner-sponsorship-page .modal-btn.primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+  }
+
+  .owner-sponsorship-page .modal-btn.primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}

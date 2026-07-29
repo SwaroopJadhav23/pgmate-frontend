@@ -1,0 +1,388 @@
+/* ===============================
+   CONTAINER
+================================ */
+
+.pg-management {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 16px;
+  animation: fadeIn 0.5s ease;
+}
+
+
+/* ===============================
+   FILTER BAR
+================================ */
+
+.pg-filters {
+  gap: 10px;
+}
+
+.pg-filters .form-control,
+.pg-filters .form-select {
+  height: 44px;
+  font-size: 14px;
+}
+
+
+/* ===============================
+   TABLE WRAPPER
+================================ */
+
+.pg-table-wrapper {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+}
+
+
+/* ===============================
+   TABLE
+================================ */
+
+.pg-table {
+  width: 100%;
+  min-width: 900px; /* Forces scroll on mobile */
+  border-collapse: collapse;
+}
+
+.pg-table thead {
+  background: #f8fafc;
+}
+
+.pg-table th,
+.pg-table td {
+  padding: 10px;
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.pg-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.pg-table tbody tr:hover {
+  background: #eef2ff;
+}
+
+
+/* ===============================
+   INPUTS
+================================ */
+
+.pg-table .form-control,
+.pg-table .form-select {
+  min-width: 90px;
+  font-size: 13px;
+  padding: 6px;
+}
+
+
+/* ===============================
+   BUTTONS
+================================ */
+
+.pg-table .btn {
+  min-width: 70px;
+  font-size: 13px;
+  padding: 5px 8px;
+  transition: all 0.2s ease;
+}
+
+.pg-table .btn:hover {
+  transform: translateY(-1px);
+}
+
+
+/* ===============================
+   HORIZONTAL SCROLL
+================================ */
+
+.table-responsive-x {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar style */
+
+.table-responsive-x::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive-x::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 10px;
+}
+
+
+/* ===============================
+   FORCE TABLE MODE (NO CARDS)
+================================ */
+
+.pg-table-desktop {
+  display: block !important;
+}
+
+.pg-cards-mobile {
+  display: none !important;
+}
+
+
+/* ===============================
+   TABLET VIEW
+================================ */
+
+@media (max-width: 1024px) {
+
+  .pg-management {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .pg-table {
+    min-width: 750px;
+  }
+
+  .pg-table th,
+  .pg-table td {
+    font-size: 13px;
+  }
+}
+
+
+/* ===============================
+   MOBILE VIEW (SCROLL TABLE)
+================================ */
+
+@media (max-width: 768px) {
+
+  /* Full width container */
+  .pg-management {
+    padding: 0 8px;
+  }
+
+  /* Stack filters */
+  .pg-filters .col-md-4,
+  .pg-filters .col-md-3 {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  /* Smaller table text */
+  .pg-table th,
+  .pg-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  /* Smaller buttons */
+  .pg-table .btn {
+    font-size: 11px;
+    padding: 4px 6px;
+    min-width: auto;
+  }
+
+  /* Scroll hint shadow */
+  .pg-table-wrapper {
+    border-radius: 12px;
+    box-shadow: inset -6px 0 6px -6px rgba(0,0,0,0.2);
+  }
+
+}
+
+
+/* ===============================
+   SMALL PHONES
+================================ */
+
+@media (max-width: 480px) {
+
+  .pg-table {
+    min-width: 650px;
+  }
+
+  .pg-table th,
+  .pg-table td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .pg-table .btn {
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+
+}
+
+
+/* ===============================
+   ANIMATIONS
+================================ */
+
+@keyframes fadeIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ===============================
+   OWNER PLAN BADGE
+================================ */
+
+.plan-badge {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* Plan colors */
+.plan-free {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.plan-basic {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.plan-pro {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.plan-premium {
+  background: linear-gradient(135deg, #111827, #1f2933);
+  color: #f9fafb;
+}
+
+/* Slight hover polish */
+.pg-table tbody tr:hover .plan-badge {
+  transform: scale(1.03);
+  transition: 0.15s ease;
+}
+/* ===============================
+   PRIORITY INPUT – SOFT PLAN HINT
+================================ */
+
+.priority-input {
+  font-size: 13px;
+}
+
+/* Very subtle plan tint */
+.priority-input.plan-free {
+  background: #f9fafb;
+}
+
+.priority-input.plan-basic {
+  background: #f0f7ff;
+}
+
+.priority-input.plan-pro {
+  background: #f5f3ff;
+}
+
+.priority-input.plan-premium {
+  background: #f9fafb;
+  border: 1px solid #111827;
+}
+
+/* Hint text */
+.priority-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #6b7280;
+}
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+}
+.table{
+  width:100%;
+  table-layout:auto;
+}
+.table th,
+.table td{
+  vertical-align:middle;
+}
+/* ACTION COLUMN */
+.actions-cell{
+  white-space: nowrap;
+}
+
+/* button spacing */
+.actions-cell .btn{
+  margin-right:8px;
+}
+
+/* align actions nicely */
+.actions-cell{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  white-space:nowrap;
+}
+.table{
+  table-layout:auto;
+}
+
+.table th,
+.table td{
+  vertical-align:middle;
+}
+.pg-table{
+  min-width:700px;
+}
+
+.pg-table th,
+.pg-table td{
+  white-space:nowrap;
+}
+@media (max-width:768px){
+
+  .pg-management{
+    padding:0 8px;
+  }
+
+  .pg-table th,
+  .pg-table td{
+    font-size:12px;
+    padding:8px;
+  }
+
+  .actions-cell{
+    flex-direction:column;
+    gap:6px;
+  }
+
+}

@@ -1,0 +1,441 @@
+.reserve-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.72);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 20000;
+}
+
+.reserve-modal-box {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 32px);
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.26);
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.reserve-modal-header {
+  background: linear-gradient(135deg,#6366f1,#4f46e5);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reserve-modal-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.reserve-modal-subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  margin-top: 2px;
+}
+
+.reserve-modal-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.reserve-modal-body {
+  padding: 22px 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.reserve-form-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.09em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.reserve-input {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+.reserve-input:disabled {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+}
+
+.reserve-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.reserve-input-group > .reserve-input {
+  flex: 1;
+}
+
+.reserve-select {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  background: #fff;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+.reserve-stay-grid {
+  display: grid;
+  gap: 8px;
+}
+.reserve-stay-grid.multi-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.reserve-stay-btn {
+  padding: 12px;
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.2s;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  background: #f8fafc;
+}
+.reserve-stay-btn.is-active {
+  background: #eef2ff;
+  border-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+}
+
+.reserve-stay-btn-title {
+  font-size: 14px;
+}
+.reserve-stay-btn-title.is-active {
+  color: #4f46e5;
+  font-weight: 800;
+}
+.reserve-stay-btn-title.is-inactive {
+  color: #475569;
+  font-weight: 700;
+}
+
+.reserve-stay-btn-desc {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.reserve-stay-btn-desc.is-active {
+  color: #6366f1;
+}
+.reserve-stay-btn-desc.is-inactive {
+  color: #94a3b8;
+}
+
+.reserve-divider {
+  height: 1px;
+  background: #f1f5f9;
+}
+
+.reserve-bed-box {
+  background: linear-gradient(135deg,#eef2ff,#f0fdf4);
+  border: 1.5px solid #a5b4fc;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.reserve-bed-details {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reserve-bed-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.reserve-bed-item-label {
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.reserve-bed-item-value {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-top: 1px;
+}
+.reserve-bed-item-value.is-amber {
+  color: #b45309;
+}
+.reserve-bed-item-value.is-green {
+  color: #16a34a;
+}
+
+.reserve-bed-change-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  background: #fff;
+  border: 1.5px solid #6366f1;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+  cursor: pointer;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  flex-shrink: 0;
+}
+
+.reserve-bed-pick-btn {
+  width: 100%;
+  padding: 14px;
+  background: #f8f7ff;
+  border: 2px dashed #a5b4fc;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6366f1;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+.reserve-price-warning {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.reserve-summary-box {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reserve-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #334155;
+}
+
+.reserve-pay-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.reserve-pay-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #166534;
+  letter-spacing: 0.07em;
+}
+
+.reserve-pay-amount {
+  font-size: 18px;
+  font-weight: 900;
+  color: #15803d;
+  margin-top: 2px;
+}
+
+.reserve-pay-subtext {
+  font-size: 11px;
+  font-weight: 500;
+  color: #16a34a;
+  margin-left: 5px;
+}
+
+.reserve-pay-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #dcfce7;
+  color: #15803d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.reserve-pay-alert {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reserve-steps {
+  display: flex;
+  gap: 5px;
+}
+
+.reserve-step-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.reserve-step-line {
+  width: 100%;
+  height: 3px;
+  border-radius: 99px;
+}
+.reserve-step-line.is-done {
+  background: #6366f1;
+}
+.reserve-step-line.is-pending {
+  background: #e2e8f0;
+}
+
+.reserve-step-label {
+  font-size: 9px;
+  font-weight: 700;
+}
+.reserve-step-label.is-done {
+  color: #6366f1;
+}
+.reserve-step-label.is-pending {
+  color: #94a3b8;
+}
+
+.reserve-terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px 13px;
+}
+.reserve-terms-label.is-agreed {
+  background: #eef2ff;
+  border: 1.5px solid #a5b4fc;
+}
+.reserve-terms-label.not-agreed {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+}
+
+.reserve-terms-check {
+  margin-top: 2px;
+  accent-color: #6366f1;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.reserve-terms-text {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.reserve-terms-link {
+  color: #4f46e5;
+  text-decoration: underline;
+  font-weight: 700;
+  margin: 0 3px;
+}
+
+.reserve-submit-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg,#6366f1,#4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  transition: all 0.2s;
+}
+.reserve-submit-btn:not(:disabled) {
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(99,102,241,0.32);
+}
+.reserve-submit-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.reserve-cancel-btn {
+  width: 100%;
+  padding: 11px;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  transition: background 0.2s;
+}
+.reserve-cancel-btn:hover {
+  background: #e2e8f0;
+}

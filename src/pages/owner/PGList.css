@@ -1,0 +1,616 @@
+/* ======================================================
+   PG HORIZONTAL LIST
+====================================================== */
+
+.pg-horizontal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ======================================================
+   HORIZONTAL PG CARD
+====================================================== */
+
+.pg-h-card {
+  display: flex;
+  flex-direction: row;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  min-height: 260px;
+}
+
+.pg-h-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.11);
+  transform: translateY(-2px);
+}
+
+/* ======================================================
+   LEFT COLUMN — Image + Info
+====================================================== */
+
+.pg-h-image-col {
+  display: flex;
+  flex-direction: column;
+  width: 230px;
+  flex-shrink: 0;
+  border-right: 1px solid #f1f5f9;
+}
+
+.pg-h-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 185px;
+  background: #f1f5f9;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pg-h-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #94a3b8;
+  background: #f8fafc;
+}
+
+/* Slider buttons */
+.slide-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.slide-btn.left { left: 6px; }
+.slide-btn.right { right: 6px; }
+.slide-btn:hover { background: rgba(0, 0, 0, 0.82); }
+
+/* Live / Hidden badge */
+.visibility-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.visibility-badge.active  { background: #16a34a; }
+.visibility-badge.inactive { background: #64748b; }
+
+/* Info block below the image */
+.pg-h-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.pg-h-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pg-h-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-decoration: none;
+}
+
+.pg-h-gender-icon {
+  font-size: 15px;
+  color: #64748b;
+}
+
+.pg-h-location {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Status pills (APPROVED / PENDING / REJECTED) */
+.status-pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.status-pill.APPROVED  { background: #dcfce7; color: #15803d; }
+.status-pill.PENDING   { background: #fef9c3; color: #92400e; }
+.status-pill.REJECTED  { background: #fee2e2; color: #b91c1c; }
+
+/* Pending / Rejected inline badges next to toggle */
+.badge-pending  { font-size: 11px; color: #f59e0b; font-weight: 600; }
+.badge-rejected { font-size: 11px; color: #ef4444; font-weight: 600; }
+
+/* ======================================================
+   TOGGLE ROWS
+====================================================== */
+
+.pg-h-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.toggle-label {
+  font-size: 12px;
+  color: #374151;
+}
+
+/* Toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  left: 3px;
+  top: 3px;
+  transition: transform 0.2s ease;
+}
+
+.switch input:checked + .toggle-slider { background: #2563eb; }
+.switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+.switch input:disabled + .toggle-slider { opacity: 0.5; cursor: not-allowed; }
+
+/* ======================================================
+   RIGHT COLUMN — Details
+====================================================== */
+
+.pg-h-details-col {
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* ── TOP BAR: stats + verified + edit ── */
+.pg-h-top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pg-h-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 18px 0 0;
+}
+
+.stat-item:first-child { padding-left: 0; }
+
+.stat-label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 36px;
+  background: #e2e8f0;
+  margin: 0 18px 0 0;
+  flex-shrink: 0;
+}
+
+.pg-h-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.verified-chip {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 13px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.edit-icon-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.edit-icon-btn:hover { background: #eff6ff; }
+
+/* ── SECTION (House Rules / Amenities / Images) ── */
+.pg-h-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pg-h-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.pg-h-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Checkbox chip style */
+.detail-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #374151;
+  cursor: default;
+  user-select: none;
+}
+
+.detail-chip input[type="checkbox"] {
+  accent-color: #2563eb;
+  width: 14px;
+  height: 14px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.amenity-chip input[type="checkbox"] { accent-color: #2563eb; }
+
+/* Property image thumbnails */
+.pg-h-thumb-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pg-h-thumb {
+  width: 56px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ── ACTION BUTTONS ── */
+.pg-h-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.pg-h-actions .btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* ======================================================
+   HEADER RIGHT
+====================================================== */
+
+.pg-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.add-pg-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.add-pg-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(37, 99, 235, 0.35); }
+.add-pg-btn.disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ======================================================
+   SUBSCRIPTION CARD
+====================================================== */
+
+.subscription-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 18px;
+  min-width: 240px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subscription-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-badge {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 999px;
+  color: #fff;
+  letter-spacing: 0.6px;
+}
+
+.plan-premium { background: linear-gradient(135deg, #111827, #1f2937); }
+.plan-basic   { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.plan-pro     { background: linear-gradient(135deg, #7c3aed, #9333ea); }
+.plan-free    { background: #64748b; }
+
+.expiry-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  color: #0f172a;
+}
+
+.subscription-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.premium-text { font-size: 13px; font-weight: 600; color: #059669; }
+.usage-text   { font-size: 13px; color: #334155; }
+
+.upgrade-btn {
+  background: linear-gradient(135deg, #f97316, #fb923c);
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  width: fit-content;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(249, 115, 22, 0.3); }
+
+/* ======================================================
+   MODALS
+====================================================== */
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-box {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-box img {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* ======================================================
+   EMPTY STATE
+====================================================== */
+
+.empty-state-clean {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.empty-content {
+  text-align: center;
+  max-width: 380px;
+}
+
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-content h2 { font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+.empty-content p  { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media (max-width: 900px) {
+  .pg-h-card {
+    flex-direction: column;
+  }
+
+  .pg-h-image-col {
+    width: 100%;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .pg-h-image-wrapper {
+    width: 160px;
+    height: 140px;
+    flex-shrink: 0;
+  }
+
+  .pg-h-info {
+    flex: 1;
+    padding: 10px 14px;
+  }
+
+  .stat-value { font-size: 18px; }
+  .stat-item  { padding-right: 12px; }
+  .stat-divider { margin-right: 12px; }
+}
+
+@media (max-width: 600px) {
+  .pg-h-image-col {
+    flex-direction: column;
+  }
+
+  .pg-h-image-wrapper {
+    width: 100%;
+    height: 200px;
+  }
+
+  .pg-h-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pg-h-stats {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .stat-divider { display: none; }
+
+  .stat-item {
+    padding-right: 0;
+    min-width: 80px;
+  }
+
+  .pg-h-details-col { padding: 12px 14px; }
+
+  .subscription-card { min-width: unset; width: 100%; }
+
+  .pg-desktop-info { display: none !important; }
+
+  .subscription-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    min-width: unset !important;
+  }
+
+  .add-pg-btn {
+    white-space: nowrap;
+  }
+
+  .pg-h-actions .btn { font-size: 11px; padding: 4px 10px; }
+}
+.pgv2-info-btn {
+  font-size: 13px;
+  cursor: default;
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+
+.pgv2-info-btn:hover {
+  color: #4f46e5;
+}

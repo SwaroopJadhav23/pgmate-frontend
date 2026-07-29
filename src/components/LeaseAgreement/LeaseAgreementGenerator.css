@@ -1,0 +1,1279 @@
+/* ================================================================
+   Lease Agreement Generator — Complete Stylesheet
+   ================================================================ */
+
+/* ── Workspace ───────────────────────────────────────────────── */
+.lease-workspace-wrapper {
+  background: #f8fafc;
+  padding: 60px 0 100px;
+}
+
+.lease-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  font-family: "DM Sans", sans-serif;
+}
+
+.lease-workspace-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.lease-workspace-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.lease-workspace-header p {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  color: #64748b;
+  margin: 0;
+}
+
+.lease-workspace {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.lease-preview-section {
+  position: sticky;
+  top: 24px;
+}
+
+@media (max-width: 1000px) {
+  .lease-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Details Blocks ── */
+.lt-details-blocks {
+  display: flex;
+  gap: 24px;
+  padding: 0 36px 8px;
+}
+
+.lt-detail-box {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #c4b5fd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lt-detail-header {
+  background: transparent;
+  border-bottom: 1px solid #e8edff;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #6f7af0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lt-inner-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.lt-inner-label {
+  padding: 4px 12px;
+  font-weight: 800;
+  color: #1a1a2e;
+  border-bottom: 1px solid #e8edff;
+  width: 85px;
+  vertical-align: top;
+}
+
+.lt-inner-val {
+  padding: 4px 12px;
+  color: #334155;
+  border-bottom: 1px solid #e8edff;
+  vertical-align: top;
+}
+
+.lt-inner-table tr:last-child .lt-inner-label,
+.lt-inner-table tr:last-child .lt-inner-val {
+  border-bottom: none;
+}
+
+/* ── Form Section ── */
+.lease-form-section {
+  margin-top: 41px;
+}
+.lease-section-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.lease-form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.lease-section-gap {
+  margin-top: 24px;
+}
+
+.lease-form-section-icon {
+  color: #6f7af0;
+  font-size: 1rem;
+}
+
+.lease-floating-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.lease-floating-group input {
+  width: 100%;
+  padding: 18px 14px 6px;
+  height: 52px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: #f8fafc;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.lease-floating-group textarea {
+  width: 100%;
+  padding: 18px 14px 6px;
+  min-height: 90px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: #f8fafc;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+/* Fix for browser autofill background */
+.lease-floating-group input:-webkit-autofill,
+.lease-floating-group input:-webkit-autofill:hover,
+.lease-floating-group input:-webkit-autofill:focus,
+.lease-floating-group input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #1e293b !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.lease-floating-group textarea {
+  height: auto;
+  min-height: 90px;
+  resize: vertical;
+}
+
+.lease-floating-group input:focus,
+.lease-floating-group textarea:focus {
+  border-color: #6f7af0;
+  box-shadow: 0 0 0 3px rgba(92, 84, 246, 0.08);
+}
+
+.lease-floating-group input.input-error,
+.lease-floating-group textarea.input-error {
+  border-color: #ef4444;
+}
+
+.lease-floating-group label {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  font-size: 0.9rem;
+  color: #64748b;
+  pointer-events: none;
+  transition:
+    transform 0.2s,
+    font-size 0.2s,
+    color 0.2s;
+  transform-origin: left top;
+  background: transparent;
+}
+
+.lease-floating-group textarea ~ label {
+  top: 14px;
+  transform: none;
+}
+
+.lease-floating-group input:focus ~ label,
+.lease-floating-group input:not(:placeholder-shown) ~ label,
+.lease-floating-group textarea:focus ~ label,
+.lease-floating-group textarea:not(:placeholder-shown) ~ label {
+  transform: translateY(-10px) scale(0.75);
+  font-weight: 700;
+  color: #64748b;
+}
+
+.field-error {
+  display: block;
+  font-size: 0.78rem;
+  color: #ef4444;
+  margin-top: 4px;
+  padding-left: 2px;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.lease-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .lease-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Form Actions ── */
+.lease-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.btn-generate-lease {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #5b50f0 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s,
+    transform 0.15s;
+  box-shadow: 0 4px 14px rgba(91, 80, 240, 0.28);
+}
+
+.btn-generate-lease::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0)
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-generate-lease:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(92, 84, 246, 0.45);
+}
+
+.btn-generate-lease:hover::after {
+  opacity: 1;
+}
+
+.btn-reset-lease {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  color: #6f7af0;
+  border: 1.5px solid #6f7af0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.btn-reset-lease:hover {
+  background: #6f7af0;
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(92, 84, 246, 0.25);
+}
+
+/* ── Preview Panel ───────────────────────────────────────────── */
+.lease-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+
+.lease-preview-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.lease-preview-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6f7af0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  border-radius: 999px;
+  padding: 5px 14px;
+}
+
+.lease-preview-container {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 24px 12px;
+  display: flex;
+  justify-content: center;
+  /* Fixed height = A4 height (1123px) at 0.55 scale + 2×24px padding ≈ 665px */
+  min-height: 665px;
+  max-height: 82vh;
+}
+
+/* A4 = 794 × 1123 px. Scale to fit ~620px panel width → scale ≈ 0.55 */
+.lease-scale-wrapper {
+  transform: scale(0.55);
+  transform-origin: top center;
+  width: 794px;
+  /* Compensate collapsed height so the container reads correct height */
+  margin-bottom: calc((794px * 1.415 * (1 - 0.55)) * -1);
+  flex-shrink: 0;
+}
+
+.lease-loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 16px;
+}
+
+.lease-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e8edff;
+  border-top-color: #6f7af0;
+  border-radius: 50%;
+  animation: leaseSpin 0.8s linear infinite;
+}
+
+@keyframes leaseSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lease-loading-text {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ── Download Bar ────────────────────────────────────────────── */
+.lease-download-bar {
+  display: flex;
+  justify-content: center;
+}
+
+/* Reuse existing download dropdown styles from RentReceiptGenerator.css */
+
+/* ── Printable Document Template (lt = LeaseTemplate) ───────── */
+/* A4 at 96 dpi = 794 × 1123 px */
+.lt-wrapper {
+  background: #ffffff;
+  font-family: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  color: #1a1a2e;
+  width: 794px;
+  height: 1122px; /* Strict height just under 1123px to prevent 1px overflow page breaks */
+  box-sizing: border-box;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  overflow: hidden; /* Force single page to prevent blank second pages */
+  margin: 0 auto;
+}
+
+.lt-accent-bar {
+  height: 18px;
+  background: #6f7af0;
+  clip-path: polygon(0 0, 100% 0, 100% 20%, 73% 20%, 70% 100%, 0 100%);
+}
+
+/* ── Template Header ── */
+.lt-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 2px 36px 2px;
+}
+
+.lt-header-left {
+  flex-shrink: 0;
+}
+
+.lt-logo {
+  width: 105px;
+  object-fit: contain;
+}
+
+.lt-header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.lt-pg-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.lt-name-line {
+  flex: 1;
+  height: 1.5px;
+  background: #6f7af0;
+  max-width: 120px;
+}
+
+.lt-dot {
+  color: #6f7af0;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.lt-pg-name {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #6f7af0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.lt-doc-title {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #1a1a2e;
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
+}
+
+.lt-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.lt-subtitle {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #6f7af0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lt-intro-text {
+  font-size: 0.9rem;
+  color: #1e293b;
+  line-height: 1.5;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+/* ── Sections ── */
+.lt-section {
+  padding: 0 36px 4px;
+}
+
+.lt-section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+
+.lt-section-num {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  font-weight: 900;
+  color: #6f7af0;
+}
+
+.lt-section-title {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  font-weight: 900;
+  color: #6f7af0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Accommodation Details Table ── */
+.lt-details-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #818cf8;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.75rem;
+}
+
+.lt-td-label {
+  padding: 3px 8px;
+  font-weight: 700;
+  color: #0f172a;
+  background: #f0edff;
+  border-bottom: 1px solid #818cf8;
+  border-right: 1px solid #818cf8;
+  width: 35%;
+  vertical-align: middle;
+}
+
+.lt-td-value {
+  padding: 3px 8px;
+  color: #1e293b;
+  background: #ffffff;
+  border-bottom: 1px solid #818cf8;
+  line-height: 1.3;
+  vertical-align: middle;
+}
+
+.lt-details-table tr:last-child .lt-td-label,
+.lt-details-table tr:last-child .lt-td-value {
+  border-bottom: none;
+}
+
+/* ── House Rules List ── */
+.lt-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.lt-rule-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.lt-rule-row:last-child {
+  border-bottom: none;
+}
+
+.lt-rule-icon-box {
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border: 1.5px solid #6f7af0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lt-rule-content {
+  flex: 1;
+}
+
+.lt-rule-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0px;
+}
+
+.lt-rule-desc {
+  font-size: 0.72rem;
+  color: #334155;
+  line-height: 1.15;
+}
+
+.lt-rule-items {
+  margin: 1px 0 0 16px;
+  padding: 0;
+  font-size: 0.72rem;
+  color: #334155;
+  line-height: 1.15;
+}
+
+/* ── Terms & Conditions ── */
+.lt-terms-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.75rem;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.lt-terms-list li {
+  margin-bottom: 2px;
+}
+
+/* ── Footer & Details ── */
+.lt-footer-container {
+  padding: 0 36px 8px;
+  margin-top: 8px;
+}
+
+.lt-footer {
+  background: #f6f5ff;
+  padding: 6px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #eef2ff;
+}
+
+.lt-footer-text {
+  color: #1e293b;
+}
+
+.lt-footer-line1 {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #334155;
+}
+
+.lt-footer-line2 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #6f7af0;
+}
+
+.lt-accent-bar-bottom {
+  height: 18px;
+  background: #6f7af0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  clip-path: polygon(0 100%, 0 80%, 27% 80%, 30% 0, 100% 0, 100% 100%);
+}
+
+/* Reuse download dropdown from receipt CSS */
+.btn-download-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #6f7af0, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(92, 84, 246, 0.25);
+}
+
+.btn-download-main:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(92, 84, 246, 0.35);
+}
+
+.btn-download-main:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.download-dropdown-container {
+  position: relative;
+  z-index: 999;
+}
+
+.download-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0; /* Align right to avoid cutoff if left edge is near screen edge */
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  min-width: 220px;
+  z-index: 9999;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f8f0ff;
+  color: #6f7af0;
+}
+.dropdown-icon {
+  transition: transform 0.2s;
+}
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: leaseSpin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* Custom Multi-Select Dropdown */
+.rules-dropdown-header {
+  width: 100%;
+  padding: 16px 14px;
+  height: 52px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+  box-sizing: border-box;
+}
+
+.rules-dropdown-header:hover {
+  border-color: #cbd5e1;
+}
+
+.dropdown-title {
+  font-size: 0.95rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.dropdown-arrow {
+  color: #64748b;
+  transition: transform 0.2s;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.rules-dropdown-list {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+  padding: 8px 0;
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.rule-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rule-checkbox-label:hover {
+  background: #f1f5f9;
+}
+
+.rule-checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: #5b50f0;
+}
+
+.rule-text {
+  font-size: 0.9rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+/* ========================================= */
+/* Extracted Inline Styles: LeaseForm        */
+/* ========================================= */
+
+.lease-sub-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted, #64748b);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lease-sub-group {
+  margin-bottom: 18px;
+}
+
+.lease-toggle-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.lease-checkbox {
+  accent-color: var(--primary-color, #6f7af0);
+  width: 16px;
+  height: 16px;
+}
+
+.lease-toggle-icon {
+  color: var(--primary-color, #6f7af0);
+  font-size: 1.1rem;
+}
+
+.lease-section-gap {
+  margin-bottom: 16px;
+}
+
+.lease-floating-group.compact {
+  margin-bottom: 10px;
+}
+.lease-floating-group.no-margin {
+  margin-bottom: 0;
+}
+
+.lease-custom-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.lease-custom-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: var(--bg-alt, #f8fafc);
+  color: var(--text-color, #1e293b);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.lease-custom-input:focus {
+  border-color: var(--primary-color, #6f7af0);
+}
+
+.lease-custom-add-btn {
+  padding: 10px 18px;
+  background: var(--primary-color, #6f7af0);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+.lease-custom-add-btn:hover {
+  opacity: 0.9;
+}
+
+.lease-custom-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lease-custom-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #eef2ff;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 10px;
+}
+
+.lease-custom-item-text {
+  font-size: 0.82rem;
+  color: #3730a3;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.lease-custom-item-remove {
+  background: transparent;
+  border: none;
+  color: #6366f1;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+.lease-custom-item-remove:hover {
+  color: #4f46e5;
+}
+
+.lease-selected-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.lease-rule-badge {
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lease-rule-remove-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #3730a3;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.lease-rule-remove-btn:hover {
+  opacity: 0.7;
+}
+
+.lease-empty-state svg {
+  color: #4f46e5;
+  opacity: 0.2;
+}
+
+/* Extracted Inline Styles */
+.form-section-mt {
+  margin-top: 8px;
+}
+.form-section-mt-mb {
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
+.lease-sub-label-spaced {
+  margin-bottom: 4px;
+}
+
+/* ========================================= */
+/* Extracted Inline Styles: LeaseTemplate    */
+/* ========================================= */
+
+.lt-intro-text-center {
+  text-align: center;
+}
+
+.lt-rules-structured-list {
+  padding: 0 10px;
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.lt-subsection {
+  margin-bottom: 4px;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 4px;
+}
+
+.lt-subsection-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f172a;
+  font-weight: bold;
+}
+
+.lt-subsection-text {
+  margin: 0;
+}
+
+.lt-custom-rules-list {
+  margin: 4px 0 0;
+  padding-left: 24px;
+}
+
+.lt-custom-rule-item {
+  margin-bottom: 2px;
+}
+
+/* Terms & Conditions Section */
+.lease-term-desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 12px;
+  margin-top: -4px;
+}
+
+.lease-term-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+}
+
+.lease-term-checkbox {
+  margin-top: 3px;
+  accent-color: #6f7af0;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.lease-term-content {
+  flex: 1;
+}
+
+.lease-term-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e293b;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.lease-term-subtext {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.lease-term-select {
+  padding: 8px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: #1e293b;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Lease Template Specific Extracted Styles */
+.lt-intro-container {
+  padding: 0 36px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.lt-text-center {
+  text-align: center;
+}
+
+.lt-rules-structured-list {
+  padding: 0 10px;
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.lt-subsection {
+  margin-bottom: 4px;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 4px;
+}
+
+.lt-subsection-last {
+  margin-bottom: 0;
+  padding-bottom: 4px;
+}
+
+.lt-subsection-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f172a;
+  font-weight: bold;
+}
+
+.lt-subsection-title-last {
+  margin: 0 0 2px 0;
+  font-size: 1rem;
+  color: #0f172a;
+  font-weight: bold;
+}
+
+.lt-subsection-text {
+  margin: 0;
+}
+
+.lt-custom-rules-list {
+  margin: 4px 0 0;
+  padding-left: 24px;
+}
+
+.lt-custom-rules-list-last {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.lt-custom-rule-item {
+  margin-bottom: 2px;
+}
+
+/* ================================================================
+   Mobile Responsiveness
+   ================================================================ */
+@media (max-width: 1000px) {
+  .lt-details-blocks {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .lease-workspace-wrapper {
+    padding: 20px 0 80px;
+  }
+  
+  .lease-section-card {
+    padding: 16px;
+  }
+
+  .lease-form-row,
+  .lease-form-row-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .lease-scale-wrapper {
+    transform: scale(0.4);
+    transform-origin: top left;
+    width: 317px;
+    margin-bottom: calc((794px * 1.415 * (1 - 0.4)) * -1);
+  }
+
+  .lease-preview-container {
+    min-height: 480px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lease-scale-wrapper {
+    transform: scale(0.35);
+    transform-origin: top left;
+    width: 277px;
+    margin-bottom: calc((794px * 1.415 * (1 - 0.35)) * -1);
+  }
+  
+  .lease-preview-container {
+    min-height: 420px;
+    padding: 12px;
+  }
+}

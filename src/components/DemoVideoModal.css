@@ -1,0 +1,241 @@
+/* ── OVERLAY ── */
+.demo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 5vw, 24px);
+  animation: demoFadeIn 0.2s ease;
+}
+
+@keyframes demoFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── MODAL CARD ── */
+.demo-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.04),
+    0 8px 24px rgba(0,0,0,0.10),
+    0 32px 64px rgba(0,0,0,0.22);
+  animation: demoSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes demoSlideUp {
+  from { transform: translateY(32px) scale(0.98); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* ── HEADER ── */
+.demo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 14px 18px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.demo-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+
+.demo-title i {
+  color: #e85d04;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Play icon pill */
+.demo-title-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff5ed;
+  border: 1px solid #fddcbc;
+  border-radius: 100px;
+  padding: 4px 10px 4px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c94a00;
+}
+
+.demo-title-pill svg {
+  width: 16px;
+  height: 16px;
+  fill: #e85d04;
+  flex-shrink: 0;
+}
+
+.demo-close {
+  background: #f4f4f5;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 15px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.demo-close:hover {
+  background: #e4e4e7;
+  color: #111827;
+  transform: scale(1.08);
+}
+
+/* ── VIDEO ── */
+.demo-video-wrap {
+  background: #0a0a0a;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.demo-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+/* ── FOOTER ── */
+.demo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.demo-footer-text {
+  margin: 0;
+  font-size: 12.5px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.demo-footer-text strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.demo-skip {
+  background: none;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+.demo-skip:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+/* ── TABLET (≤ 768px) ── */
+@media (max-width: 768px) {
+  .demo-modal {
+    border-radius: 16px;
+    max-width: 560px;
+  }
+}
+
+/* ── MOBILE (≤ 480px) ── */
+@media (max-width: 480px) {
+  .demo-overlay {
+    align-items: center;   /* centered on mobile */
+    padding: 16px;
+  }
+
+  .demo-modal {
+    border-radius: 16px;
+    max-width: 100%;
+    max-height: 88dvh;
+    width: calc(100% - 0px);
+  }
+
+  .demo-header {
+    padding: 12px 14px;
+  }
+
+  .demo-footer {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 12px 14px 16px;
+    gap: 10px;
+  }
+
+  .demo-skip {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .demo-footer-text {
+    font-size: 12px;
+  }
+}
+
+/* ── LANDSCAPE PHONE ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .demo-video-wrap {
+    aspect-ratio: auto;
+    height: 48dvh;
+  }
+
+  .demo-header,
+  .demo-footer {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .demo-overlay,
+  .demo-modal {
+    animation: none;
+  }
+}

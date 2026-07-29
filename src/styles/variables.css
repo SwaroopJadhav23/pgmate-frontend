@@ -1,0 +1,32 @@
+:root {
+  /* Accent Colors */
+  --accent: #6f7af0;
+  --accent-dark: #4940d0;
+  --accent-light: #eeecff;
+
+  /* Status Colors */
+  --gold: #a16207;
+  --gold-border: #fde68a;
+  --gold-bg: #fef9e8;
+  --verified: #0d7a45;
+  --verified-bg: #e5f7ee;
+
+  /* Background & Borders */
+  --bg: #f3f4f8;
+  --border: #00000012;
+  --border-hover: #6f7af040;
+
+  /* Typography Colors */
+  --text-primary: #0c0d12;
+  --text-secondary: #4a4d60;
+  --text-muted: #8b8fa8;
+
+  /* Miscellaneous Variables */
+  --radius-badge: 999px;
+  --shadow-card: 0 2px 12px #0c0d120d;
+  --shadow-hover: 0 16px 40px #6f7af01a, 0 4px 12px #0000000f;
+
+  /* Fonts */
+  --font: "Inter", sans-serif;
+  --font-display: "Montserrat", sans-serif;
+}

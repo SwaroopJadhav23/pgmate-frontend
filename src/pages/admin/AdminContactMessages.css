@@ -1,0 +1,510 @@
+/* ===============================
+   AdminContactMessages.css
+   Standalone styles — no dependency on AdminPGEnquiries.css
+   COLOR TOKENS
+   Accent  : #5B5BD6
+   Dark    : #1e293b
+   Neutral : slate greys + white
+================================ */
+
+/* ── Top search bar ── */
+.acm-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.acm-search-wrapper {
+  position: relative;
+  flex: 0 1 960px;
+  min-width: 0;
+}
+
+.acm-search-wrapper .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.acm-search-wrapper .form-control {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #475569;
+  background: #fff;
+  box-shadow: none;
+}
+
+.acm-search-wrapper .form-control:focus {
+  border-color: #5B5BD6;
+  box-shadow: 0 0 0 3px rgba(91, 91, 214, 0.1);
+  outline: none;
+}
+
+/* ── Result count ── */
+.acm-result-count {
+  font-size: 12.5px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+
+.acm-filter-select {
+  padding: 9px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #475569;
+  background: #fff;
+  cursor: pointer;
+}
+.acm-filter-select:focus {
+  border-color: #5B5BD6;
+  box-shadow: 0 0 0 3px rgba(91,91,214,0.1);
+  outline: none;
+}
+
+/* ===============================
+   TABLE
+================================ */
+
+.acm-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.acm-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.acm-table thead th {
+  background: #1e293b;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 13px 16px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: none;
+  text-align: left;
+}
+
+.acm-table tbody td {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.acm-table tbody td.acm-message-cell {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  vertical-align: top;
+}
+
+.acm-table tbody tr:last-child td { border-bottom: none; }
+.acm-table tbody tr:hover { background: #f8faff; }
+.acm-table tbody tr.is-read { opacity: 0.7; }
+
+/* sender avatar */
+.acm-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #5B5BD6;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 7px;
+}
+
+.acm-name-cell {
+  display: flex;
+  align-items: center;
+}
+
+/* ===============================
+   STATUS PILLS
+================================ */
+
+.acm-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.acm-status-pill.NEW  { background: #eef0ff; color: #5B5BD6; border: 1px solid #c7d2fe; }
+.acm-status-pill.READ { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+/* ── Expandable message cell ── */
+.acm-message-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  white-space: normal;
+  max-width: 260px;
+}
+
+.acm-message-cell .acm-message-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.acm-message-cell.expanded {
+  white-space: normal;
+  max-width: 320px;
+}
+
+.acm-message-cell.expanded .acm-message-text {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: pre-wrap;
+}
+
+.acm-readmore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #5B5BD6;
+  cursor: pointer;
+}
+
+.acm-readmore-btn:hover { text-decoration: underline; }
+
+/* ── Danger variant for delete icon button ── */
+.acm-icon-btn-danger {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626 !important;
+}
+
+.acm-icon-btn-danger:hover { background: #fee2e2; }
+
+
+
+/* ── Mail toggle button (read/unread) ── */
+.acm-icon-btn-mail {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669 !important;
+}
+.acm-icon-btn-mail:hover { background: #d1fae5; }
+
+/* empty state */
+.acm-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* action icon buttons */
+.acm-action-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acm-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: #eef0ff;
+  border: 1px solid #c7d2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 13px;
+  color: #5B5BD6;
+  transition: background 0.15s, transform 0.1s;
+}
+.acm-icon-btn:hover { background: #e0e3ff; }
+.acm-icon-btn:active { transform: scale(0.94); }
+
+/* ===============================
+   MOBILE CARD LIST
+================================ */
+
+.acm-card-list {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.acm-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.acm-card-bar { height: 3px; background: #5B5BD6; }
+
+.acm-card-body { padding: 14px 16px; }
+
+.acm-card-top-row {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.acm-card-sender {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.acm-card-sender-info { flex: 1; min-width: 0; }
+.acm-card-sender-name  { font-size: 13.5px; font-weight: 600; color: #1e293b; }
+.acm-card-sender-email { font-size: 12px; color: #64748b; }
+
+.acm-card-meta {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 6px;
+}
+
+.acm-card-message {
+  font-size: 12.5px;
+  color: #475569;
+  background: #f8faff;
+  border: 1px solid #e8eaff;
+  border-radius: 7px;
+  padding: 8px 11px;
+  margin-top: 8px;
+  line-height: 1.55;
+}
+
+.acm-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+/* ===============================
+   MOBILE (≤768px) — all mobile sizes
+   Cards only, table hidden
+================================ */
+@media (max-width: 768px) {
+  .acm-table-wrapper { display: none; }
+  .acm-card-list { display: flex; }
+
+  .acm-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+ .acm-search-wrapper {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .acm-filter-select {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .acm-result-count {
+    font-size: 12px;
+  }
+
+  .acm-card {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+
+  .acm-card-body { padding: 15px; }
+
+  .acm-card-sender-name { font-size: 14px; }
+
+  .acm-card-sender-email {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+
+  .acm-card-meta {
+    font-size: 12.5px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+
+  .acm-card-message {
+    font-size: 12.5px;
+  }
+
+  .acm-card-actions {
+    margin-top: 12px;
+    gap: 10px;
+  }
+
+  .acm-card-actions .acm-icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+  }
+}
+
+/* ===============================
+   SMALL MOBILE (≤380px) — tighter fit
+================================ */
+@media (max-width: 380px) {
+  .acm-topbar {
+    gap: 6px;
+  }
+
+  .acm-filter-select {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  .acm-search-wrapper .form-control {
+    font-size: 12.5px;
+    padding: 8px 10px 8px 30px;
+  }
+
+  .acm-filter-select {
+    font-size: 12.5px;
+    padding: 8px 10px;
+  }
+
+  .acm-result-count {
+    font-size: 11.5px;
+    margin-bottom: 10px;
+  }
+
+  .acm-card-body { padding: 12px; }
+
+  .acm-card-top-row { font-size: 11px; }
+
+  .acm-card-sender-name { font-size: 13px; }
+
+  .acm-card-sender-email {
+    font-size: 11px;
+    max-width: 130px;
+  }
+
+  .acm-card-meta { font-size: 12px; }
+
+  .acm-card-message {
+    font-size: 12px;
+    padding: 7px 9px;
+  }
+
+  .acm-card-actions .acm-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .acm-status-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .acm-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+}
+
+/* ===============================
+   TABLET (769px – 1024px)
+   Table view, tightened + fitted
+================================ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .acm-card-list { display: none; }
+  .acm-table-wrapper { display: block; }
+
+  .acm-topbar {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .acm-search-wrapper {
+    flex: 1 1 240px;
+  }
+
+  .acm-filter-select {
+    flex: 0 1 160px;
+    font-size: 12.5px;
+    padding: 8px 10px;
+  }
+
+  .acm-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .acm-table {
+    min-width: 720px;
+  }
+
+  .acm-table thead th {
+    padding: 11px 12px;
+    font-size: 11px;
+  }
+
+  .acm-table tbody td {
+    padding: 10px 12px;
+    font-size: 13px;
+    max-width: 160px;
+  }
+
+  .acm-message-cell {
+    max-width: 200px;
+  }
+}
