@@ -256,13 +256,13 @@ subtitle={role === "MANAGER"
 
       <p
         className="contact-main contact-copy"
-        onClick={() => copyToClipboard("support@fouriseindia.com")}
+        onClick={() => copyToClipboard("support.pgmate@gmail.com")}
       >
-        support@fouriseindia.com
+        support.pgmate@gmail.com
       </p>
 
       <a
-        href="mailto:support@fouriseindia.com"
+        href="mailto:support.pgmate@gmail.com"
         className="contact-btn"
       >
         Send Email

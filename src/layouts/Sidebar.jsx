@@ -1,9 +1,9 @@
-import {FaRocket, FaLock} from "react-icons/fa";
-import {NavLink, useNavigate} from "react-router-dom";
-import {useEffect, useState, useRef, useContext} from "react";
-import {AuthContext} from "../context/AuthContext";
+import { FaRocket, FaLock } from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import api from "../api/axios";
-import {useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "./layout.css";
 import "./sidebar-owner-manager.css";
 import {
@@ -28,7 +28,7 @@ import {
 
 
 
-const Sidebar = ({open, setOpen}) => {
+const Sidebar = ({ open, setOpen }) => {
   const [managerAccessBlocked, setManagerAccessBlocked] = useState(false);
   // ✅ Dismissible expiry NOTICE — closing this only hides the popup.
   // subscriptionExpired itself (from context) stays true so card clicks still redirect.
@@ -50,6 +50,7 @@ const Sidebar = ({open, setOpen}) => {
     logout: authLogout,
     subscriptionExpired,
     refreshSubscriptionStatus,
+    ownerProfileComplete,
   } = useContext(AuthContext);
   const sidebarRef = useRef(null);
   const location = useLocation();
@@ -100,7 +101,7 @@ const Sidebar = ({open, setOpen}) => {
           setManagerAccessBlocked(true);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [role]);
 
   useEffect(() => {
@@ -122,6 +123,7 @@ const Sidebar = ({open, setOpen}) => {
       {showExpiryNotice &&
         subscriptionExpired &&
         role === "OWNER" &&
+        ownerProfileComplete === true &&
         location.pathname !== "/owner/pricing" && (
           <div
             className="expiry-blocker-overlay"
@@ -193,7 +195,7 @@ const Sidebar = ({open, setOpen}) => {
             </p>
             <button
               className="expiry-blocker-btn"
-              style={{background: "#334155"}}
+              style={{ background: "#334155" }}
               onClick={logout}
             >
               Logout
@@ -232,7 +234,7 @@ const Sidebar = ({open, setOpen}) => {
                 className="sidebar-avatar"
               />
 
-              <div style={{width: "100%"}}>
+              <div style={{ width: "100%" }}>
                 <div className="sidebar-owner-name">{owner.name}</div>
                 <div className="sidebar-profile-sub">View Profile</div>
               </div>
@@ -674,7 +676,7 @@ const Sidebar = ({open, setOpen}) => {
 };
 
 /* NAV ITEM COMPONENT */
-const NavItem = ({icon, to, label, close, subscriptionExpired}) => {
+const NavItem = ({ icon, to, label, close, subscriptionExpired }) => {
   const navigate = useNavigate();
   const allowed = to === "/owner/dashboard" || to === "/owner/pricing";
 
@@ -693,7 +695,7 @@ const NavItem = ({icon, to, label, close, subscriptionExpired}) => {
       to={to}
       end
       onClick={handleClick}
-      className={({isActive}) =>
+      className={({ isActive }) =>
         isActive ? "sidebar-link active" : "sidebar-link"
       }
     >
