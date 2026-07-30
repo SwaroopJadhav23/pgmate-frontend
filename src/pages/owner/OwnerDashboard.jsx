@@ -1650,7 +1650,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
           </div>
         </div>
 
-        {onboardingMode && (
+       {onboardingMode && !subscriptionExpired && (
           <OnboardingGuide
             mode={onboardingMode}
             onCta={handleCta}
