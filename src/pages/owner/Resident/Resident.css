@@ -547,6 +547,193 @@
   text-align: right;
 }
 
+
+.rr-cards-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rr-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.rr-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.rr-card__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rr-card__title {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.rr-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.rr-card__pg {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.rr-card__badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.rr-card__badge--monthly { background: #dcfce7; color: #166534; }
+.rr-card__badge--daily { background: #fef3c7; color: #92400e; }
+
+.rr-card__location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #475569;
+  margin-bottom: 10px;
+}
+
+.rr-card__loc-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #94a3b8;
+}
+
+.rr-card__loc-sep {
+  color: #cbd5e1;
+}
+
+.rr-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.rr-card__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rr-card__cell-label {
+  font-size: 10.5px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.rr-card__cell-val {
+  font-size: 12.5px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.rr-card__cell-val--money {
+  color: #16a34a;
+}
+
+.rr-card__phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rr-card__copy {
+  border: none;
+  background: #f1f5f9;
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.rr-card__emergency {
+  display: flex;
+  gap: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+
+.rr-card__emergency-icon {
+  color: #ea580c;
+  flex-shrink: 0;
+}
+
+.rr-card__emergency-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  display: block;
+}
+
+.rr-card__emergency-rel {
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.rr-card__emergency-phone {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.rr-card__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.rr-card__btn {
+  flex: 1;
+  border: none;
+  padding: 9px 0;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rr-card__btn--confirm {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.rr-card__btn--deny {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+
 @media (max-width: 768px) {
   .arm-progress-wrap {
     margin: 0 10px;
