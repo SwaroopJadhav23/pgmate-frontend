@@ -109,7 +109,7 @@ const MonthlyRentOverview = () => {
     }
   }, []);
 
- const loadResidents = useCallback(async () => {
+  const loadResidents = useCallback(async () => {
     try {
       const res = await api.get(`/owner/residents`);
       setResidents(res.data || []);
@@ -271,7 +271,7 @@ const MonthlyRentOverview = () => {
       </div>
 
       {/* FILTER TABS */}
-      <div className="d-flex gap-2 mb-3">
+      <div className="dues-filter-tabs mb-3">
         {tabs.map((tab) => (
           <button
             key={tab.key}

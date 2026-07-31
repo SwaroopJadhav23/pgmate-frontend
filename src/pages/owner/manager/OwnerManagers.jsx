@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import api from "../../../api/axios";
 import Swal from "sweetalert2";
@@ -366,12 +367,12 @@ useEffect(() => {
 
         </div>{/* end mgr-table-scope */}
 
-      </div>{/* end card ← THIS was the missing closing div */}
+      </div>{/* end card */}
 
       {/* ================= CREATE MODAL ================= */}
-      {showModal && (
-        <div className="modal-backdrop-custom" onClick={() => setShowModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
+      {showModal && createPortal(
+        <div className="om-backdrop" onClick={() => setShowModal(false)}>
+          <div className="om-modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-row">
               <h4>Create Caretaker</h4>
               <button className="modal-close-btn" onClick={() => setShowModal(false)}>×</button>
@@ -414,13 +415,14 @@ useEffect(() => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ================= ASSIGN / REMOVE MODAL ================= */}
-      {assignModal && (
-        <div className="modal-backdrop-custom" onClick={() => setAssignModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "500px" }} onClick={(e) => e.stopPropagation()}>
+      {assignModal && createPortal(
+        <div className="om-backdrop" onClick={() => setAssignModal(false)}>
+          <div className="om-modal-box" style={{ maxWidth: "500px" }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-row">
               <h4>Manage PGs — {selectedManager?.name}</h4>
               <button className="modal-close-btn" onClick={() => setAssignModal(false)}>×</button>
@@ -451,13 +453,14 @@ useEffect(() => {
               <button className="modal-btn primary" onClick={assignPg}>Assign</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ================= RESET PASSWORD MODAL ================= */}
-      {resetModal && (
-        <div className="modal-backdrop-custom" onClick={() => setResetModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
+      {resetModal && createPortal(
+        <div className="om-backdrop" onClick={() => setResetModal(false)}>
+          <div className="om-modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-row">
               <h4>Reset Password — {selectedManager?.name}</h4>
               <button className="modal-close-btn" onClick={() => setResetModal(false)}>×</button>
@@ -477,7 +480,8 @@ useEffect(() => {
               <button className="modal-btn primary" onClick={resetPassword}>Reset</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </DashboardLayout>
