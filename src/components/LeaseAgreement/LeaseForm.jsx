@@ -44,7 +44,9 @@ const GENERAL_RULES = [
   "Parking as per allotment only",
 ];
 
-const LeaseForm = ({formData, onChange, errors = {}}) => {
+const LeaseForm = ({formData, onChange, errors = {}, ownerPGs = [], ownerResidents = [], owner = null}) => {
+  const filteredResidents = ownerResidents?.filter(r => r.pgName === formData.pgName) || [];
+
   const handleChange = (e) => {
     let {name, value} = e.target;
     if (name === "ownerPhone" || name === "tenantPhone") {
@@ -178,6 +180,38 @@ const LeaseForm = ({formData, onChange, errors = {}}) => {
         <FiHome className="lease-form-section-icon" /> PG &amp; Property Details
       </h3>
 
+      {ownerPGs && ownerPGs.length > 1 && (
+        <div className="lease-floating-group" style={{ marginBottom: '24px' }}>
+          <select
+            value={formData.pgName}
+            onChange={(e) => {
+              const selectedPG = ownerPGs.find(pg => pg.name === e.target.value);
+              if (selectedPG) {
+                onChange({
+                  ...formData,
+                  pgName: selectedPG.name,
+                  propertyAddress: selectedPG.address || "",
+                  ownerName: owner?.name || formData.ownerName,
+                  ownerPhone: owner?.phone || formData.ownerPhone,
+                  ownerEmail: owner?.email || formData.ownerEmail
+                });
+              } else {
+                onChange({...formData, pgName: e.target.value});
+              }
+            }}
+            className="rr-select"
+          >
+            <option value="">-- Select your PG --</option>
+            {ownerPGs.map((pg) => (
+              <option key={pg.id} value={pg.name}>{pg.name}</option>
+            ))}
+          </select>
+          <div className="rr-select-arrow">
+            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M16.293 9.293 12 13.586 7.707 9.293l-1.414 1.414L12 16.414l5.707-5.707z"></path></svg>
+          </div>
+        </div>
+      )}
+
       <div className="lease-floating-group">
         <input
           id="pgName"
@@ -283,6 +317,39 @@ const LeaseForm = ({formData, onChange, errors = {}}) => {
       <h3 className="lease-form-section-title lease-section-gap">
         <FiUser className="lease-form-section-icon" /> Tenant Details
       </h3>
+
+      {filteredResidents && filteredResidents.length > 0 && (
+        <div className="lease-floating-group" style={{ marginBottom: '24px' }}>
+          <select
+            value={formData.tenantName}
+            onChange={(e) => {
+              const selectedResident = filteredResidents.find(r => r.name === e.target.value);
+              if (selectedResident) {
+                onChange({
+                  ...formData,
+                  tenantName: selectedResident.name,
+                  tenantPhone: selectedResident.phone || "",
+                  tenantEmail: selectedResident.email || "",
+                  roomBedNumber: `${selectedResident.roomNumber || ""}/${selectedResident.bedNumber || ""}`.replace(/^\/|\/$/g, '') || formData.roomBedNumber,
+                  monthlyRent: selectedResident.monthlyRent?.toString() || formData.monthlyRent,
+                  securityDeposit: selectedResident.deposit?.toString() || formData.securityDeposit
+                });
+              } else {
+                onChange({...formData, tenantName: e.target.value});
+              }
+            }}
+            className="rr-select"
+          >
+            <option value="">-- Select a Tenant --</option>
+            {filteredResidents.map((r) => (
+              <option key={r.residentId} value={r.name}>{r.name} {r.roomNumber ? `(${r.roomNumber})` : ''}</option>
+            ))}
+          </select>
+          <div className="rr-select-arrow">
+            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M16.293 9.293 12 13.586 7.707 9.293l-1.414 1.414L12 16.414l5.707-5.707z"></path></svg>
+          </div>
+        </div>
+      )}
 
       <div className="lease-floating-group">
         <input

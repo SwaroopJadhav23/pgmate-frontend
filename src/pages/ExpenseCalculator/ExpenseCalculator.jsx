@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, useContext} from "react";
 import {FiRefreshCw} from "react-icons/fi";
 import Swal from "sweetalert2";
 import ExpenseCalculatorHero from "../../components/ExpenseCalculator/ExpenseCalculatorHero";
@@ -6,6 +6,8 @@ import ExpenseCalculatorFeatures from "../../components/ExpenseCalculator/Expens
 import ExpenseForm from "../../components/ExpenseCalculator/ExpenseForm";
 import ExpenseReportPreview from "../../components/ExpenseCalculator/ExpenseReportPreview";
 import "../../components/ExpenseCalculator/ExpenseCalculator.css";
+import { AuthContext } from "../../context/AuthContext";
+import api from "../../api/axios";
 
 const DEFAULT_FORM = {
   pgName: "",
@@ -28,6 +30,9 @@ const DEFAULT_FORM = {
 };
 
 const ExpenseCalculator = () => {
+  const { isAuthenticated, role } = useContext(AuthContext);
+  const [ownerPGs, setOwnerPGs] = useState([]);
+  const [pgStats, setPgStats] = useState([]);
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [errors, setErrors] = useState({});
   const [isGenerating, setIsGenerating] = useState(false);
@@ -38,6 +43,38 @@ const ExpenseCalculator = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isAuthenticated && role === "OWNER") {
+        try {
+          const [pgsRes, statsRes] = await Promise.all([
+            api.get("/owner/pgs"),
+            api.get("/owner/pgs/stats")
+          ]);
+          const fetchedPGs = pgsRes.data || [];
+          const fetchedStats = statsRes.data || [];
+          setOwnerPGs(fetchedPGs);
+          setPgStats(fetchedStats);
+          
+          if (fetchedPGs.length === 1) {
+            const pgId = fetchedPGs[0].id;
+            const stats = fetchedStats.find(s => s.pgId === pgId) || {};
+            setFormData(prev => ({
+              ...prev,
+              pgName: fetchedPGs[0].name,
+              numRooms: stats.totalRooms?.toString() || prev.numRooms,
+              totalBeds: stats.totalBeds?.toString() || prev.totalBeds,
+              occupiedBeds: stats.occupiedBeds?.toString() || prev.occupiedBeds
+            }));
+          }
+        } catch (error) {
+          console.error("Failed to fetch PG data:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [isAuthenticated, role]);
 
   const validateForm = () => {
     const e = {};
@@ -150,6 +187,8 @@ const ExpenseCalculator = () => {
                   formData={formData}
                   onChange={handleFormChange}
                   errors={errors}
+                  ownerPGs={ownerPGs}
+                  pgStats={pgStats}
                 />
                 <div className="form-actions-wrapper">
                   <button

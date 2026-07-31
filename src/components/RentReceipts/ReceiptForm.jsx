@@ -9,7 +9,7 @@ const PAYMENT_MODES = ["Cash", "Online Transfer", "Cheque", "UPI"];
  * ReceiptForm — Left panel with input fields.
  * Uses PGMate brand styling (labels above inputs).
  */
-const ReceiptForm = ({formData, onChange, errors = {}}) => {
+const ReceiptForm = ({formData, onChange, errors = {}, ownerPGs, ownerResidents, owner}) => {
   const handleChange = (e) => {
     let {name, value} = e.target;
     if (name === "phoneNo") {
@@ -40,11 +40,46 @@ const ReceiptForm = ({formData, onChange, errors = {}}) => {
   const nextYear = new Date();
   nextYear.setFullYear(today.getFullYear() + 1);
 
+  const availableTenants = ownerResidents && formData.pgName 
+    ? ownerResidents.filter(r => r.pgName === formData.pgName) 
+    : [];
+
   return (
     <div className="rr-editor">
       <h3 className="form-section-title">
         <FiHome className="form-section-icon" /> PG Details
       </h3>
+
+      {ownerPGs && ownerPGs.length > 1 && (
+        <div className="form-group">
+          <label htmlFor="pgSelect">Select PG to Autofill</label>
+          <select
+            id="pgSelect"
+            className="rr-select"
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const selectedPg = ownerPGs.find((pg) => pg.id.toString() === selectedId);
+              if (selectedPg) {
+                onChange({
+                  ...formData,
+                  pgName: selectedPg.name,
+                  pgAddress: selectedPg.address,
+                  landlordName: owner?.name || formData.landlordName,
+                  phoneNo: owner?.phone || formData.phoneNo
+                });
+              }
+            }}
+            defaultValue=""
+          >
+            <option value="" disabled>Select your PG...</option>
+            {ownerPGs.map((pg) => (
+              <option key={pg.id} value={pg.id}>
+                {pg.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="form-group">
         <label htmlFor="pgName">
@@ -117,6 +152,38 @@ const ReceiptForm = ({formData, onChange, errors = {}}) => {
       <h3 className="form-section-title form-section-title-mt28">
         <FiUser className="form-section-icon" /> Tenant Details
       </h3>
+
+      {availableTenants.length > 0 && (
+        <div className="form-group">
+          <label htmlFor="tenantSelect">Select Tenant to Autofill</label>
+          <select
+            id="tenantSelect"
+            className="rr-select"
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const selectedResident = availableTenants.find((r) => r.residentId.toString() === selectedId);
+              if (selectedResident) {
+                const matchedMode = PAYMENT_MODES.find(m => m.toLowerCase() === (selectedResident.onboardingPaymentMode || "").toLowerCase());
+                onChange({
+                  ...formData,
+                  tenantName: selectedResident.name || formData.tenantName,
+                  rentAmount: selectedResident.monthlyRent || formData.rentAmount,
+                  securityDeposit: selectedResident.deposit || formData.securityDeposit,
+                  paymentMode: matchedMode || formData.paymentMode
+                });
+              }
+            }}
+            defaultValue=""
+          >
+            <option value="" disabled>Select a tenant...</option>
+            {availableTenants.map((r) => (
+              <option key={r.residentId} value={r.residentId}>
+                {r.name} {r.roomNumber ? `(Room ${r.roomNumber})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="form-group">
         <label htmlFor="tenantName">

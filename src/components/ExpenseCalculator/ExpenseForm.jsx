@@ -39,7 +39,7 @@ const Field = ({
   );
 };
 
-const ExpenseForm = ({formData, onChange, errors = {}}) => {
+const ExpenseForm = ({formData, onChange, errors = {}, ownerPGs, pgStats}) => {
   const handleChange = (e) => {
     const {name, value} = e.target;
     onChange({...formData, [name]: value});
@@ -51,6 +51,44 @@ const ExpenseForm = ({formData, onChange, errors = {}}) => {
       <h3 className="exp-form-section-title">
         <FiHome className="exp-form-section-icon" /> PG Information
       </h3>
+
+      {ownerPGs && ownerPGs.length > 1 && (
+        <div className="exp-floating-group">
+          <select
+            id="pgSelect"
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const selectedPg = ownerPGs.find(pg => pg.id.toString() === selectedId);
+              const stats = pgStats.find(s => s.pgId === selectedId) || {};
+              if (selectedPg) {
+                onChange({
+                  ...formData,
+                  pgName: selectedPg.name,
+                  numRooms: stats.totalRooms?.toString() || formData.numRooms,
+                  totalBeds: stats.totalBeds?.toString() || formData.totalBeds,
+                  occupiedBeds: stats.occupiedBeds?.toString() || formData.occupiedBeds
+                });
+              }
+            }}
+            defaultValue=""
+            style={{ 
+              appearance: "none", 
+              backgroundImage: "url(\"data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236f7af0%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E\")",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 14px center",
+              backgroundSize: "18px"
+            }}
+          >
+            <option value="" disabled hidden></option>
+            {ownerPGs.map((pg) => (
+              <option key={pg.id} value={pg.id}>{pg.name}</option>
+            ))}
+          </select>
+          <label htmlFor="pgSelect" style={{ transform: "translateY(-10px) scale(0.75)", fontWeight: 700, color: "#64748b" }}>
+            Select PG to Autofill
+          </label>
+        </div>
+      )}
 
       <div className="exp-floating-group">
         <input
