@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, useContext} from "react";
 import {FiRefreshCw} from "react-icons/fi";
 import Swal from "sweetalert2";
 import ReceiptForm from "../../components/RentReceipts/ReceiptForm";
@@ -6,6 +6,8 @@ import ReceiptPreview from "../../components/RentReceipts/ReceiptPreview";
 import RentReceiptHero from "../../components/RentReceipts/RentReceiptHero";
 import RentReceiptFeatures from "../../components/RentReceipts/RentReceiptFeatures";
 import "../../components/RentReceipts/RentReceiptGenerator.css";
+import {AuthContext} from "../../context/AuthContext";
+import api from "../../api/axios";
 
 const DEFAULT_FORM = {
   pgName: "",
@@ -25,6 +27,9 @@ const DEFAULT_FORM = {
 };
 
 const RentReceiptGenerator = () => {
+  const { isAuthenticated, role, owner } = useContext(AuthContext);
+  const [ownerPGs, setOwnerPGs] = useState([]);
+  const [ownerResidents, setOwnerResidents] = useState([]);
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [errors, setErrors] = useState({});
   const [savedReceipt, setSavedReceipt] = useState(null);
@@ -37,6 +42,35 @@ const RentReceiptGenerator = () => {
     // Scroll to the very top of the page on load
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isAuthenticated && role === "OWNER") {
+        try {
+          const [pgsRes, residentsRes] = await Promise.all([
+            api.get("/owner/pgs"),
+            api.get("/owner/residents")
+          ]);
+          const fetchedPGs = pgsRes.data || [];
+          const fetchedResidents = residentsRes.data || [];
+          setOwnerPGs(fetchedPGs);
+          setOwnerResidents(fetchedResidents);
+          if (fetchedPGs.length === 1) {
+            setFormData(prev => ({
+              ...prev,
+              pgName: fetchedPGs[0].name,
+              pgAddress: fetchedPGs[0].address,
+              landlordName: owner?.name || prev.landlordName,
+              phoneNo: owner?.phone || prev.phoneNo
+            }));
+          }
+        } catch (error) {
+          console.error("Failed to fetch owner data:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [isAuthenticated, role, owner]);
 
   const handleGenerate = () => {
     const currentErrors = validateForm();
@@ -165,6 +199,9 @@ const RentReceiptGenerator = () => {
                   formData={formData}
                   onChange={handleFormChange}
                   errors={errors}
+                  ownerPGs={ownerPGs}
+                  ownerResidents={ownerResidents}
+                  owner={owner}
                 />
                 <div className="form-actions-wrapper">
                   <button className="rr-primary-btn" onClick={handleGenerate}>

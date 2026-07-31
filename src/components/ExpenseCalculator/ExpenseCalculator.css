@@ -91,7 +91,8 @@
   margin-bottom: 16px;
 }
 
-.exp-floating-group input {
+.exp-floating-group input,
+.exp-floating-group select {
   width: 100%;
   padding: 18px 14px 6px;
   height: 52px;
@@ -108,12 +109,14 @@
   font-family: inherit;
 }
 
-.exp-floating-group input:focus {
+.exp-floating-group input:focus,
+.exp-floating-group select:focus {
   border-color: #6f7af0;
   box-shadow: 0 0 0 3px rgba(92, 84, 246, 0.08);
 }
 
-.exp-floating-group input.input-error {
+.exp-floating-group input.input-error,
+.exp-floating-group select.input-error {
   border-color: #ef4444;
 }
 
@@ -132,7 +135,9 @@
 }
 
 .exp-floating-group input:focus ~ label,
-.exp-floating-group input:not(:placeholder-shown) ~ label {
+.exp-floating-group input:not(:placeholder-shown) ~ label,
+.exp-floating-group select:focus ~ label,
+.exp-floating-group select:not([value=""]) ~ label {
   transform: translateY(-10px) scale(0.75);
   font-weight: 700;
   color: #64748b;

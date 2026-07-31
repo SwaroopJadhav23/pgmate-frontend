@@ -13,7 +13,8 @@ const MenuEditor = ({
   theme,
   setTheme,
   pgNameRef,
-  addressRef
+  addressRef,
+  ownerPGs
 }) => {
   const [openDayId, setOpenDayId] = useState(1);
 
@@ -200,6 +201,49 @@ const MenuEditor = ({
       <h3 className="form-section-title">
         <FiHome className="form-section-icon" /> PG Details
       </h3>
+
+      {ownerPGs && ownerPGs.length > 1 && (
+        <div className="form-group">
+          <label>Select PG to Autofill</label>
+          <select
+            style={{
+              width: "100%",
+              padding: "12px 40px 12px 14px",
+              height: "48px",
+              borderRadius: "12px",
+              border: "1.5px solid #e2e8f0",
+              background: "#f8fafc",
+              backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%234f46e5' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 14px center",
+              backgroundSize: "18px 18px",
+              fontFamily: "inherit",
+              fontSize: "0.95rem",
+              color: "#1e293b",
+              cursor: "pointer",
+              appearance: "none",
+              WebkitAppearance: "none",
+              MozAppearance: "none"
+            }}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const selectedPg = ownerPGs.find((pg) => pg.id.toString() === selectedId);
+              if (selectedPg) {
+                setPgName(selectedPg.name);
+                setAddress(selectedPg.address);
+              }
+            }}
+            defaultValue=""
+          >
+            <option value="" disabled>Select your PG...</option>
+            {ownerPGs.map((pg) => (
+              <option key={pg.id} value={pg.id}>
+                {pg.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="form-group">
         <label>PG / Hostel Name <span className="required">*</span></label>

@@ -351,7 +351,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
                 value={form.stayType}
                 onChange={(e) => setForm({ ...form, stayType: e.target.value })}
               >
-<option value="MONTHLY_BASIC">Monthly Basic</option>
+                <option value="MONTHLY_BASIC">Monthly Basic</option>
                 <option value="DAILY_BASIC" disabled={!selectedRoom?.dailyRent}>Daily Basic</option>
               </Form.Select>
             </div>
@@ -472,7 +472,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
             {/* ID Proof */}
 
-           <div className="arm-field arm-id-proof-field" data-mobile-full="true">
+            <div className="arm-field arm-id-proof-field" data-mobile-full="true">
               <label>ID Proof</label>
               <Form.Control type="file" accept="image/*,.pdf" onChange={(e) => setIdProof(e.target.files[0])} />
             </div>

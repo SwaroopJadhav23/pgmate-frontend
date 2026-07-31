@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, useContext} from "react";
 import {FiRefreshCw} from "react-icons/fi";
 import Swal from "sweetalert2";
 import LeaseAgreementHero from "../../components/LeaseAgreement/LeaseAgreementHero";
@@ -6,6 +6,8 @@ import LeaseForm from "../../components/LeaseAgreement/LeaseForm";
 import LeasePreview from "../../components/LeaseAgreement/LeasePreview";
 import LeaseAgreementFeatures from "../../components/LeaseAgreement/LeaseAgreementFeatures";
 import "../../components/LeaseAgreement/LeaseAgreementGenerator.css";
+import {AuthContext} from "../../context/AuthContext";
+import api from "../../api/axios";
 
 const DEFAULT_FORM = {
   pgName: "",
@@ -45,6 +47,9 @@ const DEFAULT_FORM = {
 };
 
 const LeaseAgreementGenerator = () => {
+  const { isAuthenticated, role, owner } = useContext(AuthContext);
+  const [ownerPGs, setOwnerPGs] = useState([]);
+  const [ownerResidents, setOwnerResidents] = useState([]);
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [errors, setErrors] = useState({});
   const [isGenerating, setIsGenerating] = useState(false);
@@ -55,6 +60,36 @@ const LeaseAgreementGenerator = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isAuthenticated && role === "OWNER") {
+        try {
+          const [pgsRes, residentsRes] = await Promise.all([
+            api.get("/owner/pgs"),
+            api.get("/owner/residents")
+          ]);
+          const fetchedPGs = pgsRes.data || [];
+          const fetchedResidents = residentsRes.data || [];
+          setOwnerPGs(fetchedPGs);
+          setOwnerResidents(fetchedResidents);
+          if (fetchedPGs.length === 1) {
+            setFormData(prev => ({
+              ...prev,
+              pgName: fetchedPGs[0].name,
+              propertyAddress: fetchedPGs[0].address,
+              ownerName: owner?.name || prev.ownerName,
+              ownerPhone: owner?.phone || prev.ownerPhone,
+              ownerEmail: owner?.email || prev.ownerEmail
+            }));
+          }
+        } catch (error) {
+          console.error("Failed to fetch owner data:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [isAuthenticated, role, owner]);
 
   const validateForm = (opts = {setErrors: true}) => {
     const e = {};
@@ -181,6 +216,9 @@ const LeaseAgreementGenerator = () => {
                   formData={formData}
                   onChange={handleFormChange}
                   errors={errors}
+                  ownerPGs={ownerPGs}
+                  ownerResidents={ownerResidents}
+                  owner={owner}
                 />
                 <div className="form-actions-wrapper">
                   <button

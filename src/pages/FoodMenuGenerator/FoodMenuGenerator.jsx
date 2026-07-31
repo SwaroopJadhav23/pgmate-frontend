@@ -1,9 +1,10 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import MenuEditor from "../../components/MenuGenerator/MenuEditor";
 import MenuPreview from "../../components/MenuGenerator/MenuPreview";
 import FoodMenuHero from "../../components/MenuGenerator/FoodMenuHero";
 import FoodMenuDemo from "../../components/MenuGenerator/FoodMenuDemo";
 import "../../components/MenuGenerator/FoodMenuGenerator.css";
+import api from "../../api/axios";
 import { jsPDF } from "jspdf";
 import * as htmlToImage from "html-to-image";
 import { saveMenu } from "../../services/menuService";
@@ -70,6 +71,7 @@ const FoodMenuGenerator = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showAuthModal,setShowAuthModal]= useState(false);
   const [pendingDownload, setPendingDownload] = useState(null);
+  const [ownerPGs, setOwnerPGs] = useState([]);
 
   // eslint-disable-next-line no-unused-vars
   const [saving, setSaving] = useState(false);
@@ -83,6 +85,25 @@ const FoodMenuGenerator = () => {
 
   // responsive zoom
   const [previewZoom, setPreviewZoom] = useState(0.48);
+
+  useEffect(() => {
+    const fetchPGs = async () => {
+      if (isAuthenticated && role === "OWNER") {
+        try {
+          const res = await api.get("/owner/pgs");
+          const fetchedPGs = res.data || [];
+          setOwnerPGs(fetchedPGs);
+          if (fetchedPGs.length === 1) {
+            setPgName(fetchedPGs[0].name);
+            setAddress(fetchedPGs[0].address);
+          }
+        } catch (error) {
+          console.error("Failed to fetch owner PGs:", error);
+        }
+      }
+    };
+    fetchPGs();
+  }, [isAuthenticated, role]);
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -330,6 +351,7 @@ const FoodMenuGenerator = () => {
                   theme={theme}           setTheme={setTheme}
                   pgNameRef={pgNameRef}
                   addressRef={addressRef}
+                  ownerPGs={ownerPGs}
                 />
                 <div className="form-actions-wrapper">
                   <button onClick={handleGenerate} className="menu-primary-btn">
