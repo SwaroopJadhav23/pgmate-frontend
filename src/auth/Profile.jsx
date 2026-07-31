@@ -437,7 +437,16 @@ const Profile = () => {
               <button
                 className="pv-edit-btn"
                 style={{background: "#dc2626", color: "#fff"}}
-                onClick={() => setShowDeleteModal(true)}
+                onClick={() => {
+                  setDeleteForm({
+                    fullName: profile.name || "",
+                    phone: profile.phone || "",
+                    email: profile.email || "",
+                    reason: "",
+                    confirmation: "",
+                  });
+                  setShowDeleteModal(true);
+                }}
               >
                 Delete Account
               </button>
