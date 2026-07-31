@@ -588,6 +588,19 @@ const Cities = () => {
                   </motion.button>
                 )}
               </AnimatePresence>
+              <button
+                type="button"
+                className="cities-search-btn"
+                aria-label="Search"
+                disabled={!search.trim()}
+                onClick={() => {
+                  if (search.trim()) {
+                    handleCityClick(filtered.length > 0 ? filtered[0].name : search.trim());
+                  }
+                }}
+              >
+                Search
+              </button>
             </motion.div>
 
             {!search && quickChips.length > 0 && (

@@ -260,6 +260,36 @@
   background: #E4E4EC;
 }
 
+.cities-search-btn {
+  flex-shrink: 0;
+  border: none;
+  background: var(--cities-accent);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+.cities-search-btn:hover:not(:disabled) {
+  background: var(--cities-accent-2);
+  transform: translateY(-1px);
+}
+
+.cities-search-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .cities-search-btn {
+    padding: 9px 14px;
+    font-size: 0.78rem;
+  }
+}
+
 /* ============ QUICK CHIPS ============ */
 
 .cities-quick-chips {
