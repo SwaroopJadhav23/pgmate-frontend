@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Building2,
   Users2,
@@ -67,27 +67,27 @@ const demoSteps = [
     title: "Add your PG",
     desc: "See how to list your PG — add your property details, amenities, and photos in just a few steps.",
     video: "/AddPGDemo.mp4",
-    poster: "/AddPGDemo.jpg",
+    youtubeId: "CPe0B2Hwyl8",
   },
   {
     title: "Add rooms & set rent",
     desc: "Learn how to add rooms to your PG, choose the sharing type, and set the monthly rent and deposit.",
-    video: "/AddRoomDemo.mp4",
+    youtubeId: "5FEDHUfyFDk",
   },
   {
     title: "Add a tenant",
     desc: "See how to add a new tenant to your PG — assign a bed, fill in their details, and set the rent. Simple and done in minutes.",
-    video: "/demo.mp4",
+    youtubeId: "OGS2Q300W3M",
   },
-  {
+  /*{
     title: "Handle complaints, the easy way",
     desc: "Tenants report issues directly in the app. You get notified, assign it, and mark it resolved — no calls, no WhatsApp threads.",
     video: "/demo.mp4",
-  },
+  },*/
   {
     title: "Know your rent status at a glance",
     desc: "See exactly who has paid, who hasn't, and how much you've collected this month — all in one clear view.",
-    video: "/demo.mp4",
+    youtubeId: "3Oo8T3sKYgA",
   },
 ];
 
@@ -354,7 +354,7 @@ const securityWords = securityPoints.map((s) => s.title);
 
 /* ---------------- ANIMATED NUMBER ---------------- */
 
-const AnimatedNumber = ({value}) => {
+const AnimatedNumber = ({ value }) => {
   const [display, setDisplay] = useState("0");
   const ref = useRef(null);
   const started = useRef(false);
@@ -385,7 +385,7 @@ const AnimatedNumber = ({value}) => {
           requestAnimationFrame(step);
         }
       },
-      {threshold: 0.4},
+      { threshold: 0.4 },
     );
 
     if (ref.current) obs.observe(ref.current);
@@ -449,8 +449,11 @@ const ForOwnersPage = () => {
       value: cityCount !== null ? `${cityCount}+` : "20+",
       label: "Cities covered",
     },
-    {value: "100%", label: "Digital management"},
+    { value: "100%", label: "Digital management" },
   ];
+
+  const [playing, setPlaying] = useState({});
+  const [ready, setReady] = useState({});
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -490,7 +493,7 @@ const ForOwnersPage = () => {
       stepRefs.current[activeIndex]?.classList.add("active");
     };
 
-    window.addEventListener("scroll", update, {passive: true});
+    window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     update();
 
@@ -506,7 +509,7 @@ const ForOwnersPage = () => {
         const id = window.location.hash.replace("#", "");
         const element = document.getElementById(id);
         if (element) {
-          element.scrollIntoView({behavior: "smooth", block: "start"});
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }, 300);
     }
@@ -545,7 +548,7 @@ const ForOwnersPage = () => {
                   onClick={() =>
                     document
                       .getElementById("demo-videos")
-                      ?.scrollIntoView({behavior: "smooth"})
+                      ?.scrollIntoView({ behavior: "smooth" })
                   }
                 >
                   Watch demo ↓
@@ -703,12 +706,12 @@ const ForOwnersPage = () => {
                             Collected this month
                           </span>
                           <div className="fo-mock-bars">
-                            <span style={{height: "30%"}} />
-                            <span style={{height: "45%"}} />
-                            <span style={{height: "38%"}} />
-                            <span style={{height: "60%"}} />
-                            <span style={{height: "52%"}} />
-                            <span style={{height: "78%"}} />
+                            <span style={{ height: "30%" }} />
+                            <span style={{ height: "45%" }} />
+                            <span style={{ height: "38%" }} />
+                            <span style={{ height: "60%" }} />
+                            <span style={{ height: "52%" }} />
+                            <span style={{ height: "78%" }} />
                           </div>
                           <div className="fo-dash-mini-row">
                             <div className="fo-dash-mini-pill fo-dash-mini-amber">
@@ -830,7 +833,7 @@ const ForOwnersPage = () => {
             access-controlled, and never shared with third parties.
           </p>
 
-          <div className="fo-security-grid" style={{marginTop: "32px"}}>
+          <div className="fo-security-grid" style={{ marginTop: "32px" }}>
             {securityPoints.map((sp, i) => {
               const Icon = sp.icon;
               return (
@@ -849,857 +852,884 @@ const ForOwnersPage = () => {
 
       {/* DEMO VIDEOS */}
       <section className="fo-section" id="demo-videos">
-        <div className="container">
-          <div className="fo-eyebrow">See it in action</div>
-          <h2 className="fo-title">Watch how owners use PGMate</h2>
-          <p className="fo-sub">
-            Four short clips, each under two minutes — covering exactly what
-            you'll do in your first week.
-          </p>
+  <div className="container">
+    <div className="fo-eyebrow">See it in action</div>
+    <h2 className="fo-title">Watch how owners use PGMate</h2>
+    <p className="fo-sub">
+      Four short clips, each under two minutes — covering exactly what
+      you'll do in your first week.
+    </p>
 
-          <div className="demo-track" ref={trackRef}>
-            <div className="demo-string">
-              <div className="demo-string-fill" ref={fillRef} />
+    <div className="demo-track" ref={trackRef}>
+      <div className="demo-string">
+        <div className="demo-string-fill" ref={fillRef} />
+      </div>
+      <div className="demo-ball" ref={ballRef} />
+
+      <div className="demo-steps">
+        {demoSteps.map((s, i) => (
+          <div
+            key={i}
+            className="demo-step"
+            ref={(el) => (stepRefs.current[i] = el)}
+          >
+            <div className="demo-dot">{i + 1}</div>
+            <div className="demo-text">
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
             </div>
-            <div className="demo-ball" ref={ballRef} />
-
-            <div className="demo-steps">
-              {demoSteps.map((s, i) => (
-                <div
-                  key={i}
-                  className="demo-step"
-                  ref={(el) => (stepRefs.current[i] = el)}
-                >
-                  <div className="demo-dot">{i + 1}</div>
-                  <div className="demo-text">
-                    <h3>{s.title}</h3>
-                    <p>{s.desc}</p>
-                  </div>
-                  <div className="demo-video">
-                    <video
-                      src={s.video}
-                      controls
-                      muted
-                      preload="metadata"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "inherit",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <div className="demo-dur">{s.tag}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* WHO IS THIS FOR */}
-      <section className="fo-section fo-section-alt">
-        <div className="container">
-          <div className="fo-eyebrow">Built for</div>
-          <h2 className="fo-title">
-            Who PGMate is for{" "}
-            <span className="fo-rotating-word-wrapper">
-              <span className="fo-rotating-word" key={rotatingIndex}>
-                {audiences[rotatingIndex].title}
-              </span>
-            </span>
-          </h2>
-
-          <div className="row g-4 mt-2">
-            {audiences.map((a, i) => {
-              const Icon = a.icon;
-              return (
-                <div key={i} className="col-12 col-md-4">
-                  <div className="fo-audience-card">
-                    <div className="fo-audience-icon">
-                      <Icon size={24} strokeWidth={1.8} />
-                    </div>
-                    <h3>{a.title}</h3>
-                    <p>{a.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* COMPARE */}
-      <section className="fo-section">
-        <div className="container">
-          {/* BANNER HEADER */}
-          <div className="fo-cv2-banner">
-            {/* LEFT — clipboard + books */}
-            <div className="fo-cv2-banner-left">
-              <svg
-                width="240"
-                height="160"
-                viewBox="0 0 160 110"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="10"
-                  y="72"
-                  width="72"
-                  height="14"
-                  rx="3"
-                  fill="#4a47a3"
-                />
-                <rect
-                  x="6"
-                  y="58"
-                  width="76"
-                  height="16"
-                  rx="3"
-                  fill="#6c63d6"
-                />
-                <rect
-                  x="12"
-                  y="46"
-                  width="68"
-                  height="14"
-                  rx="3"
-                  fill="#9b97e0"
-                />
-                <line
-                  x1="22"
-                  y1="46"
-                  x2="22"
-                  y2="60"
-                  stroke="#fff"
-                  strokeWidth="1"
-                  strokeOpacity="0.3"
-                />
-                <line
-                  x1="38"
-                  y1="58"
-                  x2="38"
-                  y2="74"
-                  stroke="#fff"
-                  strokeWidth="1"
-                  strokeOpacity="0.3"
-                />
-                <rect
-                  x="74"
-                  y="38"
-                  width="6"
-                  height="42"
-                  rx="2"
-                  fill="#f5a623"
-                  transform="rotate(-15 74 38)"
-                />
-                <polygon
-                  points="74,76 80,76 77,86"
-                  fill="#ffd580"
-                  transform="rotate(-15 74 38)"
-                />
-                <rect
-                  x="74"
-                  y="38"
-                  width="6"
-                  height="6"
-                  rx="1"
-                  fill="#e8e8e8"
-                  transform="rotate(-15 74 38)"
-                />
-                <rect
-                  x="44"
-                  y="8"
-                  width="68"
-                  height="78"
-                  rx="6"
-                  fill="#f7f8fc"
-                  stroke="#d1cee1"
-                  strokeWidth="1.5"
-                />
-                <rect
-                  x="62"
-                  y="4"
-                  width="32"
-                  height="10"
-                  rx="5"
-                  fill="#6c63d6"
-                />
-                <rect
-                  x="54"
-                  y="26"
-                  width="48"
-                  height="3"
-                  rx="1.5"
-                  fill="#d1cee1"
-                />
-                <rect
-                  x="54"
-                  y="34"
-                  width="40"
-                  height="3"
-                  rx="1.5"
-                  fill="#d1cee1"
-                />
-                <rect
-                  x="54"
-                  y="42"
-                  width="44"
-                  height="3"
-                  rx="1.5"
-                  fill="#d1cee1"
-                />
-                <rect
-                  x="54"
-                  y="50"
-                  width="36"
-                  height="3"
-                  rx="1.5"
-                  fill="#d1cee1"
-                />
-                <rect
-                  x="54"
-                  y="58"
-                  width="42"
-                  height="3"
-                  rx="1.5"
-                  fill="#d1cee1"
-                />
-                <circle cx="52" cy="27.5" r="5" fill="#27ae60" />
-                <polyline
-                  points="49.5,27.5 51.5,29.5 54.5,25"
-                  stroke="#fff"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="52" cy="35.5" r="5" fill="#27ae60" />
-                <polyline
-                  points="49.5,35.5 51.5,37.5 54.5,33"
-                  stroke="#fff"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="52" cy="43.5" r="5" fill="#e74c3c" />
-                <line
-                  x1="50"
-                  y1="41.5"
-                  x2="54"
-                  y2="45.5"
-                  stroke="#fff"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="54"
-                  y1="41.5"
-                  x2="50"
-                  y2="45.5"
-                  stroke="#fff"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <circle cx="22" cy="88" r="10" fill="#e74c3c" />
-                <line
-                  x1="19"
-                  y1="85"
-                  x2="25"
-                  y2="91"
-                  stroke="#fff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="25"
-                  y1="85"
-                  x2="19"
-                  y2="91"
-                  stroke="#fff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-
-            {/* CENTER */}
-            <div className="fo-cv2-banner-center">
-              <h2 className="fo-cv2-banner-title">Registers vs. PGMate</h2>
-              <p className="fo-cv2-banner-sub">
-                See how PGMate makes PG management smarter, faster &amp;
-                hassle-free
-              </p>
-            </div>
-
-            {/* RIGHT — laptop + phone */}
-            <div className="fo-cv2-banner-right">
-              <svg
-                width="280"
-                height="160"
-                viewBox="0 0 170 110"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <text x="128" y="16" fontSize="13" fill="#f5a623">
-                  ✦
-                </text>
-                <text x="148" y="30" fontSize="7" fill="#f5a623">
-                  ✦
-                </text>
-                <rect
-                  x="4"
-                  y="16"
-                  width="118"
-                  height="76"
-                  rx="6"
-                  fill="#3d3a8c"
-                />
-                <rect
-                  x="8"
-                  y="20"
-                  width="110"
-                  height="66"
-                  rx="4"
-                  fill="#2b2870"
-                />
-                <rect
-                  x="11"
-                  y="23"
-                  width="104"
-                  height="60"
-                  rx="3"
-                  fill="#f7f8fc"
-                />
-                <rect
-                  x="0"
-                  y="92"
-                  width="130"
-                  height="8"
-                  rx="3"
-                  fill="#4a47a3"
-                />
-                <rect
-                  x="46"
-                  y="92"
-                  width="38"
-                  height="3"
-                  rx="1.5"
-                  fill="#3d3a8c"
-                />
-                <rect
-                  x="11"
-                  y="23"
-                  width="104"
-                  height="10"
-                  rx="3"
-                  fill="#5b52d6"
-                />
-                <rect
-                  x="15"
-                  y="26"
-                  width="28"
-                  height="3.5"
-                  rx="1.5"
-                  fill="#fff"
-                  fillOpacity="0.6"
-                />
-                <rect
-                  x="98"
-                  y="26"
-                  width="14"
-                  height="3.5"
-                  rx="1.5"
-                  fill="#fff"
-                  fillOpacity="0.35"
-                />
-                <rect x="11" y="33" width="20" height="50" fill="#efedfd" />
-                <rect
-                  x="14"
-                  y="37"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#9b97e0"
-                />
-                <rect
-                  x="14"
-                  y="43"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="14"
-                  y="49"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="14"
-                  y="55"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="14"
-                  y="61"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="14"
-                  y="67"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="14"
-                  y="73"
-                  width="14"
-                  height="2.5"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="34"
-                  y="35"
-                  width="36"
-                  height="14"
-                  rx="2.5"
-                  fill="#fff"
-                  stroke="#e3e6f0"
-                  strokeWidth="0.5"
-                />
-                <rect
-                  x="37"
-                  y="38"
-                  width="14"
-                  height="2"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="37"
-                  y="42"
-                  width="10"
-                  height="4"
-                  rx="1"
-                  fill="#5b52d6"
-                />
-                <rect
-                  x="74"
-                  y="35"
-                  width="36"
-                  height="14"
-                  rx="2.5"
-                  fill="#fff"
-                  stroke="#e3e6f0"
-                  strokeWidth="0.5"
-                />
-                <rect
-                  x="77"
-                  y="38"
-                  width="14"
-                  height="2"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="77"
-                  y="42"
-                  width="10"
-                  height="4"
-                  rx="1"
-                  fill="#27ae60"
-                />
-                <rect
-                  x="34"
-                  y="53"
-                  width="76"
-                  height="28"
-                  rx="2.5"
-                  fill="#fff"
-                  stroke="#e3e6f0"
-                  strokeWidth="0.5"
-                />
-                <rect
-                  x="37"
-                  y="56"
-                  width="18"
-                  height="2"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="40"
-                  y="62"
-                  width="4"
-                  height="14"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="47"
-                  y="58"
-                  width="4"
-                  height="18"
-                  rx="1"
-                  fill="#9b97e0"
-                />
-                <rect
-                  x="54"
-                  y="60"
-                  width="4"
-                  height="16"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="61"
-                  y="55"
-                  width="4"
-                  height="21"
-                  rx="1"
-                  fill="#5b52d6"
-                />
-                <rect
-                  x="68"
-                  y="57"
-                  width="4"
-                  height="19"
-                  rx="1"
-                  fill="#9b97e0"
-                />
-                <rect
-                  x="75"
-                  y="63"
-                  width="4"
-                  height="13"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-                <rect
-                  x="82"
-                  y="59"
-                  width="4"
-                  height="17"
-                  rx="1"
-                  fill="#5b52d6"
-                />
-                <rect
-                  x="89"
-                  y="56"
-                  width="4"
-                  height="20"
-                  rx="1"
-                  fill="#9b97e0"
-                />
-                <rect
-                  x="94"
-                  y="55"
-                  width="13"
-                  height="6"
-                  rx="2"
-                  fill="#e6f9f0"
-                />
-                <text
-                  x="96"
-                  y="60"
-                  fontSize="3.8"
-                  fill="#27ae60"
-                  fontWeight="700"
-                >
-                  ▲ 12%
-                </text>
-                <rect
-                  x="114"
-                  y="34"
-                  width="46"
-                  height="72"
-                  rx="8"
-                  fill="#3d3a8c"
-                />
-                <rect
-                  x="117"
-                  y="38"
-                  width="40"
-                  height="62"
-                  rx="5"
-                  fill="#f7f8fc"
-                />
-                <rect
-                  x="130"
-                  y="35"
-                  width="16"
-                  height="4"
-                  rx="2"
-                  fill="#2b2870"
-                />
-                <rect
-                  x="117"
-                  y="38"
-                  width="40"
-                  height="9"
-                  rx="5"
-                  fill="#5b52d6"
-                />
-                <rect
-                  x="120"
-                  y="41"
-                  width="16"
-                  height="2.5"
-                  rx="1"
-                  fill="#fff"
-                  fillOpacity="0.7"
-                />
-                <rect
-                  x="120"
-                  y="51"
-                  width="10"
-                  height="10"
-                  rx="2.5"
-                  fill="#efedfd"
-                />
-                <rect
-                  x="133"
-                  y="51"
-                  width="10"
-                  height="10"
-                  rx="2.5"
-                  fill="#fde8e8"
-                />
-                <rect
-                  x="146"
-                  y="51"
-                  width="8"
-                  height="10"
-                  rx="2.5"
-                  fill="#e6f9f0"
-                />
-                <rect
-                  x="120"
-                  y="65"
-                  width="30"
-                  height="2.5"
-                  rx="1"
-                  fill="#e3e6f0"
-                />
-                <rect
-                  x="120"
-                  y="70"
-                  width="24"
-                  height="2.5"
-                  rx="1"
-                  fill="#e3e6f0"
-                />
-                <rect
-                  x="120"
-                  y="75"
-                  width="27"
-                  height="2.5"
-                  rx="1"
-                  fill="#e3e6f0"
-                />
-                <rect
-                  x="120"
-                  y="82"
-                  width="32"
-                  height="9"
-                  rx="3"
-                  fill="#5b52d6"
-                />
-                <text
-                  x="123"
-                  y="89"
-                  fontSize="4.5"
-                  fill="#fff"
-                  fontWeight="700"
-                >
-                  PGMate
-                </text>
-                <rect
-                  x="131"
-                  y="98"
-                  width="16"
-                  height="2"
-                  rx="1"
-                  fill="#c5c3ee"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div className="fo-cv2-wrap">
-            {/* HEADER PILLS */}
-            <div className="fo-cv2-head">
-              <div className="fo-cv2-cell-feat-head">Feature</div>
-              <div className="fo-cv2-cell-old-head">
-                <span className="fo-cv2-head-icon fo-cv2-head-icon-red">
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </span>
-                Traditional way
-              </div>
-              <div className="fo-cv2-cell-pg-head">
-                <span className="fo-cv2-head-icon fo-cv2-head-icon-green">
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
-                PGMate
-              </div>
-            </div>
-
-            {/* ROWS */}
-            <div className="fo-cv2-rows-wrap">
-              {compareRows.map((r, i) => (
-                <div key={i} className="fo-cv2-row">
-                  <div className="fo-cv2-cell-feat">
-                    <span className="fo-cv2-row-icon">{compareIcons[i]}</span>
-                    <span className="fo-cv2-row-label">{r.feature}</span>
-                  </div>
-                  <div className="fo-cv2-cell-old">
-                    <span className="fo-cv2-dot fo-cv2-dot-red">
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    </span>
-                    {r.old}
-                  </div>
-                  <div className="fo-cv2-cell-pg">
-                    <span className="fo-cv2-dot fo-cv2-dot-green">
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </span>
-                    {r.pg}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* FOOTER */}
-            <div className="fo-cv2-footer">
-              <div className="fo-cv2-footer-old">
-                <span className="fo-cv2-dot fo-cv2-dot-red fo-cv2-dot-lg">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </span>
-                <div>
-                  <strong>Traditional way</strong>
-                  <p>Time-consuming, error-prone &amp; hard to manage</p>
-                </div>
-              </div>
-              <div className="fo-cv2-footer-vs">VS</div>
-              <div className="fo-cv2-footer-pg">
-                <span className="fo-cv2-dot fo-cv2-dot-green fo-cv2-dot-lg">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
-                <div>
-                  <strong>PGMate</strong>
-                  <p>Smart, automated &amp; built for modern PG owners</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="fo-cta-band">
-        <div className="container">
-          <div className="fo-cta-left">
-            <div className="fo-cta-icon-wrap">
-              <CalendarCheck size={22} strokeWidth={1.6} />
-            </div>
-            <div>
-              <h2>Ready to simplify your PG management?</h2>
-              <p>
-                Book a free demo — we'll walk you through the owner dashboard
-                live. No commitment needed.
-              </p>
-            </div>
-          </div>
-          <div className="fo-cta-btns">
-            <button
-              className="btn-outline-grad btn-outline-on-dark"
-              onClick={() => navigate("/list-your-property")}
+            <div
+              className="demo-video"
+              onClick={() => {
+                setPlaying((p) => ({ ...p, [i]: true }));
+                setTimeout(() => setReady((r) => ({ ...r, [i]: true })), 1200);
+              }}
             >
-              List your PG →
-            </button>
+              <img
+                src={`https://img.youtube.com/vi/${s.youtubeId}/hqdefault.jpg`}
+                alt={s.title}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "inherit",
+                  display: "block",
+                }}
+              />
+              {playing[i] && (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${s.youtubeId}?autoplay=1`}
+                  title={s.title}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "inherit",
+                    border: "none",
+                    opacity: ready[i] ? 1 : 0,
+                    transition: "opacity 0.5s ease",
+                  }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
+              {!playing[i] && (
+                <div className="demo-play">
+                  <span>▶</span>
+                </div>
+              )}
+              <div className="demo-dur">{s.tag}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+  {/* WHO IS THIS FOR */ }
+  < section className = "fo-section fo-section-alt" >
+    <div className="container">
+      <div className="fo-eyebrow">Built for</div>
+      <h2 className="fo-title">
+        Who PGMate is for{" "}
+        <span className="fo-rotating-word-wrapper">
+          <span className="fo-rotating-word" key={rotatingIndex}>
+            {audiences[rotatingIndex].title}
+          </span>
+        </span>
+      </h2>
+
+      <div className="row g-4 mt-2">
+        {audiences.map((a, i) => {
+          const Icon = a.icon;
+          return (
+            <div key={i} className="col-12 col-md-4">
+              <div className="fo-audience-card">
+                <div className="fo-audience-icon">
+                  <Icon size={24} strokeWidth={1.8} />
+                </div>
+                <h3>{a.title}</h3>
+                <p>{a.desc}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+      </section >
+
+  {/* COMPARE */ }
+  < section className = "fo-section" >
+    <div className="container">
+      {/* BANNER HEADER */}
+      <div className="fo-cv2-banner">
+        {/* LEFT — clipboard + books */}
+        <div className="fo-cv2-banner-left">
+          <svg
+            width="240"
+            height="160"
+            viewBox="0 0 160 110"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="10"
+              y="72"
+              width="72"
+              height="14"
+              rx="3"
+              fill="#4a47a3"
+            />
+            <rect
+              x="6"
+              y="58"
+              width="76"
+              height="16"
+              rx="3"
+              fill="#6c63d6"
+            />
+            <rect
+              x="12"
+              y="46"
+              width="68"
+              height="14"
+              rx="3"
+              fill="#9b97e0"
+            />
+            <line
+              x1="22"
+              y1="46"
+              x2="22"
+              y2="60"
+              stroke="#fff"
+              strokeWidth="1"
+              strokeOpacity="0.3"
+            />
+            <line
+              x1="38"
+              y1="58"
+              x2="38"
+              y2="74"
+              stroke="#fff"
+              strokeWidth="1"
+              strokeOpacity="0.3"
+            />
+            <rect
+              x="74"
+              y="38"
+              width="6"
+              height="42"
+              rx="2"
+              fill="#f5a623"
+              transform="rotate(-15 74 38)"
+            />
+            <polygon
+              points="74,76 80,76 77,86"
+              fill="#ffd580"
+              transform="rotate(-15 74 38)"
+            />
+            <rect
+              x="74"
+              y="38"
+              width="6"
+              height="6"
+              rx="1"
+              fill="#e8e8e8"
+              transform="rotate(-15 74 38)"
+            />
+            <rect
+              x="44"
+              y="8"
+              width="68"
+              height="78"
+              rx="6"
+              fill="#f7f8fc"
+              stroke="#d1cee1"
+              strokeWidth="1.5"
+            />
+            <rect
+              x="62"
+              y="4"
+              width="32"
+              height="10"
+              rx="5"
+              fill="#6c63d6"
+            />
+            <rect
+              x="54"
+              y="26"
+              width="48"
+              height="3"
+              rx="1.5"
+              fill="#d1cee1"
+            />
+            <rect
+              x="54"
+              y="34"
+              width="40"
+              height="3"
+              rx="1.5"
+              fill="#d1cee1"
+            />
+            <rect
+              x="54"
+              y="42"
+              width="44"
+              height="3"
+              rx="1.5"
+              fill="#d1cee1"
+            />
+            <rect
+              x="54"
+              y="50"
+              width="36"
+              height="3"
+              rx="1.5"
+              fill="#d1cee1"
+            />
+            <rect
+              x="54"
+              y="58"
+              width="42"
+              height="3"
+              rx="1.5"
+              fill="#d1cee1"
+            />
+            <circle cx="52" cy="27.5" r="5" fill="#27ae60" />
+            <polyline
+              points="49.5,27.5 51.5,29.5 54.5,25"
+              stroke="#fff"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="52" cy="35.5" r="5" fill="#27ae60" />
+            <polyline
+              points="49.5,35.5 51.5,37.5 54.5,33"
+              stroke="#fff"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="52" cy="43.5" r="5" fill="#e74c3c" />
+            <line
+              x1="50"
+              y1="41.5"
+              x2="54"
+              y2="45.5"
+              stroke="#fff"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <line
+              x1="54"
+              y1="41.5"
+              x2="50"
+              y2="45.5"
+              stroke="#fff"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <circle cx="22" cy="88" r="10" fill="#e74c3c" />
+            <line
+              x1="19"
+              y1="85"
+              x2="25"
+              y2="91"
+              stroke="#fff"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <line
+              x1="25"
+              y1="85"
+              x2="19"
+              y2="91"
+              stroke="#fff"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+
+        {/* CENTER */}
+        <div className="fo-cv2-banner-center">
+          <h2 className="fo-cv2-banner-title">Registers vs. PGMate</h2>
+          <p className="fo-cv2-banner-sub">
+            See how PGMate makes PG management smarter, faster &amp;
+            hassle-free
+          </p>
+        </div>
+
+        {/* RIGHT — laptop + phone */}
+        <div className="fo-cv2-banner-right">
+          <svg
+            width="280"
+            height="160"
+            viewBox="0 0 170 110"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <text x="128" y="16" fontSize="13" fill="#f5a623">
+              ✦
+            </text>
+            <text x="148" y="30" fontSize="7" fill="#f5a623">
+              ✦
+            </text>
+            <rect
+              x="4"
+              y="16"
+              width="118"
+              height="76"
+              rx="6"
+              fill="#3d3a8c"
+            />
+            <rect
+              x="8"
+              y="20"
+              width="110"
+              height="66"
+              rx="4"
+              fill="#2b2870"
+            />
+            <rect
+              x="11"
+              y="23"
+              width="104"
+              height="60"
+              rx="3"
+              fill="#f7f8fc"
+            />
+            <rect
+              x="0"
+              y="92"
+              width="130"
+              height="8"
+              rx="3"
+              fill="#4a47a3"
+            />
+            <rect
+              x="46"
+              y="92"
+              width="38"
+              height="3"
+              rx="1.5"
+              fill="#3d3a8c"
+            />
+            <rect
+              x="11"
+              y="23"
+              width="104"
+              height="10"
+              rx="3"
+              fill="#5b52d6"
+            />
+            <rect
+              x="15"
+              y="26"
+              width="28"
+              height="3.5"
+              rx="1.5"
+              fill="#fff"
+              fillOpacity="0.6"
+            />
+            <rect
+              x="98"
+              y="26"
+              width="14"
+              height="3.5"
+              rx="1.5"
+              fill="#fff"
+              fillOpacity="0.35"
+            />
+            <rect x="11" y="33" width="20" height="50" fill="#efedfd" />
+            <rect
+              x="14"
+              y="37"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#9b97e0"
+            />
+            <rect
+              x="14"
+              y="43"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="14"
+              y="49"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="14"
+              y="55"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="14"
+              y="61"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="14"
+              y="67"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="14"
+              y="73"
+              width="14"
+              height="2.5"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="34"
+              y="35"
+              width="36"
+              height="14"
+              rx="2.5"
+              fill="#fff"
+              stroke="#e3e6f0"
+              strokeWidth="0.5"
+            />
+            <rect
+              x="37"
+              y="38"
+              width="14"
+              height="2"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="37"
+              y="42"
+              width="10"
+              height="4"
+              rx="1"
+              fill="#5b52d6"
+            />
+            <rect
+              x="74"
+              y="35"
+              width="36"
+              height="14"
+              rx="2.5"
+              fill="#fff"
+              stroke="#e3e6f0"
+              strokeWidth="0.5"
+            />
+            <rect
+              x="77"
+              y="38"
+              width="14"
+              height="2"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="77"
+              y="42"
+              width="10"
+              height="4"
+              rx="1"
+              fill="#27ae60"
+            />
+            <rect
+              x="34"
+              y="53"
+              width="76"
+              height="28"
+              rx="2.5"
+              fill="#fff"
+              stroke="#e3e6f0"
+              strokeWidth="0.5"
+            />
+            <rect
+              x="37"
+              y="56"
+              width="18"
+              height="2"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="40"
+              y="62"
+              width="4"
+              height="14"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="47"
+              y="58"
+              width="4"
+              height="18"
+              rx="1"
+              fill="#9b97e0"
+            />
+            <rect
+              x="54"
+              y="60"
+              width="4"
+              height="16"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="61"
+              y="55"
+              width="4"
+              height="21"
+              rx="1"
+              fill="#5b52d6"
+            />
+            <rect
+              x="68"
+              y="57"
+              width="4"
+              height="19"
+              rx="1"
+              fill="#9b97e0"
+            />
+            <rect
+              x="75"
+              y="63"
+              width="4"
+              height="13"
+              rx="1"
+              fill="#c5c3ee"
+            />
+            <rect
+              x="82"
+              y="59"
+              width="4"
+              height="17"
+              rx="1"
+              fill="#5b52d6"
+            />
+            <rect
+              x="89"
+              y="56"
+              width="4"
+              height="20"
+              rx="1"
+              fill="#9b97e0"
+            />
+            <rect
+              x="94"
+              y="55"
+              width="13"
+              height="6"
+              rx="2"
+              fill="#e6f9f0"
+            />
+            <text
+              x="96"
+              y="60"
+              fontSize="3.8"
+              fill="#27ae60"
+              fontWeight="700"
+            >
+              ▲ 12%
+            </text>
+            <rect
+              x="114"
+              y="34"
+              width="46"
+              height="72"
+              rx="8"
+              fill="#3d3a8c"
+            />
+            <rect
+              x="117"
+              y="38"
+              width="40"
+              height="62"
+              rx="5"
+              fill="#f7f8fc"
+            />
+            <rect
+              x="130"
+              y="35"
+              width="16"
+              height="4"
+              rx="2"
+              fill="#2b2870"
+            />
+            <rect
+              x="117"
+              y="38"
+              width="40"
+              height="9"
+              rx="5"
+              fill="#5b52d6"
+            />
+            <rect
+              x="120"
+              y="41"
+              width="16"
+              height="2.5"
+              rx="1"
+              fill="#fff"
+              fillOpacity="0.7"
+            />
+            <rect
+              x="120"
+              y="51"
+              width="10"
+              height="10"
+              rx="2.5"
+              fill="#efedfd"
+            />
+            <rect
+              x="133"
+              y="51"
+              width="10"
+              height="10"
+              rx="2.5"
+              fill="#fde8e8"
+            />
+            <rect
+              x="146"
+              y="51"
+              width="8"
+              height="10"
+              rx="2.5"
+              fill="#e6f9f0"
+            />
+            <rect
+              x="120"
+              y="65"
+              width="30"
+              height="2.5"
+              rx="1"
+              fill="#e3e6f0"
+            />
+            <rect
+              x="120"
+              y="70"
+              width="24"
+              height="2.5"
+              rx="1"
+              fill="#e3e6f0"
+            />
+            <rect
+              x="120"
+              y="75"
+              width="27"
+              height="2.5"
+              rx="1"
+              fill="#e3e6f0"
+            />
+            <rect
+              x="120"
+              y="82"
+              width="32"
+              height="9"
+              rx="3"
+              fill="#5b52d6"
+            />
+            <text
+              x="123"
+              y="89"
+              fontSize="4.5"
+              fill="#fff"
+              fontWeight="700"
+            >
+              PGMate
+            </text>
+            <rect
+              x="131"
+              y="98"
+              width="16"
+              height="2"
+              rx="1"
+              fill="#c5c3ee"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div className="fo-cv2-wrap">
+        {/* HEADER PILLS */}
+        <div className="fo-cv2-head">
+          <div className="fo-cv2-cell-feat-head">Feature</div>
+          <div className="fo-cv2-cell-old-head">
+            <span className="fo-cv2-head-icon fo-cv2-head-icon-red">
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </span>
+            Traditional way
+          </div>
+          <div className="fo-cv2-cell-pg-head">
+            <span className="fo-cv2-head-icon fo-cv2-head-icon-green">
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            PGMate
           </div>
         </div>
-      </section>
+
+        {/* ROWS */}
+        <div className="fo-cv2-rows-wrap">
+          {compareRows.map((r, i) => (
+            <div key={i} className="fo-cv2-row">
+              <div className="fo-cv2-cell-feat">
+                <span className="fo-cv2-row-icon">{compareIcons[i]}</span>
+                <span className="fo-cv2-row-label">{r.feature}</span>
+              </div>
+              <div className="fo-cv2-cell-old">
+                <span className="fo-cv2-dot fo-cv2-dot-red">
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </span>
+                {r.old}
+              </div>
+              <div className="fo-cv2-cell-pg">
+                <span className="fo-cv2-dot fo-cv2-dot-green">
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                {r.pg}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* FOOTER */}
+        <div className="fo-cv2-footer">
+          <div className="fo-cv2-footer-old">
+            <span className="fo-cv2-dot fo-cv2-dot-red fo-cv2-dot-lg">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </span>
+            <div>
+              <strong>Traditional way</strong>
+              <p>Time-consuming, error-prone &amp; hard to manage</p>
+            </div>
+          </div>
+          <div className="fo-cv2-footer-vs">VS</div>
+          <div className="fo-cv2-footer-pg">
+            <span className="fo-cv2-dot fo-cv2-dot-green fo-cv2-dot-lg">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            <div>
+              <strong>PGMate</strong>
+              <p>Smart, automated &amp; built for modern PG owners</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+      </section >
+
+  {/* CTA */ }
+  < section className = "fo-cta-band" >
+    <div className="container">
+      <div className="fo-cta-left">
+        <div className="fo-cta-icon-wrap">
+          <CalendarCheck size={22} strokeWidth={1.6} />
+        </div>
+        <div>
+          <h2>Ready to simplify your PG management?</h2>
+          <p>
+            Book a free demo — we'll walk you through the owner dashboard
+            live. No commitment needed.
+          </p>
+        </div>
+      </div>
+      <div className="fo-cta-btns">
+        <button
+          className="btn-outline-grad btn-outline-on-dark"
+          onClick={() => navigate("/list-your-property")}
+        >
+          List your PG →
+        </button>
+      </div>
+    </div>
+      </section >
+    </div >
   );
 };
 
