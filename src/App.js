@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Login from "./auth/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import OwnerToolsGuard from "./routes/OwnerToolsGuard";
 import Home from "./pages/public/Home/Home";
 import PGDetail from "./pages/public/PGDetail";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -126,12 +127,12 @@ function App() {
         <Routes>
           {/* PUBLIC */}
           <Route path="/" element={<Home />} />
-          <Route path="/tools" element={<PublicLayout><Tools /></PublicLayout>} />
-          <Route path="/tools/menu-generator" element={<PublicLayout><MenuGenerator /></PublicLayout>} />
-          <Route path="/tools/food-menu-generator" element={<PublicLayout><FoodMenuGenerator /></PublicLayout>} />
-          <Route path="/tools/rent-receipt-generator" element={<PublicLayout><RentReceiptGenerator /></PublicLayout>} />
-          <Route path="/tools/lease-agreement-generator" element={<PublicLayout><LeaseAgreementGenerator /></PublicLayout>} />
-          <Route path="/tools/expense-calculator" element={<PublicLayout><ExpenseCalculator /></PublicLayout>} />
+          <Route path="/tools" element={<PublicLayout><OwnerToolsGuard><Tools /></OwnerToolsGuard></PublicLayout>} />
+          <Route path="/tools/menu-generator" element={<PublicLayout><OwnerToolsGuard><MenuGenerator /></OwnerToolsGuard></PublicLayout>} />
+          <Route path="/tools/food-menu-generator" element={<PublicLayout><OwnerToolsGuard><FoodMenuGenerator /></OwnerToolsGuard></PublicLayout>} />
+          <Route path="/tools/rent-receipt-generator" element={<PublicLayout><OwnerToolsGuard><RentReceiptGenerator /></OwnerToolsGuard></PublicLayout>} />
+          <Route path="/tools/lease-agreement-generator" element={<PublicLayout><OwnerToolsGuard><LeaseAgreementGenerator /></OwnerToolsGuard></PublicLayout>} />
+          <Route path="/tools/expense-calculator" element={<PublicLayout><OwnerToolsGuard><ExpenseCalculator /></OwnerToolsGuard></PublicLayout>} />
           <Route path="*" element={<NotFound />} />
           <Route
             path="/pg/:id"

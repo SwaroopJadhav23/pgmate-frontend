@@ -36,7 +36,6 @@ const Navbar = () => {
   // const [cityStateMap, setCityStateMap] = useState({});
   const navSearchRef = useRef(null);
 
-
   // eslint-disable-next-line no-unused-vars
   const [showExport, setShowExport] = useState(false);
   // eslint-disable-next-line no-unused-vars
@@ -166,8 +165,6 @@ const Navbar = () => {
     logout();
     navigate("/");
   };
-
-
 
   const fetchStats = async () => {
     try {
@@ -416,16 +413,20 @@ const Navbar = () => {
               </NavLink>
             </li>
           )}
-          <li>
-            <NavLink
-              to="/tools"
-              className={({isActive}) =>
-                `pg-center-link ${isActive ? "active" : ""}`
-              }
-            >
-              Free Tools <span className="pg-new-badge">New</span>
-            </NavLink>
-          </li>
+          {/* Free Tools are Owner-only; hide from a logged-in USER (Tenant),
+              same rule as "For Owners". */}
+          {!(token && roleUpper === "USER") && (
+            <li>
+              <NavLink
+                to="/tools"
+                className={({isActive}) =>
+                  `pg-center-link ${isActive ? "active" : ""}`
+                }
+              >
+                Free Tools <span className="pg-new-badge">New</span>
+              </NavLink>
+            </li>
+          )}
           {/*
           <li>
             <NavLink
@@ -489,11 +490,16 @@ const Navbar = () => {
               <i className="bi bi-geo-alt"></i> Cities
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/tools" className="pg-menu-link" onClick={closeMenu}>
-              <i className="bi bi-tools"></i> Free Tools <span className="pg-new-badge" style={{ marginLeft: "auto" }}>New</span>
-            </NavLink>
-          </li>
+          {!(token && roleUpper === "USER") && (
+            <li>
+              <NavLink to="/tools" className="pg-menu-link" onClick={closeMenu}>
+                <i className="bi bi-tools"></i> Free Tools{" "}
+                <span className="pg-new-badge" style={{marginLeft: "auto"}}>
+                  New
+                </span>
+              </NavLink>
+            </li>
+          )}
           {!(token && roleUpper === "USER") && (
             <li>
               <NavLink
@@ -506,7 +512,6 @@ const Navbar = () => {
             </li>
           )}
 
-          
           {/*
           <li>
             <NavLink
@@ -518,7 +523,6 @@ const Navbar = () => {
             </NavLink>
           </li>
           */}
-          
 
           <li>
             <NavLink
@@ -622,8 +626,6 @@ const Navbar = () => {
             </li>
           )}
 
-
-
           {/* ── Mobile CTA (menu-link style) ── */}
           {roleUpper !== "USER" && (
             <li className="mobile-only">
@@ -643,24 +645,28 @@ const Navbar = () => {
         <div className="pg-nav-right">
           <div id="google_translate_element" style={{display: "none"}}></div>
 
-
-
           {!token ? (
             <Link to="/login" className="pg-login-btn desktop-only">
               <i className="bi bi-person"></i> Login
             </Link>
           ) : roleUpper === "USER" ? (
-  <Link to={location.pathname === "/profile" ? "/" : "/profile"} className="pg-profile desktop-only" style={{textDecoration:"none"}}>
-    <div className="pg-avatar"><i className="bi bi-person-fill"></i></div>
-  </Link>
-) : (
-  <div
-    className="pg-profile desktop-only"
-    onClick={(e) => {
-      e.stopPropagation();
-      setShowProfileMenu((prev) => !prev);
-    }}
-  >
+            <Link
+              to={location.pathname === "/profile" ? "/" : "/profile"}
+              className="pg-profile desktop-only"
+              style={{textDecoration: "none"}}
+            >
+              <div className="pg-avatar">
+                <i className="bi bi-person-fill"></i>
+              </div>
+            </Link>
+          ) : (
+            <div
+              className="pg-profile desktop-only"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowProfileMenu((prev) => !prev);
+              }}
+            >
               <div className="pg-avatar">
                 <i className="bi bi-person-fill"></i>
               </div>
@@ -702,7 +708,7 @@ const Navbar = () => {
                       <i className="bi bi-speedometer2"></i> Dashboard
                     </NavLink>
                   )}
-                {roleUpper === "PG_MANAGER" && (
+                  {roleUpper === "PG_MANAGER" && (
                     <NavLink
                       to="/manager/dashboard"
                       className="pg-menu-link"
@@ -711,9 +717,9 @@ const Navbar = () => {
                       <i className="bi bi-speedometer2"></i> Dashboard
                     </NavLink>
                   )}
-                 <button onClick={handleLogout} className="mobile-logout">
-  <i className="bi bi-box-arrow-right"></i> Logout
-</button>
+                  <button onClick={handleLogout} className="mobile-logout">
+                    <i className="bi bi-box-arrow-right"></i> Logout
+                  </button>
                 </div>
               )}
             </div>
