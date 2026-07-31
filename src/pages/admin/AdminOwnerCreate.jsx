@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../../api/axios";
 import "./AdminOwnerCreate.css";
 import Swal from "sweetalert2";
+import { FaUser, FaEnvelope, FaPhone, FaCity, FaTicketAlt, FaUserPlus } from "react-icons/fa";
 const AdminOwnerCreate = () => {
   const [form, setForm] = useState({
     name: "",
@@ -114,73 +115,101 @@ await api.post(endpoint, fd);
     <div className="admin-content px-4 py-3">
       <div className="card admin-form-card">
         <div className="card-body">
-        
+
+          <div className="owner-form-header">
+            <div className="owner-form-header-icon"><FaUserPlus /></div>
+            <div>
+              <h4>Create New Owner</h4>
+              <p>Fill in the details to add a PG owner account</p>
+            </div>
+          </div>
 
           <form onSubmit={submit}>
-            <input
-              className="form-control mb-3"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={onChange}
-              required
-            />
+            <div className="owner-form-grid">
+              <div className="input-icon-wrap">
+                <FaUser className="input-icon" />
+                <input
+                  className="form-control mb-3"
+                  name="name"
+                  placeholder="Full Name"
+                  value={form.name}
+                  onChange={onChange}
+                  required
+                />
+              </div>
 
-            <input
-              type="email"
-              className="form-control mb-3"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={onChange}
-              required
-            />
+              <div className="input-icon-wrap">
+                <FaEnvelope className="input-icon" />
+                <input
+                  type="email"
+                  className="form-control mb-3"
+                  name="email"
+                  placeholder="Email"
+                  value={form.email}
+                  onChange={onChange}
+                  required
+                />
+              </div>
+            </div>
 
-            {/* PHONE FIELD WITH VALIDATION */}
-            <input
-              className="form-control mb-3"  // UPDATED: added space below phone field
-              name="phone"
-              placeholder="Phone Number"
-              maxLength={10}
-              value={form.phone}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ""); // numbers only
-                setForm({ ...form, phone: value });
+            <div className="owner-form-grid">
+              <div>
+                {/* PHONE FIELD WITH VALIDATION */}
+                <div className="input-icon-wrap">
+                  <FaPhone className="input-icon" />
+                  <input
+                    className="form-control mb-3"
+                    name="phone"
+                    placeholder="Phone Number"
+                    maxLength={10}
+                    value={form.phone}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // numbers only
+                      setForm({ ...form, phone: value });
 
-                // UPDATED: live validation (min 10 digits)
-                if (value.length < 10) {
-                  setPhoneError("Phone number must be at least 10 digits");
-                } else {
-                  setPhoneError("");
-                }
-              }}
-              required
-            />
+                      // UPDATED: live validation (min 10 digits)
+                      if (value.length < 10) {
+                        setPhoneError("Phone number must be at least 10 digits");
+                      } else {
+                        setPhoneError("");
+                      }
+                    }}
+                    required
+                  />
+                </div>
 
-            {/* ERROR MESSAGE */}
-            {phoneError && (
-              <small className="text-danger d-block mb-3">
-                {phoneError}
-              </small>
-            )}
+                {/* ERROR MESSAGE */}
+                {phoneError && (
+                  <small className="text-danger d-block mb-3">
+                    {phoneError}
+                  </small>
+                )}
+              </div>
 
-            {/* CITY FIELD */}
-            <input
-              className="form-control mb-3"
-              name="city"
-              placeholder="City"
-              value={form.city}
-              onChange={onChange}
-              required
-            />
+              {/* CITY FIELD */}
+              <div className="input-icon-wrap">
+                <FaCity className="input-icon" />
+                <input
+                  className="form-control mb-3"
+                  name="city"
+                  placeholder="City"
+                  value={form.city}
+                  onChange={onChange}
+                  required
+                />
+              </div>
+            </div>
 
-            <input
-              className="form-control mb-3"
-              name="referralCode"
-              placeholder="Referral Code (Optional)"
-              value={form.referralCode}
-              onChange={onChange}
-            />
+            <div className="input-icon-wrap">
+              <FaTicketAlt className="input-icon" />
+              <input
+                className="form-control mb-3"
+                name="referralCode"
+                placeholder="Referral Code (Optional)"
+                value={form.referralCode}
+                onChange={onChange}
+              />
+            </div>
 
             {/* PASSWORD FIELD */}
             <div className="position-relative mb-3">

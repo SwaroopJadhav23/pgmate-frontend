@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import "./AdminVerification.css";
 import "./adminReservations.css";
 import { TableSkeleton, UniversalCardSkeleton } from "../public/Skeleton";
+import { FaHome } from "react-icons/fa";
 
 const PAGE_SIZE = 20;
 
@@ -286,7 +287,7 @@ const AdminVerification = ({ basePath = "/admin/verifications", showAmountContro
 
                   <td>
                     <div className="verif-pg-cell">
-                      <div className="verif-pg-icon">??</div>
+                      <div className="verif-pg-icon"><FaHome /></div>
                       <span className="verif-pg-name">{req.pgName || "Unknown PG"}</span>
                     </div>
                   </td>
@@ -337,7 +338,7 @@ const AdminVerification = ({ basePath = "/admin/verifications", showAmountContro
 
                 <div className="verif-card-top">
                   <div className="verif-card-pg">
-                    <div className="verif-pg-icon">??</div>
+                    <div className="verif-pg-icon"><FaHome /></div>
                     <div>
                       <div className="verif-card-pgname">{req.pgName}</div>
                       <div className="verif-card-owner">{req.ownerName || "-"}</div>

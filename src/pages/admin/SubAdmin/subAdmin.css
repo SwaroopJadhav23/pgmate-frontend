@@ -312,6 +312,37 @@
   overflow-y: auto;
 }
 
+/* Scoped overrides: other pages define unscoped global .modal-box /
+   .modal-backdrop-custom rules that leak app-wide and fight each other
+   on load order. These !important rules on unique classes make sub
+   admin's modal immune to that, regardless of what else is loaded. */
+.sa-modal-box {
+  width: 100% !important;
+  max-width: 420px !important;
+  height: fit-content !important;
+  max-height: 90vh !important;
+  border-radius: 12px !important;
+  margin: 0 !important;
+  align-self: center !important;
+}
+
+.sa-modal-backdrop {
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 768px) {
+  .sa-modal-backdrop {
+    align-items: center !important;
+    padding: 12px !important;
+  }
+  .sa-modal-box {
+    border-radius: 14px !important;
+    padding: 18px !important;
+    max-height: 85vh !important;
+  }
+}
+
 .modal-box h4 {
   font-size: 16px;
   font-weight: 700;
