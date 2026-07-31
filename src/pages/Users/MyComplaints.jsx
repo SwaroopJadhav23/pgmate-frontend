@@ -154,6 +154,7 @@ const MyComplaints = () => {
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [viewingImages, setViewingImages] = useState(null);
+  const [hasActivePg, setHasActivePg] = useState(true); // assume true until we know otherwise
 
   const fetchComplaints = () => {
     setLoading(true);
@@ -169,12 +170,14 @@ const MyComplaints = () => {
     api.get("/complaints/my/active-pgs")
       .then((res) => {
         const data = res.data || [];
+        setHasActivePg(data.length > 0);
         if (data.length > 0) {
           setForm((prev) => ({ ...prev, pgId: data[0].id, pgName: data[0].name }));
         }
       })
       .catch(() => { });
   }, []);
+
   const handleSubmit = async () => {
     if (!form.pgId) {
       Swal.fire({ icon: "warning", title: "Please select a PG", text: "Type and choose a PG from the suggestions" });
@@ -209,6 +212,7 @@ const MyComplaints = () => {
       setSubmitting(false);
     }
   };
+
   return (
     <UserLayout hideWelcome>
       <main className="mc-main">
@@ -219,12 +223,20 @@ const MyComplaints = () => {
             <h2><AlertTriangleIcon size={20} /> My Complaints</h2>
             <p>Track complaints you've raised</p>
           </div>
-          <button
-            className={`mc-new-btn ${showForm ? "mc-btn-new-cancel" : "mc-btn-new-create"}`}
-            onClick={() => setShowForm(!showForm)}
-          >
-            {showForm ? (<><XIcon size={12} /> Cancel</>) : (<><span>+</span> New Complaint</>)}
-          </button>
+          <span className="mc-new-btn-wrap">
+            <button
+              className={`mc-new-btn ${showForm ? "mc-btn-new-cancel" : "mc-btn-new-create"}`}
+              onClick={() => hasActivePg && setShowForm(!showForm)}
+              disabled={!hasActivePg && !showForm}
+            >
+              {showForm ? (<><XIcon size={12} /> Cancel</>) : (<><span>+</span> New Complaint</>)}
+            </button>
+            {!hasActivePg && !showForm && (
+              <span className="mc-new-btn-tooltip">
+                You need to book a PG or bed before you can raise a complaint
+              </span>
+            )}
+          </span>
         </div>
 
         {/* ── Complaint Form ── */}

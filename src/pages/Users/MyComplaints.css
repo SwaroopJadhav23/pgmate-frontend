@@ -281,3 +281,52 @@
 .mc-card-date { font-size: 12px; color: #64748b; }
 .mc-card-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
 .mc-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.mc-new-btn-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.mc-new-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mc-new-btn-tooltip {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: 240px;
+  background: #1e1b4b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  z-index: 20;
+  box-shadow: 0 8px 20px rgba(30, 27, 75, 0.25);
+  pointer-events: none;
+}
+
+.mc-new-btn-wrap:hover .mc-new-btn-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .mc-new-btn-wrap {
+    flex: 1 1 100%;
+  }
+  .mc-new-btn-tooltip {
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+}

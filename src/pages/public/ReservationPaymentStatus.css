@@ -1,0 +1,302 @@
+.rps-page {
+  --rps-accent: #4f46e5;
+  --rps-accent-2: #6A5AE0;
+  --rps-accent-soft: #eef2ff;
+  --rps-ink: #1e1b4b;
+  --rps-muted: #64748b;
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 28px 16px 60px;
+}
+
+.rps-header {
+  max-width: 900px;
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rps-logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--rps-accent);
+  letter-spacing: -0.01em;
+}
+
+.rps-help {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--rps-muted);
+  text-align: right;
+}
+
+.rps-help > div {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+}
+
+.rps-help-label {
+  font-weight: 700;
+  color: var(--rps-ink);
+  font-size: 0.78rem;
+  margin-bottom: 2px;
+}
+
+.rps-help a {
+  color: var(--rps-muted);
+  text-decoration: none;
+}
+
+.rps-help a:hover {
+  color: var(--rps-accent);
+}
+
+.rps-main {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Hero ── */
+
+.rps-hero {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+  border: 1px solid #eef0f6;
+}
+
+.rps-hero-icon-wrap {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rps-hero--success .rps-hero-icon-wrap { background: #dcfce7; color: #16a34a; }
+.rps-hero--danger .rps-hero-icon-wrap  { background: #fee2e2; color: #dc2626; }
+.rps-hero--pending .rps-hero-icon-wrap { background: #fef9c3; color: #b45309; }
+
+.rps-hero-copy h1 {
+  margin: 0 0 6px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--rps-ink);
+}
+
+.rps-hero-lead {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.rps-hero--success .rps-hero-lead { color: #16a34a; }
+.rps-hero--danger .rps-hero-lead  { color: #dc2626; }
+.rps-hero--pending .rps-hero-lead { color: #b45309; }
+
+.rps-hero-sub {
+  margin: 0;
+  color: var(--rps-muted);
+  font-size: 0.88rem;
+}
+
+/* ── Reservation details ── */
+
+.rps-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--rps-ink);
+  margin: 0 0 16px;
+}
+
+.rps-section-title--center {
+  justify-content: center;
+  text-align: center;
+}
+
+.rps-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.rps-detail-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #eef0f6;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.rps-detail-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--rps-accent-soft);
+  color: var(--rps-accent);
+}
+
+.rps-detail-icon--danger  { background: #fee2e2; color: #dc2626; }
+.rps-detail-icon--success { background: #dcfce7; color: #16a34a; }
+.rps-detail-icon--pending { background: #fef9c3; color: #b45309; }
+
+.rps-detail-label {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--rps-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rps-detail-value {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--rps-ink);
+  word-break: break-word;
+}
+
+.rps-status-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.rps-status-pill--danger  { background: #fee2e2; color: #dc2626; }
+.rps-status-pill--success { background: #dcfce7; color: #16a34a; }
+.rps-status-pill--pending { background: #fef9c3; color: #b45309; }
+
+/* ── What happened ── */
+
+.rps-explainer {
+  background: #fff;
+  border: 1px solid #eef0f6;
+  border-radius: 18px;
+  padding: 28px 24px;
+}
+
+.rps-explainer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.rps-explainer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  color: var(--rps-accent);
+  padding: 0 8px;
+}
+
+.rps-explainer-item p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--rps-ink);
+  line-height: 1.5;
+}
+
+/* ── Actions ── */
+
+.rps-actions {
+  background: #fff;
+  border: 1px solid #eef0f6;
+  border-radius: 18px;
+  padding: 26px 24px 30px;
+}
+
+.rps-actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rps-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.rps-btn--primary {
+  background: linear-gradient(120deg, var(--rps-accent), var(--rps-accent-2));
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.28);
+}
+
+.rps-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.36);
+}
+
+.rps-btn--outline {
+  background: #fff;
+  color: var(--rps-accent);
+  border: 1.5px solid #d9d6f7;
+}
+
+.rps-btn--outline:hover {
+  background: var(--rps-accent-soft);
+}
+
+/* ── Focus states ── */
+
+.rps-btn:focus-visible,
+.rps-help a:focus-visible {
+  outline: 2px solid var(--rps-accent);
+  outline-offset: 2px;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+  .rps-header { flex-direction: row; align-items: center; }
+  .rps-hero { flex-direction: column; text-align: center; padding: 26px 20px; }
+  .rps-details-grid { grid-template-columns: 1fr; }
+  .rps-explainer-grid { grid-template-columns: 1fr; }
+  .rps-actions-row { flex-direction: column; }
+  .rps-btn { width: 100%; justify-content: center; }
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .rps-btn { transition: none; }
+}
