@@ -69,19 +69,23 @@ const RoomManager = ({ role }) => {
     } catch { setAllRooms([]); }
   }, [floorEndpoint, roomEndpoint]);
 
-useEffect(() => {
-  api.get(pgEndpoint).then((res) => {
-    const pgList = res.data;
-    setPgs(pgList);
-    fetchAllRoomsGlobal(pgList);
-    if (pgList.length === 1) setPgId(pgList[0].id);
-  });
-}, [pgEndpoint, fetchAllRoomsGlobal]);
+  useEffect(() => {
+    api.get(pgEndpoint).then((res) => {
+      const pgList = res.data;
+      setPgs(pgList);
+      fetchAllRoomsGlobal(pgList);
+      if (pgList.length > 0) setPgId(pgList[0].id);
+    });
+  }, [pgEndpoint, fetchAllRoomsGlobal]);
 
   useEffect(() => {
     if (!pgId) { setFloors([]); setFloorId(""); setRooms([]); return; }
     setFloorId(""); setRooms([]);
-    api.get(`${floorEndpoint}/pg/${pgId}`).then((res) => setFloors(res.data));
+    api.get(`${floorEndpoint}/pg/${pgId}`).then((res) => {
+      const floorList = res.data;
+      setFloors(floorList);
+      if (floorList.length > 0) setFloorId(floorList[0].id);
+    });
   }, [pgId, floorEndpoint]);
 
   const loadRooms = useCallback(async () => {
@@ -241,15 +245,15 @@ useEffect(() => {
       {/* ── Filter Bar ── */}
       <div className="room-filter-bar">
         {pgs.length === 1 ? (
-  <div className="form-control rm-single-pg-display" style={{ width: "100%" }}>
-    {pgs[0].name}
-  </div>
-) : (
-  <select className="form-control" value={pgId} onChange={(e) => setPgId(e.target.value)} style={{ width: "100%" }}>
-    <option value="">Select PG</option>
-    {pgs.map((pg) => <option key={pg.id} value={pg.id}>{pg.name}</option>)}
-  </select>
-)}
+          <div className="form-control rm-single-pg-display" style={{ width: "100%" }}>
+            {pgs[0].name}
+          </div>
+        ) : (
+          <select className="form-control" value={pgId} onChange={(e) => setPgId(e.target.value)} style={{ width: "100%" }}>
+            <option value="">Select PG</option>
+            {pgs.map((pg) => <option key={pg.id} value={pg.id}>{pg.name}</option>)}
+          </select>
+        )}
         <select className="form-control" value={floorId} onChange={(e) => setFloorId(e.target.value)} disabled={!floors.length} style={{ width: "100%" }}>
           <option value="">Select Floor</option>
           {floors.map((f) => <option key={f.id} value={f.id}>Floor {f.floorNumber}</option>)}

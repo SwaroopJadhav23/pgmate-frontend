@@ -139,11 +139,11 @@ useEffect(() => {
     const bell = document.querySelector(".notif-bell-wrapper");
     if (bell) bell.style.display = "none";
 
-    api.get("/owner/pgs")
+   api.get("/owner/pgs")
   .then((res) => {
     const pgList = res.data || [];
     setPgs(pgList);
-    if (pgList.length === 1) {
+    if (pgList.length > 0) {
       loadForPg(pgList[0].id, pgList);
     } else {
       loadInitial(pgList);
