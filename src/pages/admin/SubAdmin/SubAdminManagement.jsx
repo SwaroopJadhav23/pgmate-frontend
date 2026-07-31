@@ -314,8 +314,8 @@ const SubAdminManagement = () => {
 
       {/* ══ CREATE / EDIT MODAL ══ */}
       {showModal && (
-        <div className="modal-backdrop-custom" onClick={closeModal}>
-          <div className="modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop-custom sa-modal-backdrop" onClick={closeModal}>
+          <div className="modal-box sa-modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", paddingBottom: "12px", borderBottom: "1px solid #f1f5f9" }}>
               <h4 style={{ margin: 0, padding: 0, border: "none" }}>{editing ? "Update Sub Admin" : "Create Sub Admin"}</h4>
               <button onClick={closeModal} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: "18px", lineHeight: 1 }}>
@@ -366,8 +366,8 @@ const SubAdminManagement = () => {
 
       {/* ══ RESET PASSWORD MODAL ══ */}
       {resetModal && (
-        <div className="modal-backdrop-custom" onClick={() => setResetModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop-custom sa-modal-backdrop" onClick={() => setResetModal(false)}>
+          <div className="modal-box sa-modal-box" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
             <h4>Reset Password — {selectedAdmin?.name}</h4>
             <div className="password-field">
               <input
