@@ -115,44 +115,59 @@ const AdminDeletionRequests = () => {
             <tbody>
               {requests.map((r) => (
                 <tr key={r.id} className={`adr-tr ${expandedId === r.id ? "expanded" : ""}`}>
-                  <td data-label="Name" className="adr-td adr-td-header" onClick={() => toggleExpand(r.id)}>
+                  <td className="adr-td adr-td-header" onClick={() => toggleExpand(r.id)}>
                     <div className="adr-mobile-header">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="adr-val adr-name">{r.fullName || "Unknown"}</span>
+                      <div className="adr-header-left">
+                        <span className="adr-name">{r.fullName || "Unknown"}</span>
                         <span className={`adr-status-badge adr-status-${r.status.toLowerCase()}`}>
                           {r.status}
                         </span>
                       </div>
                       <div className="adr-mobile-chevron">
-                        {expandedId === r.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        {expandedId === r.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                       </div>
                     </div>
                   </td>
-                  <td data-label="Phone" className="adr-td"><span className="adr-val">{r.phone || "—"}</span></td>
-                  <td data-label="Email" className="adr-td"><span className="adr-val">{r.email || "—"}</span></td>
-                  <td data-label="Reason" className="adr-td">
-                    <span className="adr-reason">{r.reason || "—"}</span>
+
+                  <td className="adr-td">
+                    <span className="adr-label">Phone</span>
+                    <span className="adr-val">{r.phone || "—"}</span>
                   </td>
-                  <td data-label="Requested On" className="adr-td">
+
+                  <td className="adr-td">
+                    <span className="adr-label">Email</span>
+                    <span className="adr-val">{r.email || "—"}</span>
+                  </td>
+
+                  <td className="adr-td">
+                    <span className="adr-label">Reason</span>
+                    <span className="adr-val adr-reason">{r.reason || "—"}</span>
+                  </td>
+
+                  <td className="adr-td">
+                    <span className="adr-label">Requested On</span>
                     <span className="adr-val">
                       {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") || "—"}
                     </span>
                   </td>
-                  <td data-label="Status" className="adr-td adr-desktop-only">
-                    <span
-                      className={`adr-status adr-status-${r.status.toLowerCase()}`}
-                    >
+
+                  <td className="adr-td adr-desktop-only">
+                    <span className={`adr-status adr-status-${r.status.toLowerCase()}`}>
                       {r.status}
                     </span>
                   </td>
-                  <td data-label="Days Left" className="adr-td">
+
+                  <td className="adr-td">
+                    <span className="adr-label">Days Left</span>
                     <span className="adr-val">
                       {r.status === "PENDING"
                         ? `${daysLeft(r.scheduledDeletionAt)} day(s)`
                         : "—"}
                     </span>
                   </td>
-                  <td data-label="Actions" className="adr-td">
+
+                  <td className="adr-td">
+                    <span className="adr-label">Actions</span>
                     {r.status === "PENDING" ? (
                       <div className="adr-actions">
                         <button
@@ -171,7 +186,7 @@ const AdminDeletionRequests = () => {
                         </button>
                       </div>
                     ) : (
-                      "—"
+                      <span className="adr-val">—</span>
                     )}
                   </td>
                 </tr>
