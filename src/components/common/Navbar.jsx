@@ -438,16 +438,18 @@ const Navbar = () => {
             </NavLink>
           </li>
 
-          <li>
-            <NavLink
-              to="/about-us"
-              className={({isActive}) =>
-                `pg-center-link ${isActive ? "active" : ""}`
-              }
-            >
-              About Us
-            </NavLink>
-          </li>
+          {token && roleUpper === "USER" && (
+            <li>
+              <NavLink
+                to="/about-us"
+                className={({isActive}) =>
+                  `pg-center-link ${isActive ? "active" : ""}`
+                }
+              >
+                About Us
+              </NavLink>
+            </li>
+          )}
         </ul>
 
         {/* ── HAMBURGER ── */}
@@ -520,15 +522,17 @@ const Navbar = () => {
             </NavLink>
           </li>
 
-          <li>
-            <NavLink
-              to="/about-us"
-              className="pg-menu-link"
-              onClick={closeMenu}
-            >
-              <i className="bi bi-info-circle"></i> About Us
-            </NavLink>
-          </li>
+          {token && roleUpper === "USER" && (
+            <li>
+              <NavLink
+                to="/about-us"
+                className="pg-menu-link"
+                onClick={closeMenu}
+              >
+                <i className="bi bi-info-circle"></i> About Us
+              </NavLink>
+            </li>
+          )}
 
           {/* ── Mobile auth ── */}
           <li className="mobile-only mobile-auth">
