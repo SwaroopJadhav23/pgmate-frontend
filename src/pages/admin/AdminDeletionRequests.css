@@ -131,9 +131,9 @@
 }
 
 /* ════════════════════════════════════════
-   MOBILE VIEW (CARD LAYOUT)
+   MOBILE VIEW (CARD LAYOUT - <= 768px)
 ════════════════════════════════════════ */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .adr-table-container {
     background: transparent;
     border: none;
