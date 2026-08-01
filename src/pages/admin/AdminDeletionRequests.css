@@ -264,3 +264,47 @@
     margin-top: 0;
   }
 }
+
+/* ════════════════════════════════════════
+   FINE-TUNING FOR MOBILE S & M (< 480px)
+════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .adr-table-container {
+    padding: 0 4px;
+  }
+
+  .adr-td {
+    padding: 10px 12px;
+  }
+
+  .adr-name {
+    font-size: 0.9rem;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .adr-status-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+
+  .adr-label {
+    font-size: 0.7rem;
+    margin-right: 10px;
+  }
+
+  .adr-val {
+    font-size: 0.82rem;
+  }
+
+  .adr-actions {
+    gap: 6px;
+  }
+
+  .adr-btn {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+  }
+}
