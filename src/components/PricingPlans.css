@@ -238,6 +238,11 @@
   z-index: 1;
 }
 
+/* ══ SWIPE HINT (Hidden on Desktop) ══ */
+.mobile-swipe-hint {
+  display: none;
+}
+
 /* ══ CARDS GRID ══ */
 .pricing-cards {
   display: flex;
@@ -245,7 +250,7 @@
   gap: 14px;
   justify-content: center;
   align-items: stretch;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -305,17 +310,17 @@
 
 /* ── FEATURED ── */
 .pricing-card.featured {
-  border-color: var(--brand);
-  background: linear-gradient(160deg, #eef2ff 0%, var(--white) 45%);
+  border-color: #ea580c;
+  background: linear-gradient(160deg, #fff7ed 0%, var(--white) 45%);
   box-shadow:
-    0 0 0 1px var(--brand),
-    var(--shadow-brand);
+    0 0 0 1px #ea580c,
+    0 8px 24px rgba(234, 88, 12, 0.2);
 }
 
 .pricing-card.featured:hover {
   box-shadow:
-    0 0 0 1px var(--brand),
-    0 16px 48px rgba(91, 91, 214, 0.3);
+    0 0 0 1px #ea580c,
+    0 16px 48px rgba(234, 88, 12, 0.3);
   transform: translateY(-5px);
 }
 
@@ -1230,7 +1235,7 @@
 }
 
 /* ══ RESPONSIVE ══ */
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .pricing-cards {
     flex-wrap: wrap;
   }
@@ -1280,19 +1285,68 @@
     font-size: 1rem;
   }
 
-  /* ── CARDS: single column, full width ── */
-  .pricing-cards {
-    flex-direction: column;
-    align-items: stretch;
-    /* stretch to full width, not centered */
-    gap: 12px;
+  /* ── SWIPE HINT ── */
+  .mobile-swipe-hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--brand);
+    background: rgba(91, 91, 214, 0.1);
+    border: 1px solid rgba(91, 91, 214, 0.2);
+    padding: 6px 16px;
+    border-radius: 99px;
+    margin: 0 auto 16px auto;
+    width: max-content;
+    box-shadow: 0 4px 12px rgba(91, 91, 214, 0.05);
+    backdrop-filter: blur(4px);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .mobile-swipe-hint span {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    animation: swipe-bounce 1.5s infinite ease-in-out;
+  }
+  
+  @keyframes swipe-bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
   }
 
+  /* ── CARDS: Horizontal Swipe Carousel ── */
+  .pricing-cards {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 16px;
+    padding-top: 24px !important;
+    margin-top: -10px !important;
+    padding-bottom: 20px !important;
+    max-width: 100vw !important;
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 16px !important;
+    scrollbar-width: none;
+  }
+  
+  .pricing-cards::-webkit-scrollbar {
+    display: none;
+  }
   .pricing-card-wrapper {
-    flex: none;
-    width: 100%;
-    max-width: 100%;
-    /* remove the 360px cap — use full screen */
+    flex: 0 0 82% !important;
+    max-width: 320px !important;
+    scroll-snap-align: start;
   }
 
   /* ── CARD INTERNALS ── */
@@ -1811,12 +1865,6 @@
 }
 
 @media (max-width: 992px) {
-  .pricing-cards {
-    flex-direction: column !important;
-    align-items: stretch;
-    max-width: 400px !important;
-    margin: 0 auto;
-  }
   .pricing-trust-bar {
     flex-wrap: wrap;
     gap: 20px;
@@ -1961,4 +2009,105 @@
 .pricing-trust-bar {
   margin-top: 15px !important;
   padding: 10px !important;
+}
+
+@keyframes feature-pulse {
+  0% { transform: scale(1); color: #16a34a; }
+  50% { transform: scale(1.03); color: #15803d; text-shadow: 0 0 10px rgba(22, 163, 74, 0.4); }
+  100% { transform: scale(1); color: #16a34a; }
+}
+
+.highlight-basic-feature {
+  color: #16a34a;
+  font-weight: 800;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: feature-pulse 2.5s ease-in-out infinite;
+  transform-origin: left center;
+  -webkit-box-reflect: below -3px linear-gradient(transparent 50%, rgba(22, 163, 74, 0.3));
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 15px;
+  margin-bottom: -15px;
+}
+
+.highlight-basic-feature .plus-icon {
+  font-weight: 900;
+  font-size: 1.2em;
+}
+
+@keyframes feature-pulse-pro {
+  0% { transform: scale(1); color: #9333ea; }
+  50% { transform: scale(1.03); color: #7e22ce; text-shadow: 0 0 10px rgba(147, 51, 234, 0.4); }
+  100% { transform: scale(1); color: #9333ea; }
+}
+
+.highlight-pro-feature {
+  color: #9333ea;
+  font-weight: 800;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: feature-pulse-pro 2.5s ease-in-out infinite;
+  transform-origin: left center;
+  -webkit-box-reflect: below -3px linear-gradient(transparent 50%, rgba(147, 51, 234, 0.3));
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 15px;
+  margin-bottom: -15px;
+}
+
+.highlight-basic-feature::before,
+.highlight-pro-feature::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 100%
+  );
+  animation: sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── CLICKED CARD HIGHLIGHTS ── */
+.pricing-card.card-clicked-basic {
+  border-color: #16a34a;
+  background: linear-gradient(160deg, #f0fdf7 0%, var(--white) 45%);
+  box-shadow: 0 0 0 1px #16a34a, 0 4px 20px rgba(22, 163, 74, 0.15);
+}
+.badge-clicked-basic {
+  background: #16a34a;
+  color: white;
+  box-shadow: 0 2px 10px rgba(22, 163, 74, 0.4);
+}
+
+.pricing-card.card-clicked-pro {
+  border-color: #9333ea;
+  background: linear-gradient(160deg, #faf5ff 0%, var(--white) 45%);
+  box-shadow: 0 0 0 1px #9333ea, 0 4px 20px rgba(147, 51, 234, 0.15);
+}
+.badge-clicked-pro {
+  background: #9333ea;
+  color: white;
+  box-shadow: 0 2px 10px rgba(147, 51, 234, 0.4);
+}
+
+.pricing-card.card-clicked-premium {
+  border-color: #ea580c;
+  background: linear-gradient(160deg, #fff7ed 0%, var(--white) 45%);
+  box-shadow: 0 0 0 1px #ea580c, 0 4px 20px rgba(234, 88, 12, 0.15);
+}
+.badge-clicked-premium {
+  background: #ea580c;
+  color: white;
+  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.4);
 }

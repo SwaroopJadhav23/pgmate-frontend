@@ -24,6 +24,7 @@ const OwnerManagers = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [newPassword, setNewPassword] = useState("");
+  const [subSummary, setSubSummary] = useState(null);
 const [openMenuId, setOpenMenuId] = useState(null);
 
 useEffect(() => {
@@ -57,6 +58,9 @@ useEffect(() => {
   useEffect(() => {
     loadManagers();
     loadPgs();
+    api.get("/owner/subscription/summary")
+      .then((res) => setSubSummary(res.data))
+      .catch(() => {});
   }, []);
 
   /* ================= CREATE ================= */
@@ -168,15 +172,40 @@ useEffect(() => {
     return matchSearch && matchStatus;
   });
 
+  const isStaffLimitReached =
+    subSummary?.staffLimit >= 0 && managers.length >= subSummary?.staffLimit;
+
   /* ================= UI ================= */
   return (
     <DashboardLayout
       title="Caretaker Management"
       subtitle="Create and manage PG caretakers"
       rightAction={
-        <button className="primary-btn" onClick={() => setShowModal(true)}>
-          + Add Caretaker
-        </button>
+        isStaffLimitReached ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+            <button
+              className="primary-btn"
+              style={{ opacity: 0.5, cursor: "not-allowed", background: "#94a3b8" }}
+              disabled
+            >
+              + Add Caretaker
+            </button>
+            <span style={{ fontSize: "0.7rem", color: "#dc2626", fontWeight: 600 }}>
+              Staff limit reached ({subSummary?.staffLimit}/{subSummary?.staffLimit}). <a href="/owner/pricing" style={{ color: "#5B5BD6" }}>Upgrade Plan →</a>
+            </span>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+            <button className="primary-btn" onClick={() => setShowModal(true)}>
+              + Add Caretaker
+            </button>
+            {subSummary?.staffLimit >= 0 && (
+              <span style={{ fontSize: "0.7rem", color: "#64748b" }}>
+                {managers.length} / {subSummary.staffLimit} staff used
+              </span>
+            )}
+          </div>
+        )
       }
     >
       {/* ── STAT CARDS ── */}

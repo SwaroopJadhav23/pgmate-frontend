@@ -5,7 +5,7 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import "./AdminPlanDashboard.css";
 import "../../components/PricingPlans.css";
 import Swal from "sweetalert2";
-import { Users, User, Briefcase, Infinity as InfinityIcon, Building, Gift, Check } from "lucide-react";
+import { Users, User, Briefcase, Infinity as InfinityIcon, Building, Gift, Check, Plus } from "lucide-react";
 
 const AdminPlanDashboard = () => {
   const [plans, setPlans]           = useState([]);
@@ -399,7 +399,7 @@ const removeOffer = async (planType) => {
                   <div className={`plan-shaded-box box-${p.planType.toLowerCase()}`} style={{ marginTop: "auto", marginBottom: "14px" }}>
                     <div className="plan-row"><Building size={16} /> {p.pgLimit < 0 ? "Unlimited PGs" : `${p.pgLimit} PG${p.pgLimit !== 1 ? "s" : ""}`}</div>
                     <div className="plan-row"><Users size={16} /> Unlimited Tenants</div>
-                    <div className="plan-row"><User size={16} /> {p.planType === "PRO" ? "Unlimited Staff Logins" : "5 Staff Logins"}</div>
+                    <div className="plan-row"><User size={16} /> {p.planType === "BASIC" ? "2 Staff Logins" : p.planType === "PRO" ? "3 Staff Logins" : "5 Staff Logins"}</div>
                   </div>
 
                   <div style={{borderTop: "1px dashed #e2e8f0", paddingTop: "14px", marginBottom: "14px"}}></div>
@@ -407,7 +407,9 @@ const removeOffer = async (planType) => {
                   <ul className="plan-features" style={{marginBottom: "20px"}}>
                     {(p.features || []).map((f, i) => (
                       <li key={i}>
-                        <span className={`feat-icon check-${p.planType.toLowerCase()}`}><Check size={16} /></span>
+                        <span className={`feat-icon ${f.includes("highlight-basic-feature") ? "check-basic" : f.includes("highlight-pro-feature") ? "check-pro" : `check-${p.planType.toLowerCase()}`}`}>
+                          {f.includes("highlight-basic-feature") || f.includes("highlight-pro-feature") ? <Plus size={16} strokeWidth={3} /> : <Check size={16} />}
+                        </span>
                         <span dangerouslySetInnerHTML={{__html: f}}></span>
                       </li>
                     ))}
