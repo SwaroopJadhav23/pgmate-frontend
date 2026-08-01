@@ -72,6 +72,10 @@
 .adr-status-completed { color: #dc2626; }
 .adr-status-cancelled { color: #64748b; }
 
+.adr-status-badge {
+  display: none;
+}
+
 /* ── ACTION BUTTONS ── */
 .adr-actions {
   display: flex;
@@ -118,6 +122,7 @@
     background: transparent;
     border: none;
     overflow-x: visible;
+    padding: 0 12px;
   }
 
   .adr-table thead {
@@ -155,6 +160,10 @@
     text-align: right;
   }
 
+  .adr-desktop-only {
+    display: none !important;
+  }
+
   /* Show the header row always */
   .adr-td.adr-td-header {
     display: flex;
@@ -181,6 +190,18 @@
     font-size: 1rem;
     color: #0f172a;
   }
+
+  .adr-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #f1f5f9;
+  }
+  .adr-status-badge.adr-status-pending { background: #fef3c7; color: #d97706; }
+  .adr-status-badge.adr-status-completed { background: #fee2e2; color: #b91c1c; }
+  .adr-status-badge.adr-status-cancelled { background: #f1f5f9; color: #475569; }
 
   .adr-td:last-child {
     border-bottom: none;

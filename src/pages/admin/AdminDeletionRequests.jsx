@@ -117,7 +117,12 @@ const AdminDeletionRequests = () => {
                 <tr key={r.id} className={`adr-tr ${expandedId === r.id ? "expanded" : ""}`}>
                   <td data-label="Name" className="adr-td adr-td-header" onClick={() => toggleExpand(r.id)}>
                     <div className="adr-mobile-header">
-                      <span className="adr-val adr-name">{r.fullName || "Unknown"}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span className="adr-val adr-name">{r.fullName || "Unknown"}</span>
+                        <span className={`adr-status-badge adr-status-${r.status.toLowerCase()}`}>
+                          {r.status}
+                        </span>
+                      </div>
                       <div className="adr-mobile-chevron">
                         {expandedId === r.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                       </div>
@@ -133,7 +138,7 @@ const AdminDeletionRequests = () => {
                       {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") || "—"}
                     </span>
                   </td>
-                  <td data-label="Status" className="adr-td">
+                  <td data-label="Status" className="adr-td adr-desktop-only">
                     <span
                       className={`adr-status adr-status-${r.status.toLowerCase()}`}
                     >
