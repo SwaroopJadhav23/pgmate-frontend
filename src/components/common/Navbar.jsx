@@ -1,21 +1,21 @@
-import {Link, NavLink, useNavigate, useLocation} from "react-router-dom";
-import {useState, useEffect, useContext, useRef} from "react";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useContext, useRef } from "react";
 import "../common/nav.css";
-import {AuthContext} from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import pgmateLogo from "../../assets/PGMate.png";
 
 import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
-import {saveAs} from "file-saver";
+import { saveAs } from "file-saver";
 import api from "../../api/axios";
-import {useCityFilter} from "../../context/CityFilterContext";
+import { useCityFilter } from "../../context/CityFilterContext";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   // eslint-disable-next-line no-unused-vars
-  const {selectedCity, setSelectedCity} = useCityFilter();
+  const { selectedCity, setSelectedCity } = useCityFilter();
   const [cityStateMap, setCityStateMap] = useState({});
   const [dbCities, setDbCities] = useState([]); // actual cities from DB
   const location = useLocation();
@@ -42,7 +42,7 @@ const Navbar = () => {
   const exportRef = useRef(null);
 
   const navigate = useNavigate();
-  const {token, role, logout} = useContext(AuthContext);
+  const { token, role, logout } = useContext(AuthContext);
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -70,7 +70,7 @@ const Navbar = () => {
     if (cached) {
       try {
         setCityStateMap(JSON.parse(cached));
-      } catch {}
+      } catch { }
     }
 
     api
@@ -80,7 +80,7 @@ const Navbar = () => {
         setCityStateMap(map);
         localStorage.setItem("cityStateMap", JSON.stringify(map));
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [locationAllowed]);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ const Navbar = () => {
       .then((res) => {
         setDbCities(res.data || []);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -147,7 +147,7 @@ const Navbar = () => {
 
       if (matches && !seen.has(dbCity)) {
         seen.add(dbCity);
-        results.push({city: dbCity, state});
+        results.push({ city: dbCity, state });
       }
     });
 
@@ -217,7 +217,7 @@ const Navbar = () => {
       ["Occupied Beds", stats.occupiedBeds ?? 0],
     ];
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws["!cols"] = [{wch: 40}, {wch: 18}];
+    ws["!cols"] = [{ wch: 40 }, { wch: 18 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
     XLSX.writeFile(wb, "OwnerDashboard.xlsx");
@@ -239,7 +239,7 @@ const Navbar = () => {
         <tr><td>Occupied Beds</td><td>${stats.occupiedBeds ?? 0}</td></tr>
       </table></body></html>`;
     saveAs(
-      new Blob(["\ufeff", html], {type: "application/msword"}),
+      new Blob(["\ufeff", html], { type: "application/msword" }),
       "OwnerDashboard.doc",
     );
     setShowExport(false);
@@ -382,7 +382,7 @@ const Navbar = () => {
           <li>
             <NavLink
               to="/pgs"
-              className={({isActive}) =>
+              className={({ isActive }) =>
                 `pg-center-link ${isActive ? "active" : ""}`
               }
             >
@@ -392,7 +392,7 @@ const Navbar = () => {
           <li>
             <NavLink
               to="/cities"
-              className={({isActive}) =>
+              className={({ isActive }) =>
                 `pg-center-link ${isActive ? "active" : ""}`
               }
             >
@@ -405,7 +405,7 @@ const Navbar = () => {
             <li>
               <NavLink
                 to="/for-owners"
-                className={({isActive}) =>
+                className={({ isActive }) =>
                   `pg-center-link ${isActive ? "active" : ""}`
                 }
               >
@@ -419,7 +419,7 @@ const Navbar = () => {
             <li>
               <NavLink
                 to="/tools"
-                className={({isActive}) =>
+                className={({ isActive }) =>
                   `pg-center-link ${isActive ? "active" : ""}`
                 }
               >
@@ -427,7 +427,17 @@ const Navbar = () => {
               </NavLink>
             </li>
           )}
-          {/*
+          <li>
+            <NavLink
+              to="/contact-us"
+              className={({ isActive }) =>
+                `pg-center-link ${isActive ? "active" : ""}`
+              }
+            >
+              Contact
+            </NavLink>
+          </li>
+
           <li>
             <NavLink
               to="/about-us"
@@ -436,18 +446,6 @@ const Navbar = () => {
               }
             >
               About Us
-            </NavLink>
-          </li>
-          */}
-
-          <li>
-            <NavLink
-              to="/contact-us"
-              className={({isActive}) =>
-                `pg-center-link ${isActive ? "active" : ""}`
-              }
-            >
-              Contact
             </NavLink>
           </li>
         </ul>
@@ -494,7 +492,7 @@ const Navbar = () => {
             <li>
               <NavLink to="/tools" className="pg-menu-link" onClick={closeMenu}>
                 <i className="bi bi-tools"></i> Free Tools{" "}
-                <span className="pg-new-badge" style={{marginLeft: "auto"}}>
+                <span className="pg-new-badge" style={{ marginLeft: "auto" }}>
                   New
                 </span>
               </NavLink>
@@ -512,18 +510,6 @@ const Navbar = () => {
             </li>
           )}
 
-          {/*
-          <li>
-            <NavLink
-              to="/about-us"
-              className="pg-menu-link"
-              onClick={closeMenu}
-            >
-              <i className="bi bi-info-circle"></i> About Us
-            </NavLink>
-          </li>
-          */}
-
           <li>
             <NavLink
               to="/contact-us"
@@ -531,6 +517,16 @@ const Navbar = () => {
               onClick={closeMenu}
             >
               <i className="bi bi-envelope"></i> Contact
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/about-us"
+              className="pg-menu-link"
+              onClick={closeMenu}
+            >
+              <i className="bi bi-info-circle"></i> About Us
             </NavLink>
           </li>
 
@@ -643,7 +639,7 @@ const Navbar = () => {
 
         {/* ── RIGHT SIDE (desktop) ── */}
         <div className="pg-nav-right">
-          <div id="google_translate_element" style={{display: "none"}}></div>
+          <div id="google_translate_element" style={{ display: "none" }}></div>
 
           {!token ? (
             <Link to="/login" className="pg-login-btn desktop-only">
@@ -653,7 +649,7 @@ const Navbar = () => {
             <Link
               to={location.pathname === "/profile" ? "/" : "/profile"}
               className="pg-profile desktop-only"
-              style={{textDecoration: "none"}}
+              style={{ textDecoration: "none" }}
             >
               <div className="pg-avatar">
                 <i className="bi bi-person-fill"></i>
