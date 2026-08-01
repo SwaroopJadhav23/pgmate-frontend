@@ -1,6 +1,6 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 //import {Link, useNavigate} from "react-router-dom";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ShieldCheck,
   MapPin,
@@ -12,21 +12,21 @@ import {
   //Star,
 } from "lucide-react";
 import api from "../../../api/axios";
-import {useCityFilter} from "../../../context/CityFilterContext";
+import { useCityFilter } from "../../../context/CityFilterContext";
 
 const GENDER_OPTIONS = [
-  {value: "MALE", label: "Men"},
-  {value: "FEMALE", label: "Women"},
-  {value: "UNISEX", label: "Unisex"},
+  { value: "MALE", label: "Men" },
+  { value: "FEMALE", label: "Women" },
+  { value: "UNISEX", label: "Unisex" },
 ];
 
 const BUDGET_OPTIONS = [
-  {value: 5000, label: "Under ₹5,000"},
-  {value: 8000, label: "₹5,000 - ₹8,000"},
-  {value: 12000, label: "₹8,000 - ₹12,000"},
-  {value: 18000, label: "₹12,000 - ₹18,000"},
-  {value: 25000, label: "₹18,000 - ₹25,000"},
-  {value: 30000, label: "Above ₹25,000"},
+  { value: 5000, label: "Under ₹5,000" },
+  { value: 8000, label: "₹5,000 - ₹8,000" },
+  { value: 12000, label: "₹8,000 - ₹12,000" },
+  { value: 18000, label: "₹12,000 - ₹18,000" },
+  { value: 25000, label: "₹18,000 - ₹25,000" },
+  { value: 30000, label: "Above ₹25,000" },
 ];
 
 export default function PGMateBanner({
@@ -49,7 +49,10 @@ export default function PGMateBanner({
   const searchWrapRef = useRef(null);
   const navigate = useNavigate();
 
-  const {selectedCity, setSelectedCity} = useCityFilter(); // import { useCityFilter } from "../../../context/CityFilterContext";
+  const { selectedCity, setSelectedCity } = useCityFilter(); // import { useCityFilter } from "../../../context/CityFilterContext";
+  const role = localStorage.getItem("role") || null;
+  const token = localStorage.getItem("token") || null;
+  const isTenant = !!token && role === "USER";
   const [localityOptions, setLocalityOptions] = useState([]);
   const [checkingMatch, setCheckingMatch] = useState(false);
   const [hasNonCityMatch, setHasNonCityMatch] = useState(true); // assume match until proven otherwise
@@ -63,7 +66,7 @@ export default function PGMateBanner({
       .then((res) => {
         if (mounted.current) setPgCount(res.data?.count ?? null);
       })
-      .catch(() => {});
+      .catch(() => { });
     api
       .get("/public/cities")
       .then((res) => {
@@ -73,7 +76,7 @@ export default function PGMateBanner({
           setCityOptions(cities);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       mounted.current = false;
     };
@@ -109,7 +112,7 @@ export default function PGMateBanner({
     setCheckingMatch(true);
     debounceRef.current = setTimeout(() => {
       api
-        .get("/public/pgs/paged", {params: {search: q, page: 0, size: 1}})
+        .get("/public/pgs/paged", { params: { search: q, page: 0, size: 1 } })
         .then((res) => {
           const found = (res.data?.content || []).length > 0;
           setHasNonCityMatch(found);
@@ -138,7 +141,7 @@ export default function PGMateBanner({
       return;
     }
     api
-      .get("/public/localities", {params: {city: selectedCity}})
+      .get("/public/localities", { params: { city: selectedCity } })
       .then((res) => setLocalityOptions(res.data || []))
       .catch(() => setLocalityOptions([]));
   }, [selectedCity]);
@@ -196,8 +199,10 @@ export default function PGMateBanner({
       <section className="pgb-wrap">
         <div className="pgb-ticker">
           <div className="pgb-ticker-track">
-            <span style={{marginLeft: "9px"}}>
-              Explore verified PGs, connect with owners, and move in without the hassle.
+            <span style={{ marginLeft: "9px" }}>
+              {isTenant
+                ? "Explore verified PGs, connect with owners, and move in without the hassle."
+                : "Manage rooms, tenants, rent, receipts, bookings, and WhatsApp with ease every day."}
             </span>
           </div>
         </div>
@@ -260,7 +265,7 @@ export default function PGMateBanner({
           <div
             className="pgb-field"
             ref={searchWrapRef}
-            style={{position: "relative"}}
+            style={{ position: "relative" }}
           >
             <label>Location</label>
             <div className="pgb-input-wrap">
