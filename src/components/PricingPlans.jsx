@@ -19,6 +19,7 @@ import {
   Crown,
   MessageCircle,
   Phone,
+  Plus,
 } from "lucide-react";
 
 const PLAN_ORDER = ["FREE", "BASIC", "PRO", "PREMIUM"];
@@ -33,6 +34,7 @@ const PricingPlans = () => {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [clickedPlan, setClickedPlan] = useState(null);
   const [redeemPoints, setRedeemPoints] = useState(0);
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -235,6 +237,10 @@ const PricingPlans = () => {
             </div>
           )}
 
+          <div className="mobile-swipe-hint">
+            Swipe to see more plans <span>→</span>
+          </div>
+
           <div className="pricing-cards">
             {/* 1. Talk to Our Executive Card (Hardcoded) */}
             <div className="pricing-card-wrapper">
@@ -333,10 +339,7 @@ const PricingPlans = () => {
                       className={[
                         "pricing-card",
                         isHighest && !isCurrent ? "featured" : "",
-                        isCurrent ? "card-current" : "",
-                        isCurrent && p.planType === "PREMIUM"
-                          ? "premium-active"
-                          : "",
+                        isCurrent || clickedPlan === p.planType ? `card-clicked-${p.planType.toLowerCase()}` : "",
                         !p.active ? "card-disabled" : "",
                         hasValidOffer ? "card-offer" : "",
                         isDg ? "card-downgrade" : "",
@@ -344,11 +347,21 @@ const PricingPlans = () => {
                         .filter(Boolean)
                         .join(" ")}
                       style={{"--card-index": idx}}
+                      onClick={() => {
+                        if (isCurrent) {
+                          setClickedPlan(null);
+                        } else if (!isDisabled) {
+                          setClickedPlan(p.planType);
+                        }
+                      }}
                     >
                       {isCurrent && (
-                        <div className="badge badge-current">✦ Active Plan</div>
+                        <div className={`badge badge-clicked-${p.planType.toLowerCase()}`}>✦ Active Plan</div>
                       )}
-                      {!isCurrent && p.planType === "PREMIUM" && (
+                      {!isCurrent && clickedPlan === p.planType && (
+                        <div className={`badge badge-clicked-${p.planType.toLowerCase()}`}>✦ Choose plan?</div>
+                      )}
+                      {!isCurrent && clickedPlan !== p.planType && p.planType === "PREMIUM" && (
                         <div className="badge badge-best-value">
                           <Crown size={16} style={{marginRight: "4px"}} /> Best
                           Value
@@ -420,9 +433,11 @@ const PricingPlans = () => {
                           </div>
                           <div className="plan-row">
                             <User size={16} />{" "}
-                            {p.planType === "PRO"
-                              ? "Unlimited Staff Logins"
-                              : "5 Staff Logins"}
+                            {p.planType === "BASIC"
+                              ? "2 Staff Logins"
+                              : p.planType === "PRO"
+                                ? "3 Staff Logins"
+                                : "5 Staff Logins"}
                           </div>
                         </div>
                       </div>
@@ -438,21 +453,21 @@ const PricingPlans = () => {
                               "Online Rent Collection",
                               "Expense Management",
                               "Digital Rent Receipts",
-                              "Staff Login (1 User)",
+                              "Staff Login (2 Users)",
                               "Payment Reminders",
                               "Reports & Analytics (Basic)",
                               "Community Support",
                             ]
                           : p.planType === "PRO"
                             ? [
-                                "All Basic features",
+                                "<span class='highlight-basic-feature'>All Basic features</span>",
                                 "Unlimited Payment Reminders",
                                 "Reports & Analytics (Advanced)",
                                 "Document Management",
                                 "Priority WhatsApp Support",
                               ]
                             : [
-                                "All Pro features",
+                                "<span class='highlight-pro-feature'>All Pro features</span>",
                                 "Advanced Analytics",
                                 "Unlimited Document Management",
                                 "<strong>Free PG verification</strong>",
@@ -463,9 +478,9 @@ const PricingPlans = () => {
                         ).map((f, i) => (
                           <li key={i}>
                             <span
-                              className={`feat-icon check-${p.planType.toLowerCase()}`}
+                              className={`feat-icon ${f.includes("highlight-basic-feature") ? "check-basic" : f.includes("highlight-pro-feature") ? "check-pro" : `check-${p.planType.toLowerCase()}`}`}
                             >
-                              <Check size={16} />
+                              {f.includes("highlight-basic-feature") || f.includes("highlight-pro-feature") ? <Plus size={16} strokeWidth={3} /> : <Check size={16} />}
                             </span>
                             <span dangerouslySetInnerHTML={{__html: f}}></span>
                           </li>
