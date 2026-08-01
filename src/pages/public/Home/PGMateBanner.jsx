@@ -50,9 +50,9 @@ export default function PGMateBanner({
   const navigate = useNavigate();
 
   const { selectedCity, setSelectedCity } = useCityFilter(); // import { useCityFilter } from "../../../context/CityFilterContext";
-  const role = localStorage.getItem("role") || null;
+  const role = localStorage.getItem("role") || "";
   const token = localStorage.getItem("token") || null;
-  const isTenant = !!token && role === "USER";
+  const isTenant = !!token && role.toUpperCase() === "USER";
   const [localityOptions, setLocalityOptions] = useState([]);
   const [checkingMatch, setCheckingMatch] = useState(false);
   const [hasNonCityMatch, setHasNonCityMatch] = useState(true); // assume match until proven otherwise
