@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import api from "../../api/axios";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import "./AdminDeletionRequests.css";
 
@@ -7,6 +8,11 @@ const AdminDeletionRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null); // holds the id being acted on
+  const [expandedId, setExpandedId] = useState(null);
+
+  const toggleExpand = (id) => {
+    setExpandedId(prev => prev === id ? null : id);
+  };
 
   const handleDeleteNow = async (id) => {
     if (
@@ -108,16 +114,24 @@ const AdminDeletionRequests = () => {
             </thead>
             <tbody>
               {requests.map((r) => (
-                <tr key={r.id} className="adr-tr">
-                  <td data-label="Name" className="adr-td">{r.fullName}</td>
-                  <td data-label="Phone" className="adr-td">{r.phone}</td>
-                  <td data-label="Email" className="adr-td">{r.email}</td>
+                <tr key={r.id} className={`adr-tr ${expandedId === r.id ? "expanded" : ""}`}>
+                  <td data-label="Name" className="adr-td adr-td-header" onClick={() => toggleExpand(r.id)}>
+                    <div className="adr-mobile-header">
+                      <span className="adr-val adr-name">{r.fullName || "Unknown"}</span>
+                      <div className="adr-mobile-chevron">
+                        {expandedId === r.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      </div>
+                    </div>
+                  </td>
+                  <td data-label="Phone" className="adr-td"><span className="adr-val">{r.phone || "—"}</span></td>
+                  <td data-label="Email" className="adr-td"><span className="adr-val">{r.email || "—"}</span></td>
                   <td data-label="Reason" className="adr-td">
-                    <span className="adr-reason">{r.reason}</span>
+                    <span className="adr-reason">{r.reason || "—"}</span>
                   </td>
                   <td data-label="Requested On" className="adr-td">
-                    {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") ||
-                      "—"}
+                    <span className="adr-val">
+                      {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") || "—"}
+                    </span>
                   </td>
                   <td data-label="Status" className="adr-td">
                     <span
@@ -127,9 +141,11 @@ const AdminDeletionRequests = () => {
                     </span>
                   </td>
                   <td data-label="Days Left" className="adr-td">
-                    {r.status === "PENDING"
-                      ? `${daysLeft(r.scheduledDeletionAt)} day(s)`
-                      : "—"}
+                    <span className="adr-val">
+                      {r.status === "PENDING"
+                        ? `${daysLeft(r.scheduledDeletionAt)} day(s)`
+                        : "—"}
+                    </span>
                   </td>
                   <td data-label="Actions" className="adr-td">
                     {r.status === "PENDING" ? (
