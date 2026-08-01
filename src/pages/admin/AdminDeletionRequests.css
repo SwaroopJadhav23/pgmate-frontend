@@ -1,0 +1,180 @@
+/* ════════════════════════════════════════
+   DELETION REQUESTS TABLE STYLES
+════════════════════════════════════════ */
+.adr-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.adr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.adr-th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.adr-tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.adr-tr:last-child {
+  border-bottom: none;
+}
+
+.adr-tr:hover {
+  background-color: #f8fafc;
+}
+
+.adr-td {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  vertical-align: top;
+}
+
+.adr-reason {
+  max-width: 260px;
+  line-height: 1.4;
+  color: #475569;
+}
+
+.adr-status {
+  font-weight: 600;
+}
+.adr-status-pending { color: #f59e0b; }
+.adr-status-completed { color: #dc2626; }
+.adr-status-cancelled { color: #64748b; }
+
+/* ── ACTION BUTTONS ── */
+.adr-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adr-btn {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.adr-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.adr-btn-restore {
+  background: #16a34a;
+  color: #fff;
+}
+.adr-btn-restore:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.adr-btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+.adr-btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+/* ════════════════════════════════════════
+   MOBILE VIEW (CARD LAYOUT)
+════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .adr-table-container {
+    background: transparent;
+    border: none;
+    overflow-x: visible;
+  }
+
+  .adr-table thead {
+    display: none;
+  }
+
+  .adr-table,
+  .adr-table tbody,
+  .adr-tr,
+  .adr-td {
+    display: block;
+    width: 100%;
+  }
+
+  .adr-tr {
+    background: #fff;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 8px 0;
+  }
+  
+  .adr-tr:hover {
+    background: #fff;
+  }
+
+  .adr-td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: right;
+  }
+
+  .adr-td:last-child {
+    border-bottom: none;
+  }
+
+  /* Expose data-label for mobile headers */
+  .adr-td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #64748b;
+    margin-right: 16px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-align: left;
+  }
+
+  .adr-reason {
+    max-width: none;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  /* Make Reason look better when it breaks lines */
+  .adr-td[data-label="Reason"] {
+    align-items: flex-start;
+  }
+  .adr-td[data-label="Reason"]::before {
+    margin-top: 2px;
+  }
+
+  /* Actions Container on Mobile */
+  .adr-actions {
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 4px;
+  }
+}

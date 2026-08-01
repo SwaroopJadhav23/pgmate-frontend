@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import api from "../../api/axios";
 import DashboardLayout from "../../layouts/DashboardLayout";
+import "./AdminDeletionRequests.css";
 
 const AdminDeletionRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -81,13 +82,6 @@ const AdminDeletionRequests = () => {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
-  const statusColor = (status) =>
-    status === "PENDING"
-      ? "#f59e0b"
-      : status === "COMPLETED"
-        ? "#dc2626"
-        : "#64748b";
-
   return (
     <DashboardLayout
       title="Account Deletion Requests"
@@ -98,85 +92,59 @@ const AdminDeletionRequests = () => {
       ) : requests.length === 0 ? (
         <p style={{color: "#64748b"}}>No deletion requests yet.</p>
       ) : (
-        <div style={{overflowX: "auto"}}>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              background: "#fff",
-            }}
-          >
+          <div className="adr-table-container">
+          <table className="adr-table">
             <thead>
-              <tr
-                style={{textAlign: "left", borderBottom: "2px solid #e5e7eb"}}
-              >
-                <th style={{padding: "10px"}}>Name</th>
-                <th style={{padding: "10px"}}>Phone</th>
-                <th style={{padding: "10px"}}>Email</th>
-                <th style={{padding: "10px"}}>Reason</th>
-                <th style={{padding: "10px"}}>Requested On</th>
-                <th style={{padding: "10px"}}>Status</th>
-                <th style={{padding: "10px"}}>Days Left</th>
-                <th style={{padding: "10px"}}>Actions</th>
+              <tr>
+                <th className="adr-th">Name</th>
+                <th className="adr-th">Phone</th>
+                <th className="adr-th">Email</th>
+                <th className="adr-th">Reason</th>
+                <th className="adr-th">Requested On</th>
+                <th className="adr-th">Status</th>
+                <th className="adr-th">Days Left</th>
+                <th className="adr-th">Actions</th>
               </tr>
             </thead>
             <tbody>
               {requests.map((r) => (
-                <tr key={r.id} style={{borderBottom: "1px solid #f1f5f9"}}>
-                  <td style={{padding: "10px"}}>{r.fullName}</td>
-                  <td style={{padding: "10px"}}>{r.phone}</td>
-                  <td style={{padding: "10px"}}>{r.email}</td>
-                  <td style={{padding: "10px", maxWidth: "260px"}}>
-                    {r.reason}
+                <tr key={r.id} className="adr-tr">
+                  <td data-label="Name" className="adr-td">{r.fullName}</td>
+                  <td data-label="Phone" className="adr-td">{r.phone}</td>
+                  <td data-label="Email" className="adr-td">{r.email}</td>
+                  <td data-label="Reason" className="adr-td">
+                    <span className="adr-reason">{r.reason}</span>
                   </td>
-                  <td style={{padding: "10px"}}>
+                  <td data-label="Requested On" className="adr-td">
                     {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") ||
                       "—"}
                   </td>
-                  <td style={{padding: "10px"}}>
+                  <td data-label="Status" className="adr-td">
                     <span
-                      style={{color: statusColor(r.status), fontWeight: 600}}
+                      className={`adr-status adr-status-${r.status.toLowerCase()}`}
                     >
                       {r.status}
                     </span>
                   </td>
-                  <td style={{padding: "10px"}}>
+                  <td data-label="Days Left" className="adr-td">
                     {r.status === "PENDING"
                       ? `${daysLeft(r.scheduledDeletionAt)} day(s)`
                       : "—"}
                   </td>
-                  <td style={{padding: "10px"}}>
+                  <td data-label="Actions" className="adr-td">
                     {r.status === "PENDING" ? (
-                      <div style={{display: "flex", gap: "8px"}}>
+                      <div className="adr-actions">
                         <button
+                          className="adr-btn adr-btn-restore"
                           onClick={() => handleRestore(r.id)}
                           disabled={actionLoading === r.id}
-                          style={{
-                            background: "#16a34a",
-                            color: "#fff",
-                            border: "none",
-                            padding: "6px 12px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                          }}
                         >
                           Restore
                         </button>
                         <button
+                          className="adr-btn adr-btn-danger"
                           onClick={() => handleDeleteNow(r.id)}
                           disabled={actionLoading === r.id}
-                          style={{
-                            background: "#dc2626",
-                            color: "#fff",
-                            border: "none",
-                            padding: "6px 12px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                          }}
                         >
                           Delete Now
                         </button>
