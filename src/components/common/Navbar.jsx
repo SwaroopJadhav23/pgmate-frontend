@@ -427,7 +427,6 @@ const Navbar = () => {
               </NavLink>
             </li>
           )}
-          {/*
           <li>
             <NavLink
               to="/about-us"
@@ -438,7 +437,6 @@ const Navbar = () => {
               About Us
             </NavLink>
           </li>
-          */}
 
           <li>
             <NavLink
@@ -512,7 +510,6 @@ const Navbar = () => {
             </li>
           )}
 
-          {/*
           <li>
             <NavLink
               to="/about-us"
@@ -522,7 +519,6 @@ const Navbar = () => {
               <i className="bi bi-info-circle"></i> About Us
             </NavLink>
           </li>
-          */}
 
           <li>
             <NavLink

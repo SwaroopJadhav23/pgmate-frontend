@@ -197,8 +197,7 @@ export default function PGMateBanner({
         <div className="pgb-ticker">
           <div className="pgb-ticker-track">
             <span style={{marginLeft: "9px"}}>
-              Manage rooms, tenants, rent, receipts, bookings, and WhatsApp with
-              ease every day.
+              Explore verified PGs, connect with owners, and move in without the hassle.
             </span>
           </div>
         </div>
