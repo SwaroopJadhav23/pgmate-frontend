@@ -429,23 +429,23 @@ const Navbar = () => {
           )}
           <li>
             <NavLink
-              to="/about-us"
-              className={({isActive}) =>
-                `pg-center-link ${isActive ? "active" : ""}`
-              }
-            >
-              About Us
-            </NavLink>
-          </li>
-
-          <li>
-            <NavLink
               to="/contact-us"
               className={({ isActive }) =>
                 `pg-center-link ${isActive ? "active" : ""}`
               }
             >
               Contact
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/about-us"
+              className={({isActive}) =>
+                `pg-center-link ${isActive ? "active" : ""}`
+              }
+            >
+              About Us
             </NavLink>
           </li>
         </ul>
@@ -512,21 +512,21 @@ const Navbar = () => {
 
           <li>
             <NavLink
-              to="/about-us"
-              className="pg-menu-link"
-              onClick={closeMenu}
-            >
-              <i className="bi bi-info-circle"></i> About Us
-            </NavLink>
-          </li>
-
-          <li>
-            <NavLink
               to="/contact-us"
               className="pg-menu-link"
               onClick={closeMenu}
             >
               <i className="bi bi-envelope"></i> Contact
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/about-us"
+              className="pg-menu-link"
+              onClick={closeMenu}
+            >
+              <i className="bi bi-info-circle"></i> About Us
             </NavLink>
           </li>
 
