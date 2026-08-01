@@ -1683,6 +1683,11 @@
 }
 
 /* Plan Heads */
+.head-free {
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
 .head-basic {
   justify-content: center;
   flex-direction: column;
@@ -1699,6 +1704,18 @@
   text-align: center;
 }
 
+.icon-free {
+  color: #334155;
+  background: #f1f5f9;
+  border-radius: 50%;
+  padding: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px;
+}
 .icon-basic {
   color: #16a34a;
   background: #f0fdf4;
@@ -1736,6 +1753,12 @@
   margin: 0 auto 5px;
 }
 
+.name-free {
+  color: #334155;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
 .name-basic {
   color: #16a34a;
   font-size: 1.05rem;
@@ -1760,6 +1783,16 @@
   margin-bottom: 0 !important;
 }
 
+.offer-free {
+  background: transparent;
+  border: 1px solid #64748b;
+  color: #64748b;
+  justify-content: center;
+  margin: 15px auto;
+  border-radius: 6px;
+  padding: 6px;
+  width: 90%;
+}
 .offer-basic {
   background: transparent;
   border: 1px solid #16a34a;
@@ -1910,6 +1943,9 @@
   margin-bottom: 15px;
   text-align: left;
 }
+.box-free {
+  background-color: #f8fafc;
+}
 .box-basic {
   background-color: #f0fdf4;
 }
@@ -1931,6 +1967,9 @@
 }
 .plan-row:last-child {
   margin-bottom: 0;
+}
+.box-free .plan-row svg {
+  color: #64748b;
 }
 .box-basic .plan-row svg {
   color: #16a34a;
@@ -1963,6 +2002,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.check-free {
+  color: #64748b;
 }
 .check-basic {
   color: #16a34a;
