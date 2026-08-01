@@ -117,7 +117,7 @@
 /* ════════════════════════════════════════
    MOBILE VIEW (CARD LAYOUT)
 ════════════════════════════════════════ */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .adr-table-container {
     background: transparent;
     border: none;
@@ -139,7 +139,8 @@
 
   .adr-tr {
     background: #fff;
-    margin-bottom: 16px;
+    margin: 0 auto 16px auto;
+    max-width: 800px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
