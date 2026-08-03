@@ -432,16 +432,16 @@ const OfferManager = () => {
             {showModal && (
               <div className="modal-backdrop-custom">
                 <div className="modal-box offer-modal">
-                  <h5>{isEdit ? "Edit Offer" : "Apply Offer"}</h5>
+                  <h5 className="offer-modal-title">{isEdit ? "Edit Offer" : "Apply Offer"}</h5>
                   <button className="offer-modal-close" onClick={() => setShowModal(false)}>✕</button>
 
                   {selectedPg === "ALL" ? (
-                    <p>
+                    <p className="offer-modal-subtitle">
                       <strong>Applying to ALL PGs</strong>
                     </p>
                   ) : (
                     selectedPgData && (
-                      <p>
+                      <p className="offer-modal-subtitle">
                         for <strong>{selectedPgData.name}</strong>
                       </p>
                     )

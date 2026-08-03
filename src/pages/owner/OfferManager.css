@@ -487,3 +487,73 @@ OFFER ACTION BUTTONS
     right: 16px !important;
   }
 }
+
+/* =========================================
+   MODAL ACTIONS & INPUTS
+========================================= */
+
+.modal-box input,
+.modal-box select {
+  border-radius: 8px;
+  height: 44px;
+  border: 1px solid #e2e8f0;
+  padding: 0 14px;
+  width: 100%;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.modal-box input:focus,
+.modal-box select:focus {
+  border-color: #6366f1;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 24px;
+  flex-wrap: nowrap !important;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.modal-btn.cancel {
+  background: #e5e8f7;
+  color: rgb(101, 105, 109);
+}
+
+.modal-btn.cancel:hover {
+  background: #f0f2fa;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+}
+
+.modal-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, .35);
+}
+
+@media (max-width: 768px) {
+  .modal-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-btn {
+    width: 100%;
+    margin: 0;
+  }
+}

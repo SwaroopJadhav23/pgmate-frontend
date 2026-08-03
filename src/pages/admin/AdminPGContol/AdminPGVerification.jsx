@@ -1,9 +1,9 @@
-import { FaHome, FaFolderOpen, FaTrash } from "react-icons/fa";
-import { useEffect, useState, useCallback } from "react";
+import {FaHome, FaFolderOpen, FaTrash} from "react-icons/fa";
+import {useEffect, useState, useCallback} from "react";
 import api from "../../../api/axios";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
-import { TableSkeleton, UniversalCardSkeleton } from "../../public/Skeleton";
+import {TableSkeleton, UniversalCardSkeleton} from "../../public/Skeleton";
 import SortableImageGrid from "../../../components/Sortableimagegrid";
 import "../../../components/Sortableimagegrid.css";
 import "./AdminPGVerification.css";
@@ -12,8 +12,8 @@ const DEFAULT_PG_IMAGE =
   "https://res.cloudinary.com/drhjyumlm/image/upload/v1773823610/pgs/images/sk30iitclkb0lpsbcc3g.webp";
 const PAGE_SIZE = 20;
 
-const sessionReasonRef = { current: null };
-const AdminPGVerification = ({ basePath = "/admin" }) => {
+const sessionReasonRef = {current: null};
+const AdminPGVerification = ({basePath = "/admin"}) => {
   const [pgs, setPgs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -40,10 +40,18 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
   const fetchSummary = useCallback(async () => {
     try {
       const [pending, reapplied, approved, rejected] = await Promise.all([
-        api.get(`${basePath}/pg-verification/paged`, { params: { page: 0, size: 1, status: "PENDING" } }),
-        api.get(`${basePath}/pg-verification/paged`, { params: { page: 0, size: 1, status: "REAPPLIED" } }),
-        api.get(`${basePath}/pg-verification/paged`, { params: { page: 0, size: 1, status: "APPROVED" } }),
-        api.get(`${basePath}/pg-verification/paged`, { params: { page: 0, size: 1, status: "REJECTED" } }),
+        api.get(`${basePath}/pg-verification/paged`, {
+          params: {page: 0, size: 1, status: "PENDING"},
+        }),
+        api.get(`${basePath}/pg-verification/paged`, {
+          params: {page: 0, size: 1, status: "REAPPLIED"},
+        }),
+        api.get(`${basePath}/pg-verification/paged`, {
+          params: {page: 0, size: 1, status: "APPROVED"},
+        }),
+        api.get(`${basePath}/pg-verification/paged`, {
+          params: {page: 0, size: 1, status: "REJECTED"},
+        }),
       ]);
       setSummary({
         pending: pending.data?.totalElements || 0,
@@ -133,7 +141,9 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
       floors: [],
     });
     try {
-      const res = await api.get(`${basePath}/owners/pg/${pg.id}`, { timeout: 15000 });
+      const res = await api.get(`${basePath}/owners/pg/${pg.id}`, {
+        timeout: 15000,
+      });
       setPgDetail(res.data);
     } catch (error) {
       console.error(error);
@@ -154,17 +164,24 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
     setIsDragOver(false);
   };
 
-  const approvePG = async (pgId) => {
-    const confirm = await Swal.fire({ title: "Approve this PG?", icon: "question", showCancelButton: true });
+  const approvePG = async (pgId, pgName) => {
+    const confirm = await Swal.fire({
+      title: `Are you sure you want to approve "${pgName}"?`,
+      text: "This will mark the PG as verified and make its listing publicly visible to users.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, approve it",
+      cancelButtonText: "Cancel",
+    });
     if (!confirm.isConfirmed) return;
     await api.put(`${basePath}/pg-verification/${pgId}/approve`);
-    toast.success("PG approved and is now live.");
+    toast.success(`"${pgName}" approved and is now live.`);
     load(0, false);
     fetchSummary();
   };
 
   const rejectPG = async (pgId) => {
-    const { value: reason } = await Swal.fire({
+    const {value: reason} = await Swal.fire({
       title: "Reject PG",
       input: "textarea",
       inputLabel: "Reason",
@@ -175,7 +192,9 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
       },
     });
     if (!reason) return;
-    await api.put(`${basePath}/pg-verification/${pgId}/reject`, null, { params: { reason } });
+    await api.put(`${basePath}/pg-verification/${pgId}/reject`, null, {
+      params: {reason},
+    });
     toast.success("PG rejected successfully.");
     load(0, false);
     fetchSummary();
@@ -190,7 +209,7 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
     let reason = sessionReasonRef.current;
 
     if (!reason) {
-      const { value: inputReason } = await Swal.fire({
+      const {value: inputReason} = await Swal.fire({
         title: "Delete Media",
         input: "textarea",
         inputLabel: "Enter Reason for deletion",
@@ -229,11 +248,11 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
       if (mediaType === "image") {
         const updated = pgDetail.imageUrls.filter((u) => u !== currentUrl);
         if (updated.length === 0) setShowMediaViewer(false);
-        setPgDetail({ ...pgDetail, imageUrls: updated });
+        setPgDetail({...pgDetail, imageUrls: updated});
       } else {
         const updated = pgDetail.videoUrls.filter((u) => u !== currentUrl);
         if (updated.length === 0) setShowMediaViewer(false);
-        setPgDetail({ ...pgDetail, videoUrls: updated });
+        setPgDetail({...pgDetail, videoUrls: updated});
       }
 
       setMediaIndex(0);
@@ -243,7 +262,7 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
   };
 
   const disapprovePG = async (pgId) => {
-    const { value: reason } = await Swal.fire({
+    const {value: reason} = await Swal.fire({
       title: "Disapprove PG",
       input: "textarea",
       inputLabel: "Reason",
@@ -258,7 +277,7 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
     if (!reason) return;
 
     await api.put(`${basePath}/pg-verification/${pgId}/reject`, null, {
-      params: { reason },
+      params: {reason},
     });
 
     toast.success("PG disapproved and moved to rejected.");
@@ -275,7 +294,7 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
   const [rearrangeList, setRearrangeList] = useState([]);
 
   // ── Drag & Drop Image Upload state ──
-  const [uploadFiles, setUploadFiles] = useState([]);   // { id, file, preview, status: 'pending'|'uploading'|'done'|'error' }
+  const [uploadFiles, setUploadFiles] = useState([]); // { id, file, preview, status: 'pending'|'uploading'|'done'|'error' }
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -284,21 +303,23 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
       (pgDetail?.imageUrls || []).map((url, i) => ({
         id: `rearr-${i}`,
         src: url,
-      }))
+      })),
     );
     setShowRearrange(true);
   };
 
   const saveRearrangedOrder = () => {
     const newUrls = rearrangeList.map((img) => img.src);
-    setPgDetail({ ...pgDetail, imageUrls: newUrls });
+    setPgDetail({...pgDetail, imageUrls: newUrls});
     setMediaIndex(0);
     setShowRearrange(false);
   };
 
   // ── Drag & Drop Upload Handlers ──
   const addFilesToUpload = (files) => {
-    const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    const imageFiles = Array.from(files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
     if (!imageFiles.length) return;
     const newEntries = imageFiles.map((file) => ({
       id: `upload-${Date.now()}-${Math.random()}`,
@@ -315,7 +336,10 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
     addFilesToUpload(e.dataTransfer.files);
   };
 
-  const handleDropZoneDragOver = (e) => { e.preventDefault(); setIsDragOver(true); };
+  const handleDropZoneDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
   const handleDropZoneDragLeave = () => setIsDragOver(false);
 
   const removeUploadFile = (id) => {
@@ -332,7 +356,9 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
     setIsUploading(true);
 
     const updateStatus = (id, status) =>
-      setUploadFiles((prev) => prev.map((f) => (f.id === id ? { ...f, status } : f)));
+      setUploadFiles((prev) =>
+        prev.map((f) => (f.id === id ? {...f, status} : f)),
+      );
 
     let anySuccess = false;
     const newUrls = [];
@@ -345,7 +371,7 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
         const res = await api.post(
           `${basePath}/pg-verification/${pgDetail.id}/upload-images`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {headers: {"Content-Type": "multipart/form-data"}},
         );
         const uploaded = res.data?.imageUrls || res.data?.urls || [];
         newUrls.push(...uploaded);
@@ -366,18 +392,19 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
     setIsUploading(false);
   };
 
-  const showValue = (value, fallback = "Not specified") => value && value.length !== 0 ? value : fallback;
+  const showValue = (value, fallback = "Not specified") =>
+    value && value.length !== 0 ? value : fallback;
 
   const colSpan =
     activeTab === "PENDING"
       ? 7
       : activeTab === "REAPPLIED"
-      ? 8
-      : activeTab === "REJECTED"
-      ? 6
-      : activeTab === "APPROVED"
-      ? 6
-      : 5;
+        ? 8
+        : activeTab === "REJECTED"
+          ? 6
+          : activeTab === "APPROVED"
+            ? 6
+            : 5;
 
   return (
     <>
@@ -429,7 +456,11 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
 
       <div className="status-tabs">
         {["PENDING", "REAPPLIED", "APPROVED", "REJECTED"].map((s) => (
-          <button key={s} className={`status-btn ${activeTab === s ? "active" : ""}`} onClick={() => setActiveTab(s)}>
+          <button
+            key={s}
+            className={`status-btn ${activeTab === s ? "active" : ""}`}
+            onClick={() => setActiveTab(s)}
+          >
             {s}
           </button>
         ))}
@@ -445,7 +476,9 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
         />
       </div>
 
-      <div className="admin-results-count">Showing {pgs.length} of {totalElements} PGs</div>
+      <div className="admin-results-count">
+        Showing {pgs.length} of {totalElements} PGs
+      </div>
 
       <div className="pg-table-wrapper pg-table-wrap-pd">
         <table className="pg-table">
@@ -475,14 +508,18 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
               <TableSkeleton rows={8} cols={colSpan} />
             ) : pgs.length === 0 ? (
               <tr>
-                <td colSpan={colSpan} className="pg-table-empty">No records found</td>
+                <td colSpan={colSpan} className="pg-table-empty">
+                  No records found
+                </td>
               </tr>
             ) : (
               pgs.map((pg) => (
                 <tr key={pg.id}>
                   <td>
                     <div className="pg-name-cell">
-                      <div className="pg-name-icon"><FaHome /></div>
+                      <div className="pg-name-icon">
+                        <FaHome />
+                      </div>
                       <span className="pg-name-text">{pg.name}</span>
                     </div>
                   </td>
@@ -490,23 +527,47 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
                   <td className="pg-table-text-muted">{pg.city}</td>
                   <td className="pg-table-text-truncate">{pg.locality}</td>
                   <td className="text-center">
-                    <button className="btn-tbl btn-tbl-details" onClick={() => openDetailModal(pg)}>Details</button>
+                    <button
+                      className="btn-tbl btn-tbl-details"
+                      onClick={() => openDetailModal(pg)}
+                    >
+                      Details
+                    </button>
                   </td>
                   {(activeTab === "PENDING" || activeTab === "REAPPLIED") && (
                     <>
-                      <td className="text-center"><button className="btn-tbl btn-tbl-approve" onClick={() => approvePG(pg.id)}>Approve</button></td>
-                      <td className="text-center"><button className="btn-tbl btn-tbl-reject" onClick={() => rejectPG(pg.id)}>Reject</button></td>
+                      <td className="text-center">
+                        <button
+                          className="btn-tbl btn-tbl-approve"
+                          onClick={() => approvePG(pg.id, pg.name)}
+                        >
+                          Approve
+                        </button>
+                      </td>
+                      <td className="text-center">
+                        <button
+                          className="btn-tbl btn-tbl-reject"
+                          onClick={() => rejectPG(pg.id)}
+                        >
+                          Reject
+                        </button>
+                      </td>
                     </>
                   )}
                   {activeTab === "APPROVED" && (
                     <td className="text-center">
-                      <button className="btn-tbl btn-tbl-reject" onClick={() => disapprovePG(pg.id)}>
+                      <button
+                        className="btn-tbl btn-tbl-reject"
+                        onClick={() => disapprovePG(pg.id)}
+                      >
                         Disapprove
                       </button>
                     </td>
                   )}
                   {(activeTab === "REJECTED" || activeTab === "REAPPLIED") && (
-                    <td className="rejection-cell">{pg.rejectionReason || "-"}</td>
+                    <td className="rejection-cell">
+                      {pg.rejectionReason || "-"}
+                    </td>
                   )}
                 </tr>
               ))
@@ -531,26 +592,54 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
                     <div className="pg-card-sub">{getOwnerName(pg)}</div>
                   </div>
                   <div className="pg-card-badges">
-                    <span className={`statuss-pill ${activeTab}`}>{activeTab}</span>
+                    <span className={`statuss-pill ${activeTab}`}>
+                      {activeTab}
+                    </span>
                   </div>
                 </div>
                 <div className="pg-card-meta">
-                  <div className="pg-card-meta-item"><i className="bi bi-geo-alt-fill"></i>{pg.city}</div>
-                  <div className="pg-card-meta-item"><i className="bi bi-map"></i>{pg.locality}</div>
+                  <div className="pg-card-meta-item">
+                    <i className="bi bi-geo-alt-fill"></i>
+                    {pg.city}
+                  </div>
+                  <div className="pg-card-meta-item">
+                    <i className="bi bi-map"></i>
+                    {pg.locality}
+                  </div>
                 </div>
                 {activeTab === "REJECTED" && pg.rejectionReason && (
-                  <div className="pg-card-rejection">Reason: {pg.rejectionReason}</div>
+                  <div className="pg-card-rejection">
+                    Reason: {pg.rejectionReason}
+                  </div>
                 )}
                 <div className="pg-card-actions">
-                  <button className="btn-tbl btn-tbl-details" onClick={() => openDetailModal(pg)}>Details</button>
+                  <button
+                    className="btn-tbl btn-tbl-details"
+                    onClick={() => openDetailModal(pg)}
+                  >
+                    Details
+                  </button>
                   {(activeTab === "PENDING" || activeTab === "REAPPLIED") && (
                     <>
-                      <button className="btn-tbl btn-tbl-approve" onClick={() => approvePG(pg.id)}>Approve</button>
-                      <button className="btn-tbl btn-tbl-reject" onClick={() => rejectPG(pg.id)}>Reject</button>
+                      <button
+                        className="btn-tbl btn-tbl-approve"
+                        onClick={() => approvePG(pg.id, pg.name)}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="btn-tbl btn-tbl-reject"
+                        onClick={() => rejectPG(pg.id)}
+                      >
+                        Reject
+                      </button>
                     </>
                   )}
                   {activeTab === "APPROVED" && (
-                    <button className="btn-tbl btn-tbl-reject" onClick={() => disapprovePG(pg.id)}>
+                    <button
+                      className="btn-tbl btn-tbl-reject"
+                      onClick={() => disapprovePG(pg.id)}
+                    >
                       Disapprove
                     </button>
                   )}
@@ -563,35 +652,91 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
 
       {!loading && page + 1 < totalPages && (
         <div className="admin-load-more-wrap">
-          <button className="admin-load-more-btn" onClick={() => load(page + 1, true)} disabled={loadingMore}>
+          <button
+            className="admin-load-more-btn"
+            onClick={() => load(page + 1, true)}
+            disabled={loadingMore}
+          >
             {loadingMore ? "Loading..." : "Load More"}
           </button>
         </div>
       )}
 
       {showDetailModal && (
-        <div className="modal-backdrop-custom" onClick={() => setShowDetailModal(false)}>
-          <div className="modal-box modal-box-wide" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-backdrop-custom"
+          onClick={() => setShowDetailModal(false)}
+        >
+          <div
+            className="modal-box modal-box-wide"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header-custom">
               <h4>PG Details</h4>
-              <button className="modal-close" onClick={closeDetail}>X</button>
+              <button className="modal-close" onClick={closeDetail}>
+                X
+              </button>
             </div>
             {loadingDetail ? (
-              <div className="text-center p-5 modal-loading-text">Loading PG Details...</div>
+              <div className="text-center p-5 modal-loading-text">
+                Loading PG Details...
+              </div>
             ) : (
               <div className="pg-modal-content">
-                {loadingDetail && <div className="text-center modal-loading-text">Loading full PG details...</div>}
-                {detailError && <div className="text-center modal-error-text">{detailError}</div>}
+                {loadingDetail && (
+                  <div className="text-center modal-loading-text">
+                    Loading full PG details...
+                  </div>
+                )}
+                {detailError && (
+                  <div className="text-center modal-error-text">
+                    {detailError}
+                  </div>
+                )}
                 <div className="pg-header">
                   <h3>{pgDetail.name}</h3>
-                  <span className={`statuss-pill ${pgDetail.status === "ACTIVE" ? "ACTIVE" : "INACTIVE"}`}>{pgDetail.status}</span>
+                  <span
+                    className={`statuss-pill ${pgDetail.status === "ACTIVE" ? "ACTIVE" : "INACTIVE"}`}
+                  >
+                    {pgDetail.status}
+                  </span>
                 </div>
-                <p className="fw-semibold mb-1 pg-detail-owner-name">Owner: {pgDetail.ownerName || getOwnerName(pgDetail)}</p>
-                <p className="pg-detail-locality">{pgDetail.locality}, {pgDetail.city}</p>
+                <p className="fw-semibold mb-1 pg-detail-owner-name">
+                  Owner: {pgDetail.ownerName || getOwnerName(pgDetail)}
+                </p>
+                <p className="pg-detail-locality">
+                  {pgDetail.locality}, {pgDetail.city}
+                </p>
 
                 <div className="media-section">
-                  {pgDetail.imageUrls?.length ? <button className="media-view-btn" onClick={() => { setMediaType("image"); setMediaIndex(0); setShowMediaViewer(true); }}>View Images ({pgDetail.imageUrls.length})</button> : <span className="empty-text">No Images Available</span>}
-                  {pgDetail.videoUrls?.length ? <button className="media-view-btn" onClick={() => { setMediaType("video"); setMediaIndex(0); setShowMediaViewer(true); }}>View Videos ({pgDetail.videoUrls.length})</button> : <span className="empty-text">No Videos Available</span>}
+                  {pgDetail.imageUrls?.length ? (
+                    <button
+                      className="media-view-btn"
+                      onClick={() => {
+                        setMediaType("image");
+                        setMediaIndex(0);
+                        setShowMediaViewer(true);
+                      }}
+                    >
+                      View Images ({pgDetail.imageUrls.length})
+                    </button>
+                  ) : (
+                    <span className="empty-text">No Images Available</span>
+                  )}
+                  {pgDetail.videoUrls?.length ? (
+                    <button
+                      className="media-view-btn"
+                      onClick={() => {
+                        setMediaType("video");
+                        setMediaIndex(0);
+                        setShowMediaViewer(true);
+                      }}
+                    >
+                      View Videos ({pgDetail.videoUrls.length})
+                    </button>
+                  ) : (
+                    <span className="empty-text">No Videos Available</span>
+                  )}
                 </div>
 
                 {/* ── Drag & Drop Image Upload ── */}
@@ -601,10 +746,17 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
                     onDrop={handleDropZoneDrop}
                     onDragOver={handleDropZoneDragOver}
                     onDragLeave={handleDropZoneDragLeave}
-                    onClick={() => document.getElementById("pg-img-file-input").click()}
+                    onClick={() =>
+                      document.getElementById("pg-img-file-input").click()
+                    }
                   >
-                    <div className="img-drop-icon"><FaFolderOpen /></div>
-                    <p className="img-drop-label">Drag & drop images here, or <span className="img-drop-browse">browse</span></p>
+                    <div className="img-drop-icon">
+                      <FaFolderOpen />
+                    </div>
+                    <p className="img-drop-label">
+                      Drag & drop images here, or{" "}
+                      <span className="img-drop-browse">browse</span>
+                    </p>
                     <p className="img-drop-hint">PNG, JPG, WEBP supported</p>
                     <input
                       id="pg-img-file-input"
@@ -619,7 +771,10 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
                   {uploadFiles.length > 0 && (
                     <div className="img-upload-previews">
                       {uploadFiles.map((entry) => (
-                        <div key={entry.id} className={`img-upload-thumb img-upload-thumb--${entry.status}`}>
+                        <div
+                          key={entry.id}
+                          className={`img-upload-thumb img-upload-thumb--${entry.status}`}
+                        >
                           <img src={entry.preview} alt="preview" />
                           {entry.status === "uploading" && (
                             <div className="img-upload-overlay">
@@ -627,16 +782,25 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
                             </div>
                           )}
                           {entry.status === "done" && (
-                            <div className="img-upload-overlay img-upload-overlay--done">✓</div>
+                            <div className="img-upload-overlay img-upload-overlay--done">
+                              ✓
+                            </div>
                           )}
                           {entry.status === "error" && (
-                            <div className="img-upload-overlay img-upload-overlay--error">✕</div>
+                            <div className="img-upload-overlay img-upload-overlay--error">
+                              ✕
+                            </div>
                           )}
                           {entry.status !== "uploading" && (
                             <button
                               className="img-upload-remove"
-                              onClick={(e) => { e.stopPropagation(); removeUploadFile(entry.id); }}
-                            >×</button>
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeUploadFile(entry.id);
+                              }}
+                            >
+                              ×
+                            </button>
                           )}
                         </div>
                       ))}
@@ -649,56 +813,108 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
                       onClick={handleUploadImages}
                       disabled={isUploading}
                     >
-                      {isUploading ? "Uploading…" : `Upload ${uploadFiles.filter((f) => f.status === "pending").length} Image${uploadFiles.filter((f) => f.status === "pending").length !== 1 ? "s" : ""}`}
+                      {isUploading
+                        ? "Uploading…"
+                        : `Upload ${uploadFiles.filter((f) => f.status === "pending").length} Image${uploadFiles.filter((f) => f.status === "pending").length !== 1 ? "s" : ""}`}
                     </button>
                   )}
                 </div>
 
                 <h6 className="section-title mt-4">About Property</h6>
-                <p className="about-text">{showValue(pgDetail.aboutDescription)}</p>
+                <p className="about-text">
+                  {showValue(pgDetail.aboutDescription)}
+                </p>
 
                 <h6 className="section-title mt-4">Room Options</h6>
                 <div className="room-grid">
-                  {pgDetail.floors?.flatMap((floor) => floor.rooms?.map((room) => {
-                    const avail = room.beds?.filter((b) => b.status === "AVAILABLE").length || 0;
-                    return (
-                      <div key={room.roomId} className="room-card">
-                        <h6>{room.sharingType} Sharing</h6>
-                        <p>Rs {room.monthlyRent}/month</p>
-                        <small>Beds: {room.beds?.length || 0}   Available: {avail}</small>
-                      </div>
-                    );
-                  }))}
+                  {pgDetail.floors?.flatMap((floor) =>
+                    floor.rooms?.map((room) => {
+                      const avail =
+                        room.beds?.filter((b) => b.status === "AVAILABLE")
+                          .length || 0;
+                      return (
+                        <div key={room.roomId} className="room-card">
+                          <h6>{room.sharingType} Sharing</h6>
+                          <p>Rs {room.monthlyRent}/month</p>
+                          <small>
+                            Beds: {room.beds?.length || 0} Available: {avail}
+                          </small>
+                        </div>
+                      );
+                    }),
+                  )}
                 </div>
 
                 <h6 className="section-title mt-4">Amenities</h6>
                 <div className="chip-container">
-                  {pgDetail.amenities?.length ? pgDetail.amenities.map((a, i) => <span key={i} className="chip">{a}</span>) : <span className="empty-text">Not specified</span>}
+                  {pgDetail.amenities?.length ? (
+                    pgDetail.amenities.map((a, i) => (
+                      <span key={i} className="chip">
+                        {a}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="empty-text">Not specified</span>
+                  )}
                 </div>
 
                 <h6 className="section-title mt-4">House Rules</h6>
                 <ul className="rules-list">
-                  {pgDetail.houseRules?.length ? pgDetail.houseRules.map((r, i) => <li key={i}>{r}</li>) : <span className="empty-text">Not specified</span>}
+                  {pgDetail.houseRules?.length ? (
+                    pgDetail.houseRules.map((r, i) => <li key={i}>{r}</li>)
+                  ) : (
+                    <span className="empty-text">Not specified</span>
+                  )}
                 </ul>
 
                 <h6 className="section-title mt-4">Floor Details</h6>
-                {pgDetail.floors?.length ? pgDetail.floors.map((floor) => {
-                  const totalBeds = floor.rooms?.reduce((s, r) => s + (r.beds?.length || 0), 0) || 0;
-                  const availBeds = floor.rooms?.reduce((s, r) => s + (r.beds?.filter((b) => b.status === "AVAILABLE").length || 0), 0) || 0;
-                  const sharing = [...new Set(floor.rooms?.map((r) => r.sharingType))];
-                  return (
-                    <div key={floor.floorId} className="floor-card detailed">
-                      <h6 className="fw-bold mb-3">Floor {floor.floorNumber}</h6>
-                      <div className="floor-stats">
-                        <span><strong>Rooms:</strong> {floor.rooms?.length || 0}</span>
-                        <span><strong>Total Beds:</strong> {totalBeds}</span>
-                        <span className="available"><strong>Available:</strong> {availBeds}</span>
-                        <span className="occupied"><strong>Occupied:</strong> {totalBeds - availBeds}</span>
-                        <span><strong>Sharing:</strong> {sharing.join(", ") || "Not specified"}</span>
+                {pgDetail.floors?.length ? (
+                  pgDetail.floors.map((floor) => {
+                    const totalBeds =
+                      floor.rooms?.reduce(
+                        (s, r) => s + (r.beds?.length || 0),
+                        0,
+                      ) || 0;
+                    const availBeds =
+                      floor.rooms?.reduce(
+                        (s, r) =>
+                          s +
+                          (r.beds?.filter((b) => b.status === "AVAILABLE")
+                            .length || 0),
+                        0,
+                      ) || 0;
+                    const sharing = [
+                      ...new Set(floor.rooms?.map((r) => r.sharingType)),
+                    ];
+                    return (
+                      <div key={floor.floorId} className="floor-card detailed">
+                        <h6 className="fw-bold mb-3">
+                          Floor {floor.floorNumber}
+                        </h6>
+                        <div className="floor-stats">
+                          <span>
+                            <strong>Rooms:</strong> {floor.rooms?.length || 0}
+                          </span>
+                          <span>
+                            <strong>Total Beds:</strong> {totalBeds}
+                          </span>
+                          <span className="available">
+                            <strong>Available:</strong> {availBeds}
+                          </span>
+                          <span className="occupied">
+                            <strong>Occupied:</strong> {totalBeds - availBeds}
+                          </span>
+                          <span>
+                            <strong>Sharing:</strong>{" "}
+                            {sharing.join(", ") || "Not specified"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                }) : <span className="empty-text">Not specified</span>}
+                    );
+                  })
+                ) : (
+                  <span className="empty-text">Not specified</span>
+                )}
               </div>
             )}
           </div>
@@ -706,31 +922,59 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
       )}
 
       {showMediaViewer && (
-        <div className="modal-backdrop-custom" onClick={() => setShowMediaViewer(false)}>
-          <div className="modal-box modal-box-wide" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-backdrop-custom"
+          onClick={() => setShowMediaViewer(false)}
+        >
+          <div
+            className="modal-box modal-box-wide"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="media-viewer-body">
-              <button className="media-close" onClick={() => setShowMediaViewer(false)}>X</button>
-              <button className="media-nav prev" onClick={() => setMediaIndex((i) => Math.max(i - 1, 0))}>
+              <button
+                className="media-close"
+                onClick={() => setShowMediaViewer(false)}
+              >
+                X
+              </button>
+              <button
+                className="media-nav prev"
+                onClick={() => setMediaIndex((i) => Math.max(i - 1, 0))}
+              >
                 &#8249;
               </button>
               {mediaType === "image" ? (
-                <img src={pgDetail?.imageUrls?.[mediaIndex]} alt="PG" className="viewer-media" />
+                <img
+                  src={pgDetail?.imageUrls?.[mediaIndex]}
+                  alt="PG"
+                  className="viewer-media"
+                />
               ) : (
-                <video controls src={pgDetail?.videoUrls?.[mediaIndex]} className="viewer-media" />
+                <video
+                  controls
+                  src={pgDetail?.videoUrls?.[mediaIndex]}
+                  className="viewer-media"
+                />
               )}
               {activeTab === "PENDING" &&
                 currentUrl &&
                 currentUrl !== DEFAULT_PG_IMAGE && (
-                  <button className="media-delete-btn" onClick={handleDeleteMedia}>
+                  <button
+                    className="media-delete-btn"
+                    onClick={handleDeleteMedia}
+                  >
                     <FaTrash />
                   </button>
-              )}
+                )}
               {/* Rearrange button — only for images */}
               {mediaType === "image" && pgDetail?.imageUrls?.length > 1 && (
                 <button
                   className="media-rearrange-btn"
                   title="Rearrange images"
-                  onClick={(e) => { e.stopPropagation(); openRearrange(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openRearrange();
+                  }}
                 >
                   ⇅
                 </button>
@@ -754,15 +998,16 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
 
       {/* ══ REARRANGE MODAL ══ */}
       {showRearrange && (
-        <div className="modal-backdrop-custom" onClick={() => setShowRearrange(false)}>
+        <div
+          className="modal-backdrop-custom"
+          onClick={() => setShowRearrange(false)}
+        >
           <div
             className="modal-box modal-box-medium"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header-flex">
-              <h5 className="modal-title-bold">
-                ⇅ Rearrange Images
-              </h5>
+              <h5 className="modal-title-bold">⇅ Rearrange Images</h5>
               <button
                 onClick={() => setShowRearrange(false)}
                 className="modal-close-btn"
@@ -776,7 +1021,9 @@ const AdminPGVerification = ({ basePath = "/admin" }) => {
             <SortableImageGrid
               imageList={rearrangeList}
               onChange={setRearrangeList}
-              onRemove={(i) => setRearrangeList((prev) => prev.filter((_, idx) => idx !== i))}
+              onRemove={(i) =>
+                setRearrangeList((prev) => prev.filter((_, idx) => idx !== i))
+              }
             />
             <div className="modal-actions-right">
               <button
