@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import api from "../../api/axios";
 import DashboardLayout from "../../layouts/DashboardLayout";
+import "./AdminDeletionRequests.css";
 
 const AdminDeletionRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -57,19 +58,13 @@ const AdminDeletionRequests = () => {
 
   const parseDate = (value) => {
     if (!value) return null;
-
-    // Array format: [year, month, day, hour, minute, second, nano] — month is 1-indexed
     if (Array.isArray(value)) {
       const [year, month, day, hour = 0, minute = 0, second = 0] = value;
       return new Date(year, month - 1, day, hour, minute, second);
     }
-
-    // Mongo extended JSON: { "$date": "..." }
     if (typeof value === "object" && value.$date) {
       return new Date(value.$date);
     }
-
-    // ISO string or timestamp number
     const parsed = new Date(value);
     return isNaN(parsed.getTime()) ? null : parsed;
   };
@@ -81,12 +76,27 @@ const AdminDeletionRequests = () => {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
-  const statusColor = (status) =>
-    status === "PENDING"
-      ? "#f59e0b"
-      : status === "COMPLETED"
-        ? "#dc2626"
-        : "#64748b";
+  const renderActions = (r) => {
+    if (r.status !== "PENDING") return "—";
+    return (
+      <>
+        <button
+          className="del-btn del-btn--restore"
+          onClick={() => handleRestore(r.id)}
+          disabled={actionLoading === r.id}
+        >
+          Restore
+        </button>
+        <button
+          className="del-btn del-btn--delete"
+          onClick={() => handleDeleteNow(r.id)}
+          disabled={actionLoading === r.id}
+        >
+          Delete Now
+        </button>
+      </>
+    );
+  };
 
   return (
     <DashboardLayout
@@ -96,100 +106,101 @@ const AdminDeletionRequests = () => {
       {loading ? (
         <p>Loading…</p>
       ) : requests.length === 0 ? (
-        <p style={{color: "#64748b"}}>No deletion requests yet.</p>
+        <p className="del-empty">No deletion requests yet.</p>
       ) : (
-        <div style={{overflowX: "auto"}}>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              background: "#fff",
-            }}
-          >
-            <thead>
-              <tr
-                style={{textAlign: "left", borderBottom: "2px solid #e5e7eb"}}
-              >
-                <th style={{padding: "10px"}}>Name</th>
-                <th style={{padding: "10px"}}>Phone</th>
-                <th style={{padding: "10px"}}>Email</th>
-                <th style={{padding: "10px"}}>Reason</th>
-                <th style={{padding: "10px"}}>Requested On</th>
-                <th style={{padding: "10px"}}>Status</th>
-                <th style={{padding: "10px"}}>Days Left</th>
-                <th style={{padding: "10px"}}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((r) => (
-                <tr key={r.id} style={{borderBottom: "1px solid #f1f5f9"}}>
-                  <td style={{padding: "10px"}}>{r.fullName}</td>
-                  <td style={{padding: "10px"}}>{r.phone}</td>
-                  <td style={{padding: "10px"}}>{r.email}</td>
-                  <td style={{padding: "10px", maxWidth: "260px"}}>
-                    {r.reason}
-                  </td>
-                  <td style={{padding: "10px"}}>
+        <>
+          <div className="del-table-wrapper">
+            <table className="del-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Reason</th>
+                  <th>Requested On</th>
+                  <th>Status</th>
+                  <th>Days Left</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((r) => (
+                  <tr key={r.id}>
+                    <td>{r.fullName}</td>
+                    <td>{r.phone}</td>
+                    <td>{r.email}</td>
+                    <td className="del-reason-cell">{r.reason}</td>
+                    <td>
+                      {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") ||
+                        "—"}
+                    </td>
+                    <td>
+                      <span className={`del-status-pill ${r.status}`}>
+                        {r.status}
+                      </span>
+                    </td>
+                    <td>
+                      {r.status === "PENDING" ? (
+                        <span className="del-days-left">
+                          {daysLeft(r.scheduledDeletionAt)} day(s)
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      <div className="del-actions">{renderActions(r)}</div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="del-card-list">
+            {requests.map((r) => (
+              <div className="del-card" key={r.id}>
+                <div className="del-card-top">
+                  <div>
+                    <div className="del-card-name">{r.fullName}</div>
+                    <div className="del-card-sub">{r.phone}</div>
+                    <div className="del-card-sub">{r.email}</div>
+                  </div>
+                  <span className={`del-status-pill ${r.status}`}>
+                    {r.status}
+                  </span>
+                </div>
+
+                <div className="del-card-row">
+                  <span>Requested</span>
+                  <span>
                     {parseDate(r.requestedAt)?.toLocaleDateString("en-IN") ||
                       "—"}
-                  </td>
-                  <td style={{padding: "10px"}}>
-                    <span
-                      style={{color: statusColor(r.status), fontWeight: 600}}
-                    >
-                      {r.status}
+                  </span>
+                </div>
+
+                {r.status === "PENDING" && (
+                  <div className="del-card-row">
+                    <span>Days Left</span>
+                    <span className="del-days-left">
+                      {daysLeft(r.scheduledDeletionAt)} day(s)
                     </span>
-                  </td>
-                  <td style={{padding: "10px"}}>
-                    {r.status === "PENDING"
-                      ? `${daysLeft(r.scheduledDeletionAt)} day(s)`
-                      : "—"}
-                  </td>
-                  <td style={{padding: "10px"}}>
-                    {r.status === "PENDING" ? (
-                      <div style={{display: "flex", gap: "8px"}}>
-                        <button
-                          onClick={() => handleRestore(r.id)}
-                          disabled={actionLoading === r.id}
-                          style={{
-                            background: "#16a34a",
-                            color: "#fff",
-                            border: "none",
-                            padding: "6px 12px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                          }}
-                        >
-                          Restore
-                        </button>
-                        <button
-                          onClick={() => handleDeleteNow(r.id)}
-                          disabled={actionLoading === r.id}
-                          style={{
-                            background: "#dc2626",
-                            color: "#fff",
-                            border: "none",
-                            padding: "6px 12px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                          }}
-                        >
-                          Delete Now
-                        </button>
-                      </div>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                )}
+
+                {r.reason && (
+                  <div className="del-card-reason">{r.reason}</div>
+                )}
+
+                {r.status === "PENDING" && (
+                  <div className="del-card-actions">
+                    {renderActions(r)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </DashboardLayout>
   );
