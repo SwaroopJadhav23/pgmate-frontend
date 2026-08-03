@@ -618,14 +618,19 @@ const PGDetail = () => {
             </button>
           </div>
 
-          <div className="bc-disclaimer">
-            <span className="bc-disclaimer-icon">i</span>
-            <p>
-              Prices listed are for reference only and are subject to change.
-              Kindly contact the PG owner to confirm the latest pricing,
-              deposit, and room availability.
-            </p>
-          </div>
+         <div className="bc-disclaimer-group">
+  <div className="bc-disclaimer">
+    <span className="bc-disclaimer-icon">i</span>
+    <p>Prices are indicative — confirm final pricing with owner.</p>
+  </div>
+
+  {!((pg.reservationEnabled || pg.dailyReservationEnabled) && pg.reservationAmount > 0) && (
+    <div className="bc-disclaimer bc-disclaimer-warning">
+      <span className="bc-disclaimer-icon warning">!</span>
+      <p>Reservation may be temporarily closed (bed full / paused by owner).</p>
+    </div>
+  )}
+</div>
         </aside>
       </div>
 

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import api from "../../api/axios";
+import { AuthContext } from "../../context/AuthContext";
 import { digitsOnly, isValidEmail, isValidPhone } from "../../utils/formValidators";
 import "../../CSS/enquiryForm.css";
 import Swal from "sweetalert2";
@@ -26,12 +27,28 @@ const enquiryToast = Swal.mixin({
 });
 
 const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
+  const { isAuthenticated } = useContext(AuthContext);
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
     adminNote: ""
   });
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api.get("/users/me")
+      .then(res => {
+        const u = res.data || {};
+        setForm(f => ({
+          ...f,
+          name: u.name || f.name,
+          phone: u.phone || f.phone,
+          email: u.email || f.email,
+        }));
+      })
+      .catch(() => {}); // silent — user just types manually
+  }, [isAuthenticated]);
 
   const submit = async () => {
     if (!form.name.trim() || !form.phone) {

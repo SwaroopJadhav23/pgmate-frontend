@@ -8,7 +8,7 @@ import {
   Building2,
   Users,
   BadgeCheck,
-  //ChevronDown,
+  ChevronDown,
   //Star,
 } from "lucide-react";
 import api from "../../../api/axios";
@@ -311,7 +311,7 @@ export default function PGMateBanner({
 
           <div className="pgb-field">
             <label>Gender</label>
-            <div className="pgb-select-wrap">
+            <div className="pgb-select-wrap" style={{ position: "relative" }}>
               <Users size={15} />
               <select
                 value={gender}
@@ -324,12 +324,13 @@ export default function PGMateBanner({
                   </option>
                 ))}
               </select>
+              <ChevronDown size={15} className="pgb-select-chevron" />
             </div>
           </div>
 
           <div className="pgb-field">
             <label>Budget</label>
-            <div className="pgb-select-wrap">
+            <div className="pgb-select-wrap" style={{ position: "relative" }}>
               <span>₹</span>
               <select
                 value={maxPrice}
@@ -341,6 +342,7 @@ export default function PGMateBanner({
                   </option>
                 ))}
               </select>
+              <ChevronDown size={15} className="pgb-select-chevron" />
             </div>
           </div>
 
@@ -517,7 +519,7 @@ const CSS = `
 
 .pgb-search-card{
   display:grid;
-  grid-template-columns:minmax(0,4.5fr) minmax(0,1fr) minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,3.8fr) minmax(0,1fr) minmax(0,1.4fr) auto;
   align-items:center;
   background:white;
   padding:18px;
@@ -560,6 +562,21 @@ const CSS = `
   width:100%;
   background:transparent;
   color: #0f172a;
+}
+
+.pgb-select-wrap select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 24px;
+  cursor: pointer;
+}
+
+.pgb-select-chevron {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+  color: #94a3b8;
 }
 
 .pgb-search-btn{

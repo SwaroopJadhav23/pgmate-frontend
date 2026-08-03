@@ -228,3 +228,28 @@
     justify-content: center;
   }
 }
+
+@media (max-width: 768px) {
+  .war-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .war-stat-card {
+    min-width: 0;      /* kill the 220px floor that forced wrap */
+    padding: 12px 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .war-stat-icon-wrap {
+    width: 38px;
+    height: 38px;
+  }
+  .war-stat-value {
+    font-size: 1.2rem;
+  }
+  .war-stat-label {
+    font-size: 0.68rem;
+  }
+}

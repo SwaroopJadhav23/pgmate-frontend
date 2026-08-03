@@ -1,0 +1,159 @@
+/* ================================
+   ACCOUNT DELETION REQUESTS
+   All classes prefixed "del-" — scoped to this page only,
+   never reuse generic names like .modal-box across the app.
+================================ */
+
+.del-empty {
+  color: #64748b;
+  font-size: 14px;
+  padding: 24px;
+  text-align: center;
+}
+
+/* ---------- Table (desktop) ---------- */
+
+.del-table-wrapper {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.del-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.del-table thead tr {
+  background: #f8fafc;
+  text-align: left;
+}
+
+.del-table th {
+  padding: 12px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.del-table td {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+}
+
+.del-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.del-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.del-reason-cell {
+  max-width: 260px;
+  color: #64748b;
+}
+
+/* ---------- Status pill ---------- */
+
+.del-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.del-status-pill.PENDING { background: #fef3c7; color: #b45309; }
+.del-status-pill.COMPLETED { background: #fee2e2; color: #b91c1c; }
+.del-status-pill.CANCELLED { background: #e2e8f0; color: #475569; }
+
+.del-days-left {
+  font-weight: 600;
+  color: #334155;
+}
+
+/* ---------- Action buttons ---------- */
+
+.del-actions { display: flex; gap: 8px; }
+
+.del-btn {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.del-btn:hover { transform: translateY(-1px); }
+.del-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.del-btn--restore { background: #16a34a; color: #fff; }
+.del-btn--delete { background: #dc2626; color: #fff; }
+
+/* ---------- Mobile card view ---------- */
+
+.del-card-list { display: none; flex-direction: column; gap: 12px; }
+
+.del-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.del-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.del-card-name { font-weight: 700; color: #1e293b; font-size: 14.5px; }
+.del-card-sub { font-size: 12.5px; color: #64748b; margin-top: 2px; }
+
+.del-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #475569;
+  padding: 4px 0;
+  border-top: 1px dashed #f1f5f9;
+}
+
+.del-card-row span:first-child { color: #94a3b8; }
+
+.del-card-reason {
+  font-size: 12.5px;
+  color: #64748b;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #f1f5f9;
+}
+
+.del-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.del-card-actions .del-btn { flex: 1; }
+
+@media (max-width: 768px) {
+  .del-table-wrapper { display: none; }
+  .del-card-list { display: flex; }
+}

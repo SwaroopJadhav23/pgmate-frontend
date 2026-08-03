@@ -30,6 +30,11 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Ignore explicitly canceled requests (e.g. AbortController)
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     // AUTH EXPIRED / INVALID — keep as blocking Swal so user is forced to re-login
     if (status === 401) {
       // Already logged out (e.g. stray in-flight request resolving after
