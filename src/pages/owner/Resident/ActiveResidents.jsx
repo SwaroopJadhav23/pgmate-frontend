@@ -1,14 +1,12 @@
 import { FaLeaf, FaDrumstickBite, FaFileAlt } from "react-icons/fa";
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../../../api/axios";
-import { digitsOnly, isValidEmail, isValidPhone } from "../../../utils/formValidators";
 import "./ActiveResidents.css";
 import "./Resident.css";
 import "./Agreement.css";
-import "./AddResidentModal.css";   // ← gives arm-page / arm-page-header / arm-page-actions
 import { TableSkeleton } from "../../public/Skeleton";
 import AgreementSignaturePad from "./AgreementSignaturePad";
 
@@ -85,23 +83,12 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [resident, setResident] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
-  const [saving, setSaving] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [stayFilter, setStayFilter] = useState("ALL");
   const [detailResident, setDetailResident] = useState(null);
-  const [openedFromDetail, setOpenedFromDetail] = useState(false); // track if edit was opened from detail popup
-  const [form, setForm] = useState({ name: "", phone: "", email: "", monthlyRent: "", deposit: "", dailyRent: "", numberOfDays: "", checkinDate: "", expectedCheckoutDate: "", onboardingPaymentMode: "", stayType: "MONTHLY_BASIC", foodPreference: "", emergencyContactName: "", emergencyContact: "", emergencyContactRelation: "" });
-  const [paymentFile, setPaymentFile] = useState(null);
-  const [removePaymentProof, setRemovePaymentProof] = useState(false);
-  const [idProofFile, setIdProofFile] = useState(null);
-  const [removeIdProof, setRemoveIdProof] = useState(false);
-  const fileRef = useRef(null);
-  const idFileRef = useRef(null);
   const [showSettlement, setShowSettlement] = useState(false);
   const [settlementResident, setSettlementResident] = useState(null);
   const [agreementPopup, setAgreementPopup] = useState(null);
@@ -109,13 +96,6 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
   const [uploadingSig, setUploadingSig] = useState(false);
   const [settlementForm, setSettlementForm] = useState({ deductedAmount: "", deductionReason: "", refundPaymentMode: "" });
   const [refundFile, setRefundFile] = useState(null);
-
-  const normalizeDateForAPI = (d) => {
-    if (!d) return "";
-    if (typeof d === "string" && d.includes("-")) return d;
-    if (Array.isArray(d)) { const [y, m, day] = d; return `${y}-${String(m).padStart(2, "0")}-${String(day).padStart(2, "0")}`; }
-    return "";
-  };
 
   const loadResidents = useCallback(async (nextPage = 0, append = false) => {
     try {
@@ -129,68 +109,12 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
       const totalPages = res.data?.totalPages || 0;
       setResidents((prev) => (append ? [...prev, ...content] : content));
       setPage(nextPage); setTotalElements(res.data?.totalElements || 0); setHasMore(nextPage + 1 < totalPages);
-      return content; // ← return so submitEdit can use fresh data
+      return content;
     } finally { setLoading(false); setLoadingMore(false); }
   }, [apiPrefix, search, stayFilter]);
 
   useEffect(() => { const timer = setTimeout(() => setSearch(searchInput.trim()), 350); return () => clearTimeout(timer); }, [searchInput]);
   useEffect(() => { loadResidents(0, false); }, [loadResidents, refreshKey]);
-
-  const openEdit = (r, fromDetail = false) => {
-    setResident(r);
-    setOpenedFromDetail(fromDetail);
-    const formatForInput = (dateArr) => {
-      if (!dateArr) return "";
-      if (typeof dateArr === "string") return dateArr;
-      if (Array.isArray(dateArr)) { const [y, m, d] = dateArr; return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`; }
-      return "";
-    };
-    setForm({ name: r.name || "", phone: r.phone || "", email: r.email || "", monthlyRent: r.monthlyRent || "", deposit: r.deposit || "", dailyRent: r.dailyRent || "", numberOfDays: r.numberOfDays || "", checkinDate: formatForInput(r.checkinDate), expectedCheckoutDate: formatForInput(r.expectedCheckoutDate), onboardingPaymentMode: r.onboardingPaymentMode || "", stayType: r.stayType || "MONTHLY_BASIC", foodPreference: r.foodPreference || "", emergencyContactName: r.emergencyContactName || "", emergencyContact: r.emergencyContact || "", emergencyContactRelation: r.emergencyContactRelation || "" });
-    setPaymentFile(null); setIdProofFile(null); setRemovePaymentProof(false); setRemoveIdProof(false);
-    if (fileRef.current) fileRef.current.value = "";
-    if (idFileRef.current) idFileRef.current.value = "";
-    setShowEdit(true);
-  };
-
-  const submitEdit = async () => {
-    const isDaily = form.stayType === "DAILY_BASIC";
-    const baseInvalid = !form.name.trim() || !form.phone || !form.checkinDate || !form.onboardingPaymentMode;
-    const monthlyInvalid = !isDaily && (!form.monthlyRent || form.deposit === "");
-    const dailyInvalid = isDaily && (!form.dailyRent || !form.numberOfDays);
-    if (baseInvalid || monthlyInvalid || dailyInvalid) { await Swal.fire({ icon: "warning", title: "Incomplete Form", text: "Please fill all required fields.", confirmButtonColor: "#5B5BD6" }); return; }
-    if (!isValidPhone(form.phone)) { await Swal.fire({ icon: "warning", title: "Invalid Phone", text: "Phone must be exactly 10 digits.", confirmButtonColor: "#5B5BD6" }); return; }
-    if (form.email && !isValidEmail(form.email)) { await Swal.fire({ icon: "warning", title: "Invalid Email", text: "Please enter a valid email address.", confirmButtonColor: "#5B5BD6" }); return; }
-    try {
-      setSaving(true);
-      const editedResidentId = resident.residentId; // ← capture before async
-      const wasOpenedFromDetail = openedFromDetail;  // ← capture before async
-      const fd = new FormData();
-      fd.append("name", form.name.trim()); fd.append("phone", form.phone); fd.append("email", form.email.trim()); fd.append("stayType", form.stayType);
-      if (isDaily) { fd.append("dailyRent", Number(form.dailyRent)); fd.append("numberOfDays", Number(form.numberOfDays)); }
-      else { fd.append("monthlyRent", Number(form.monthlyRent)); fd.append("deposit", Number(form.deposit)); }
-      if (form.checkinDate) { const f = normalizeDateForAPI(form.checkinDate); if (f) fd.append("checkinDate", f); }
-      if (form.expectedCheckoutDate) { const f = normalizeDateForAPI(form.expectedCheckoutDate); if (f) fd.append("expectedCheckoutDate", f); }
-      const totalAmount = isDaily ? Number(form.dailyRent || 0) * Number(form.numberOfDays || 0) : Number(form.monthlyRent || 0) + Number(form.deposit || 0);
-      if (form.onboardingPaymentMode === "CASH") { fd.append("onboardingPaymentMode", "CASH"); fd.append("onboardingPaymentAmount", totalAmount); fd.append("removeOnboardingPaymentProof", "true"); }
-      else if (form.onboardingPaymentMode) { fd.append("onboardingPaymentMode", form.onboardingPaymentMode); fd.append("onboardingPaymentAmount", totalAmount); if (removePaymentProof) fd.append("removeOnboardingPaymentProof", "true"); if (paymentFile) fd.append("onboardingPaymentProof", paymentFile); }
-      if (idProofFile) fd.append("idProof", idProofFile);
-      if (removeIdProof) fd.append("removeIdProof", "true");
-      if (form.foodPreference) fd.append("foodPreference", form.foodPreference);
-      fd.append("emergencyContactName", form.emergencyContactName.trim());
-      fd.append("emergencyContact", form.emergencyContact.trim());
-      fd.append("emergencyContactRelation", form.emergencyContactRelation.trim());
-      await api.put(`${apiPrefix}/${editedResidentId}`, fd);
-      setShowEdit(false);
-      const freshContent = await loadResidents(0, false); // ← get fresh data
-      onReload?.();
-      // ← if edit was opened from detail popup, reopen it with fresh data
-      if (wasOpenedFromDetail && freshContent) {
-        const freshResident = freshContent.find(r => r.residentId === editedResidentId);
-        if (freshResident) setDetailResident(freshResident);
-      }
-      await Swal.fire({ icon: "success", title: "Resident Updated", timer: 1400, showConfirmButton: false });
-    } finally { setSaving(false); }
-  };
 
   const openCheckout = (r) => { setSettlementResident(r); setSettlementForm({ deductedAmount: "", deductionReason: "", refundPaymentMode: "" }); setRefundFile(null); setShowSettlement(true); };
 
@@ -245,12 +169,10 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
     } finally { setUploadingSig(false); }
   };
 
-  const currentEditIsDaily = form.stayType === "DAILY_BASIC";
   const liveDetail = detailResident
     ? residents.find(r => r.residentId === detailResident.residentId) ?? detailResident
     : null;
   const currentSettlementIsDaily = isDailyResident(settlementResident);
-  const currentEditTotal = useMemo(() => currentEditIsDaily ? Number(form.dailyRent || 0) * Number(form.numberOfDays || 0) : Number(form.monthlyRent || 0) + Number(form.deposit || 0), [currentEditIsDaily, form.dailyRent, form.numberOfDays, form.monthlyRent, form.deposit]);
   const residentStats = useMemo(() => ({ total: totalElements, monthly: residents.filter(r => r.stayType === "MONTHLY_BASIC").length, daily: residents.filter(r => r.stayType === "DAILY_BASIC").length, veg: residents.filter(r => r.foodPreference === "VEG").length, nonVeg: residents.filter(r => r.foodPreference === "NON_VEG").length }), [residents, totalElements]);
   const goToDues = (r) => {
     navigate("/owner/rent", {
@@ -264,156 +186,6 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
       },
     });
   };
-
-  // ── EDIT TENANT — full page, same style as Add Tenant. Must sit BEFORE
-  //    the component's main "return (" below — never nest an `if` inside JSX. ──
-  if (showEdit) {
-    return (
-      <div className="arm-page">
-        <div className="arm-page-header">
-          <div>
-            <h4 style={{ margin: 0 }}>Edit Tenant</h4>
-            <p className="arm-page-subtitle">Update tenant and room details</p>
-          </div>
-          <div className="arm-header-actions">
-            <button className="arm-btn-outline" onClick={() => setShowEdit(false)}>Cancel</button>
-            <button className="arm-btn-primary" disabled={saving} onClick={submitEdit}>
-              {saving ? "Saving…" : "Save Changes"}
-            </button>
-          </div>
-        </div>
-
-        <div className="arm-page-body">
-          <div className="arm-grid">
-            <div className="arm-field">
-              <label>Name</label>
-              <Form.Control value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.trimStart() })} />
-            </div>
-
-            <div className="arm-field">
-              <label>Phone</label>
-              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.phone} onChange={(e) => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })} />
-            </div>
-
-            <div className="arm-field">
-              <label>Email</label>
-              <Form.Control type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value.trim() })} />
-            </div>
-
-            <div className="arm-field">
-              <label>Stay Type</label>
-              <Form.Control value={currentEditIsDaily ? "Daily Basic" : "Monthly Basic"} disabled />
-            </div>
-
-            {currentEditIsDaily ? (
-              <>
-                <div className="arm-field">
-                  <label>Daily Rent</label>
-                  <Form.Control type="number" value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} />
-                </div>
-                <div className="arm-field">
-                  <label>Number of Days</label>
-                  <Form.Control type="number" value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="arm-field">
-                  <label>Monthly Rent</label>
-                  <Form.Control type="number" value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} />
-                </div>
-                <div className="arm-field">
-                  <label>Deposit</label>
-                  <Form.Control type="number" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} />
-                </div>
-              </>
-            )}
-
-            <hr className="arm-section-divider" />
-
-            <div className="arm-field">
-              <label>Check-in Date</label>
-              <Form.Control type="date" value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
-            </div>
-            <div className="arm-field">
-              <label>Expected Checkout</label>
-              <Form.Control type="date" value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
-            </div>
-            <div className="arm-field full">
-              <label>Total Payable</label>
-              <Form.Control type="text" value={formatMoney(currentEditTotal)} disabled />
-            </div>
-
-            <div className="arm-field">
-              <label>Onboarding Payment Mode</label>
-              <Form.Select value={form.onboardingPaymentMode} onChange={(e) => { const value = e.target.value; setForm({ ...form, onboardingPaymentMode: value }); if (value === "CASH") { setPaymentFile(null); setRemovePaymentProof(true); } else { setRemovePaymentProof(false); } }}>
-                <option value="">Select</option>{PAYMENT_MODES.map((m) => <option key={m} value={m}>{m.replace("_", " ")}</option>)}
-              </Form.Select>
-            </div>
-
-            {form.onboardingPaymentMode && form.onboardingPaymentMode !== "CASH" && (
-              <div className="arm-field">
-                <label>Replace Payment Proof</label>
-                <Form.Control ref={fileRef} type="file" accept="image/*,.pdf" onChange={(e) => { setPaymentFile(e.target.files[0]); setRemovePaymentProof(false); }} />
-              </div>
-            )}
-
-            {form.onboardingPaymentMode !== "CASH" && (
-              <div className="arm-field full">
-                <Form.Check className="edit-check" label="Remove existing payment proof" checked={removePaymentProof} onChange={(e) => setRemovePaymentProof(e.target.checked)} />
-              </div>
-            )}
-
-            <div className="arm-field" data-mobile-full="true">
-              <label>Replace ID Proof</label>
-              <Form.Control ref={idFileRef} type="file" accept="image/*,.pdf" onChange={(e) => { setIdProofFile(e.target.files[0]); setRemoveIdProof(false); }} />
-            </div>
-            <div className="arm-field full">
-              <Form.Check className="edit-check" label="Remove existing ID proof" checked={removeIdProof} onChange={(e) => setRemoveIdProof(e.target.checked)} />
-            </div>
-
-            <hr className="arm-section-divider" />
-
-            <div className="arm-field">
-              <label>Food Preference</label>
-              <Form.Select value={form.foodPreference} onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}>
-                <option value="">Select</option>
-                <option value="VEG"><FaLeaf /> Veg</option>
-                <option value="NON_VEG"><FaDrumstickBite /> Non-Veg</option>
-              </Form.Select>
-            </div>
-
-            <div className="arm-field" data-mobile-full="true">
-              <label>Emergency Contact Name</label>
-              <Form.Control value={form.emergencyContactName} placeholder="e.g. Ramesh Kumar" onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value.trimStart() })} />
-            </div>
-            <div className="arm-field" data-mobile-full="true">
-              <label>Emergency Contact Number</label>
-              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.emergencyContact} placeholder="10-digit mobile number" onChange={(e) => setForm({ ...form, emergencyContact: digitsOnly(e.target.value).slice(0, 10) })} />
-            </div>
-            <div className="arm-field" data-mobile-full="true">
-              <label>Relation</label>
-              <Form.Select value={form.emergencyContactRelation} onChange={(e) => setForm({ ...form, emergencyContactRelation: e.target.value })}>
-                <option value="">Select</option>
-                <option value="Father">Father</option>
-                <option value="Mother">Mother</option>
-                <option value="Brother">Brother</option>
-                <option value="Sister">Sister</option>
-                <option value="Spouse">Spouse</option>
-                <option value="Friend">Friend</option>
-                <option value="Other">Other</option>
-              </Form.Select>
-            </div>
-          </div>
-        </div>
-
-        <div className="arm-page-actions">
-          <button className="modal-btn cancel" onClick={() => setShowEdit(false)}>Cancel</button>
-          <button className="modal-btn success" onClick={submitEdit} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -795,7 +567,7 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
             )}
 
             <div className="rdp-actions">
-              <button className="rdp-btn-edit" onClick={() => { openEdit(liveDetail, true); setDetailResident(null); }}>Edit</button>
+              <button className="rdp-btn-edit" onClick={() => { navigate(`/owner/residents/edit/${liveDetail.residentId}`, { state: { resident: liveDetail, apiPrefix } }); setDetailResident(null); }}>Edit</button>
               <button className="rdp-btn-checkout" onClick={() => { openCheckout(liveDetail); setDetailResident(null); }}>{isDailyResident(liveDetail) ? "Complete" : "Checkout"}</button>
             </div>
           </div>

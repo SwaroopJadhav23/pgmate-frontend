@@ -112,6 +112,8 @@ import ExpenseCalculator from "./pages/ExpenseCalculator/ExpenseCalculator";
 import NotFound from "./pages/NotFound/NotFound";
 import AdminDeletionRequests from "./pages/admin/AdminDeletionRequests";
 
+import EditTenantPage from "./pages/owner/Resident/EditTenantPage";
+
 function App() {
   return (
     <AuthProvider>
@@ -228,6 +230,16 @@ function App() {
             }
           />
           {/* OWNERks */}
+
+          <Route
+            path="/owner/residents/edit/:residentId"
+            element={
+              <ProtectedRoute role="OWNER">
+                <EditTenantPage apiPrefix="/owner/residents" />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/owner/dashboard"
             element={
