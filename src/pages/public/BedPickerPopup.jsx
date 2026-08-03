@@ -205,6 +205,7 @@ const S = {
   selRow: { display: "flex", alignItems: "center", gap: 5, marginBottom: 7, minHeight: 18, flexWrap: "wrap" },
   badge: { background: "#eef2ff", border: "1.5px solid #c7d2fe", color: "#6366f1", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 800 },
   hint: { fontSize: 10, color: "#a5b4fc" },
+  closedHint: { fontSize: 10, color: "#d97706", fontWeight: 700 },
   confirmBtn: (ready, mode) => ({
     width: "100%", padding: "11px 10px", borderRadius: 11, border: "none",
     fontWeight: 800, fontSize: 13, letterSpacing: "-0.2px",
@@ -464,44 +465,44 @@ const allTypes = [...fixedTypesPresent, ...customBedCounts.map(n => `CUSTOM_${n}
         </div>
 
         {/* Footer */}
-        <div style={S.footer}>
-          <div style={S.selRow}>
-            {ready ? (
-              <div style={S.selRow}>
-                <span style={S.hint}>Selected:</span>
+<div style={S.footer}>
+  <div style={S.selRow}>
+    {ready ? (
+      <div style={S.selRow}>
+        <span style={S.hint}>Selected:</span>
 
-                <span style={S.badge}>
-                  Floor {selFloor?.floorNumber} · Room {selRoom?.roomNumber} · Bed {selBed?.bedNumber}
-                </span>
+        <span style={S.badge}>
+          Floor {selFloor?.floorNumber} · Room {selRoom?.roomNumber} · Bed {selBed?.bedNumber}
+        </span>
 
-                {selRoom?.monthlyRent > 0 && (
-                  <span style={{ ...S.badge, background: "#f0fdf4", borderColor: "#86efac", color: "#16a34a" }}>
-                    ₹{selRoom.monthlyRent.toLocaleString()}/mo
-                  </span>
-                )}
+        {selRoom?.monthlyRent > 0 && (
+          <span style={{ ...S.badge, background: "#f0fdf4", borderColor: "#86efac", color: "#16a34a" }}>
+            ₹{selRoom.monthlyRent.toLocaleString()}/mo
+          </span>
+        )}
 
-                {selRoom?.deposit > 0 && (
-                  <span style={{ ...S.badge, background: "#fffbeb", borderColor: "#fde68a", color: "#92400e" }}>
-                    dep ₹{selRoom.deposit.toLocaleString()}
-                  </span>
-                )}
-              </div>
-            ) : (
-              (pg?.reservationEnabled || pg?.dailyReservationEnabled) && (
-                <span style={S.hint}>Select a bed above to continue</span>
-              )
-            )}
-          </div>
-          {(pg?.reservationEnabled || pg?.dailyReservationEnabled) && (
-            <button
-              style={S.confirmBtn(ready, mode)}
-              disabled={!ready}
-              onClick={confirm}
-            >
-              {btnLabel}
-            </button>
-          )}
-        </div>
+        {selRoom?.deposit > 0 && (
+          <span style={{ ...S.badge, background: "#fffbeb", borderColor: "#fde68a", color: "#92400e" }}>
+            dep ₹{selRoom.deposit.toLocaleString()}
+          </span>
+        )}
+      </div>
+    ) : (pg?.reservationEnabled || pg?.dailyReservationEnabled) ? (
+      <span style={S.hint}>Select a bed above to continue</span>
+    ) : (
+      <span style={S.closedHint}>⚠️ Reservation is temporarily closed</span>
+    )}
+  </div>
+  {(pg?.reservationEnabled || pg?.dailyReservationEnabled) && (
+    <button
+      style={S.confirmBtn(ready, mode)}
+      disabled={!ready}
+      onClick={confirm}
+    >
+      {btnLabel}
+    </button>
+  )}
+</div>
 
       </div>
     </div>
