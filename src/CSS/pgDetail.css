@@ -513,6 +513,8 @@ img, video { display: block; }
   box-shadow: var(--shadow-purple);
 }
 
+
+
 .bc-tab:not(.active):hover { background: rgba(91,91,214,0.08); color: var(--purple); }
 
 .bc-rooms { display: flex; flex-direction: column; gap: 7px; }
@@ -547,6 +549,13 @@ img, video { display: block; }
 .bc-token-label { font-size: 9.5px; font-weight: 800; color: #92400e; letter-spacing: 0.07em; text-transform: uppercase; }
 .bc-token-amount { font-size: 13px; font-weight: 700; color: #78350f; }
 .bc-token-note { font-size: 11px; font-weight: 400; color: #a16207; margin-left: 3px; }
+
+.bc-tab i,
+.bc-reserve-btn i,
+.bc-avail-btn i {
+  margin-right: 6px;
+}
+
 
 .bc-reserve-btn {
   width: 100%; padding: 14px;
