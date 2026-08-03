@@ -460,84 +460,84 @@ const AdminLocalityManager = ({ basePath = "/admin" }) => {
             </div>
           ) : (
             <>
-            <div className="lm-table-responsive">
-              <table className="lm-table">
-                <thead>
-                <tr>
-                  <th className="lm-th-checkbox"></th>
-                  <th className="lm-th-name">Locality Name</th>
-                  <th className="lm-th-city">City</th>
-                  <th className="lm-th-pgs">PGs Attached</th>
-                </tr>
-              </thead>
-              <tbody>
+              <div className="lm-table-responsive">
+                <table className="lm-table">
+                  <thead>
+                    <tr>
+                      <th className="lm-th-checkbox"></th>
+                      <th className="lm-th-name">Locality Name</th>
+                      <th className="lm-th-city">City</th>
+                      <th className="lm-th-pgs">PGs Attached</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((l, i) => (
+                      <tr
+                        key={i}
+                        className={`${selected.includes(l.locality) ? "lm-selected" : ""} lm-tr-clickable`}
+                        onClick={() => toggleSelect(l.locality)}
+                      >
+                        <td className="lm-td-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            className="lm-checkbox"
+                            checked={selected.includes(l.locality)}
+                            onChange={() => toggleSelect(l.locality)}
+                          />
+                        </td>
+                        <td className="lm-td-name">
+                          <span className={`lm-locality-text ${selected.includes(l.locality) ? "lm-locality-text-selected" : "lm-locality-text-unselected"}`}>
+                            {l.locality}
+                          </span>
+                        </td>
+                        <td className="lm-td-city">
+                          <i className="bi bi-geo-alt-fill lm-geo-icon"></i>
+                          {l.city || "—"}
+                        </td>
+                        <td className="lm-td-pgs">
+                          <span className="lm-count lm-count-badge">
+                            {l.count} PG{l.count !== 1 ? "s" : ""}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="lm-card-list">
                 {filtered.map((l, i) => (
-                  <tr 
-                    key={i} 
-                    className={`${selected.includes(l.locality) ? "lm-selected" : ""} lm-tr-clickable`} 
+                  <div
+                    key={i}
+                    className={`lm-card ${selected.includes(l.locality) ? "lm-card-selected" : ""}`}
                     onClick={() => toggleSelect(l.locality)}
                   >
-                    <td className="lm-td-center" onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        className="lm-checkbox"
-                        checked={selected.includes(l.locality)}
-                        onChange={() => toggleSelect(l.locality)}
-                      />
-                    </td>
-                    <td className="lm-td-name">
-                      <span className={`lm-locality-text ${selected.includes(l.locality) ? "lm-locality-text-selected" : "lm-locality-text-unselected"}`}>
-                        {l.locality}
-                      </span>
-                    </td>
-                    <td className="lm-td-city">
-                       <i className="bi bi-geo-alt-fill lm-geo-icon"></i> 
-                       {l.city || "—"}
-                    </td>
-                    <td className="lm-td-pgs">
-                      <span className="lm-count lm-count-badge">
-                        {l.count} PG{l.count !== 1 ? "s" : ""}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
-
-            <div className="lm-card-list">
-              {filtered.map((l, i) => (
-                <div 
-                  key={i} 
-                  className={`lm-card ${selected.includes(l.locality) ? "lm-card-selected" : ""}`}
-                  onClick={() => toggleSelect(l.locality)}
-                >
-                  <div className="lm-mobile-card-row">
-                    <div className="lm-mobile-checkbox-wrap">
-                       <input
-                         type="checkbox"
-                         className="lm-checkbox"
-                         checked={selected.includes(l.locality)}
-                         onChange={() => toggleSelect(l.locality)}
-                         onClick={(e) => e.stopPropagation()}
-                       />
-                    </div>
-                    <div className="lm-mobile-info-wrap">
-                      <div className="lm-mobile-name-wrap">
-                        <span className={`lm-locality-text ${selected.includes(l.locality) ? "lm-locality-text-selected" : "lm-locality-text-unselected"}`}>
-                          {l.locality}
-                        </span>
+                    <div className="lm-mobile-card-row">
+                      <div className="lm-mobile-checkbox-wrap">
+                        <input
+                          type="checkbox"
+                          className="lm-checkbox"
+                          checked={selected.includes(l.locality)}
+                          onChange={() => toggleSelect(l.locality)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
                       </div>
-                      <div className="lm-mobile-city-row">
-                        <span><i className="bi bi-geo-alt-fill lm-geo-icon-sm"></i> {l.city || "—"}</span>
-                        <span className="lm-mobile-dot">•</span>
-                        <span>PGs Attached: <strong className="lm-count-badge">{l.count}</strong></span>
+                      <div className="lm-mobile-info-wrap">
+                        <div className="lm-mobile-name-wrap">
+                          <span className={`lm-locality-text ${selected.includes(l.locality) ? "lm-locality-text-selected" : "lm-locality-text-unselected"}`}>
+                            {l.locality}
+                          </span>
+                        </div>
+                        <div className="lm-mobile-city-row">
+                          <span><i className="bi bi-geo-alt-fill lm-geo-icon-sm"></i> {l.city || "—"}</span>
+                          <span className="lm-mobile-dot">•</span>
+                          <span>PGs Attached: <strong className="lm-count-badge">{l.count}</strong></span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </>
           )}
         </div>
