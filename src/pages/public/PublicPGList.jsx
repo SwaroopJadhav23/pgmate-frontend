@@ -1,6 +1,8 @@
 import {useEffect, useState, useCallback, useRef} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {FiFilter} from "react-icons/fi";
+import {Loader2} from "lucide-react";
+import axios from "axios";
 import api from "../../api/axios";
 import FilterSidebar from "./FilterSidebar";
 import PGListingCard from "./PGListingCard";
@@ -21,6 +23,7 @@ const PublicPGList = () => {
   const [localityOptions, setLocalityOptions] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   // const [cityLocked, setCityLocked] = useState(false);
   const cityLocked = false;
@@ -47,6 +50,8 @@ const PublicPGList = () => {
 
   const searchDebounceRef = useRef(null);
   const lastFetchKey = useRef(null);
+  const abortControllerRef = useRef(null);
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
     setShowApkModal(true);
@@ -183,9 +188,17 @@ const PublicPGList = () => {
       if (fetchKey === lastFetchKey.current) return;
       lastFetchKey.current = fetchKey;
 
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       try {
         if (append) {
           setLoadingMore(true);
+        } else if (initialLoadDone.current) {
+          setIsSearching(true);
         } else {
           setIsLoading(true);
         }
@@ -206,7 +219,10 @@ const PublicPGList = () => {
         if (currentFilters.maxPrice) params.maxPrice = currentFilters.maxPrice;
         if (currentSearch?.trim()) params.search = currentSearch.trim();
 
-        const res = await api.get("/public/pgs/paged", {params});
+        const res = await api.get("/public/pgs/paged", {
+          params,
+          signal: controller.signal,
+        });
         const content = res.data?.content || [];
         const totalPages = res.data?.totalPages || 0;
 
@@ -214,7 +230,10 @@ const PublicPGList = () => {
         setPage(nextPage);
         setHasMore(nextPage + 1 < totalPages);
         setTotalCount(res.data?.totalElements || 0);
-      } catch {
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          return;
+        }
         if (!append) {
           setPgs([]);
           setTotalCount(0);
@@ -222,7 +241,9 @@ const PublicPGList = () => {
         setHasMore(false);
       } finally {
         setIsLoading(false);
+        setIsSearching(false);
         setLoadingMore(false);
+        initialLoadDone.current = true;
       }
     },
     [],
@@ -328,20 +349,23 @@ const PublicPGList = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          {searchQuery && (
-            <button
-              className="pg-search-clear"
-              onClick={() => setSearchQuery("")}
-            >
-              ✕
-            </button>
-          )}
+          <div className="pg-search-actions">
+            {isSearching && <Loader2 size={16} className="pg-search-spinner" />}
+            {searchQuery && (
+              <button
+                className="pg-search-clear"
+                onClick={() => setSearchQuery("")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
         {isLoading ? (
           <PGListingSkeleton count={9} />
         ) : (
-          <div className="pg-results-grid">
+          <div className={`pg-results-grid ${isSearching ? "is-loading" : ""}`}>
             {pgs.filter(Boolean).map((pg) => (
               <PGListingCard
                 key={pg.id}
