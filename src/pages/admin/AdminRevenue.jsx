@@ -683,28 +683,28 @@ useEffect(() => {
   <div className="revenue-chart-shell">
   <ResponsiveContainer width="100%" height={isMobile ? 260 : 420}>
   <AreaChart
-    data={chartData}
-    margin={isMobile
-      ? { top: 12, right: 8, left: 0, bottom: 4 }
-      : { top: 20, right: 10, left: -10, bottom: 0 }}
-  >
-    <CartesianGrid strokeDasharray="3 3" />
+  data={chartData}
+  margin={isMobile
+    ? { top: 12, right: 8, left: 0, bottom: 4 }
+    : { top: 20, right: 10, left: -10, bottom: 0 }}   // unchanged
+>
+  <CartesianGrid strokeDasharray="3 3" />
 
-    <XAxis
-      dataKey="label"
-      interval="preserveStartEnd"
-      minTickGap={isMobile ? 22 : 14}
-      tickMargin={8}
-      tick={{ fontSize: isMobile ? 11 : 13 }}
-    />
+  <XAxis
+    dataKey="label"
+    interval="preserveStartEnd"
+    minTickGap={isMobile ? 22 : 14}
+    tickMargin={8}
+    tick={{ fontSize: isMobile ? 11 : 13 }}
+  />
 
-    <YAxis
-      hide={isMobile}
-      width={isMobile ? 0 : 60}
-      tick={{ fontSize: isMobile ? 11 : 13 }}
-      tickFormatter={(v) => formatCompactCurrency(v)}
-      domain={[0, (dataMax) => dataMax + 5000]}
-    />
+  <YAxis
+    hide={isMobile}
+    width={isMobile ? 0 : 90}                          // 60 → 85, more room
+    tick={{ fontSize: isMobile ? 11 : 13, dx: -18 }}    // dx: -12 added — pushes label text left
+    tickFormatter={(v) => formatCompactCurrency(v)}
+    domain={[0, (dataMax) => dataMax + 5000]}
+  />
 
     <Tooltip formatter={(v) => formatCurrency(v)} />
 
