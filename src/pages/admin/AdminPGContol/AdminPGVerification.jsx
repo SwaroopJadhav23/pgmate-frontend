@@ -1,9 +1,9 @@
-import {FaHome, FaFolderOpen, FaTrash} from "react-icons/fa";
-import {useEffect, useState, useCallback} from "react";
+import { FaHome, FaFolderOpen, FaTrash } from "react-icons/fa";
+import { useEffect, useState, useCallback } from "react";
 import api from "../../../api/axios";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
-import {TableSkeleton, UniversalCardSkeleton} from "../../public/Skeleton";
+import { TableSkeleton, UniversalCardSkeleton } from "../../public/Skeleton";
 import SortableImageGrid from "../../../components/Sortableimagegrid";
 import "../../../components/Sortableimagegrid.css";
 import "./AdminPGVerification.css";
@@ -12,8 +12,8 @@ const DEFAULT_PG_IMAGE =
   "https://res.cloudinary.com/drhjyumlm/image/upload/v1773823610/pgs/images/sk30iitclkb0lpsbcc3g.webp";
 const PAGE_SIZE = 20;
 
-const sessionReasonRef = {current: null};
-const AdminPGVerification = ({basePath = "/admin"}) => {
+const sessionReasonRef = { current: null };
+const AdminPGVerification = ({ basePath = "/admin" }) => {
   const [pgs, setPgs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -41,16 +41,16 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
     try {
       const [pending, reapplied, approved, rejected] = await Promise.all([
         api.get(`${basePath}/pg-verification/paged`, {
-          params: {page: 0, size: 1, status: "PENDING"},
+          params: { page: 0, size: 1, status: "PENDING" },
         }),
         api.get(`${basePath}/pg-verification/paged`, {
-          params: {page: 0, size: 1, status: "REAPPLIED"},
+          params: { page: 0, size: 1, status: "REAPPLIED" },
         }),
         api.get(`${basePath}/pg-verification/paged`, {
-          params: {page: 0, size: 1, status: "APPROVED"},
+          params: { page: 0, size: 1, status: "APPROVED" },
         }),
         api.get(`${basePath}/pg-verification/paged`, {
-          params: {page: 0, size: 1, status: "REJECTED"},
+          params: { page: 0, size: 1, status: "REJECTED" },
         }),
       ]);
       setSummary({
@@ -181,7 +181,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
   };
 
   const rejectPG = async (pgId) => {
-    const {value: reason} = await Swal.fire({
+    const { value: reason } = await Swal.fire({
       title: "Reject PG",
       input: "textarea",
       inputLabel: "Reason",
@@ -193,7 +193,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
     });
     if (!reason) return;
     await api.put(`${basePath}/pg-verification/${pgId}/reject`, null, {
-      params: {reason},
+      params: { reason },
     });
     toast.success("PG rejected successfully.");
     load(0, false);
@@ -209,7 +209,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
     let reason = sessionReasonRef.current;
 
     if (!reason) {
-      const {value: inputReason} = await Swal.fire({
+      const { value: inputReason } = await Swal.fire({
         title: "Delete Media",
         input: "textarea",
         inputLabel: "Enter Reason for deletion",
@@ -248,11 +248,11 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
       if (mediaType === "image") {
         const updated = pgDetail.imageUrls.filter((u) => u !== currentUrl);
         if (updated.length === 0) setShowMediaViewer(false);
-        setPgDetail({...pgDetail, imageUrls: updated});
+        setPgDetail({ ...pgDetail, imageUrls: updated });
       } else {
         const updated = pgDetail.videoUrls.filter((u) => u !== currentUrl);
         if (updated.length === 0) setShowMediaViewer(false);
-        setPgDetail({...pgDetail, videoUrls: updated});
+        setPgDetail({ ...pgDetail, videoUrls: updated });
       }
 
       setMediaIndex(0);
@@ -262,7 +262,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
   };
 
   const disapprovePG = async (pgId) => {
-    const {value: reason} = await Swal.fire({
+    const { value: reason } = await Swal.fire({
       title: "Disapprove PG",
       input: "textarea",
       inputLabel: "Reason",
@@ -277,7 +277,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
     if (!reason) return;
 
     await api.put(`${basePath}/pg-verification/${pgId}/reject`, null, {
-      params: {reason},
+      params: { reason },
     });
 
     toast.success("PG disapproved and moved to rejected.");
@@ -310,7 +310,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
 
   const saveRearrangedOrder = () => {
     const newUrls = rearrangeList.map((img) => img.src);
-    setPgDetail({...pgDetail, imageUrls: newUrls});
+    setPgDetail({ ...pgDetail, imageUrls: newUrls });
     setMediaIndex(0);
     setShowRearrange(false);
   };
@@ -357,7 +357,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
 
     const updateStatus = (id, status) =>
       setUploadFiles((prev) =>
-        prev.map((f) => (f.id === id ? {...f, status} : f)),
+        prev.map((f) => (f.id === id ? { ...f, status } : f)),
       );
 
     let anySuccess = false;
@@ -371,7 +371,7 @@ const AdminPGVerification = ({basePath = "/admin"}) => {
         const res = await api.post(
           `${basePath}/pg-verification/${pgDetail.id}/upload-images`,
           formData,
-          {headers: {"Content-Type": "multipart/form-data"}},
+          { headers: { "Content-Type": "multipart/form-data" } },
         );
         const uploaded = res.data?.imageUrls || res.data?.urls || [];
         newUrls.push(...uploaded);

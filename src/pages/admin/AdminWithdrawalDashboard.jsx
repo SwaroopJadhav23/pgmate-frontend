@@ -14,11 +14,11 @@ const formatDate = (d) => {
   if (Array.isArray(d)) {
     const [year, month, day, hour = 0, min = 0, sec = 0] = d;
     const dt = new Date(year, month - 1, day, hour, min, sec);
-    return dt.toLocaleString("en-IN", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:true });
+    return dt.toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true });
   }
   const dt = new Date(d);
   if (isNaN(dt.getTime())) return "—";
-  return dt.toLocaleString("en-IN", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:true });
+  return dt.toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true });
 };
 
 const getInitial = (name) => name ? name.charAt(0).toUpperCase() : "?";
@@ -27,18 +27,18 @@ const getInitial = (name) => name ? name.charAt(0).toUpperCase() : "?";
 
 const AdminWithdrawalDashboard = () => {
   const [withdrawals, setWithdrawals] = useState([]);
-  const [referrals, setReferrals]     = useState([]);   // for "referred by" lookup
-  const [status, setStatus]           = useState("PENDING");
-  const [loading, setLoading]         = useState(false);
-  const [search, setSearch]           = useState("");
-  const [sortOrder, setSortOrder]     = useState("desc");
+  const [referrals, setReferrals] = useState([]);   // for "referred by" lookup
+  const [status, setStatus] = useState("PENDING");
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   /* ── Load withdrawals ──────────────────────────────── */
   const loadData = useCallback(async (s = status) => {
     setLoading(true);
     try {
       let url = "/admin/withdrawals";
-      if (s === "PENDING")  url = "/admin/withdrawals/pending";
+      if (s === "PENDING") url = "/admin/withdrawals/pending";
       if (s === "REJECTED") url = "/admin/withdrawals/rejected";
       const res = await api.get(url);
       setWithdrawals(res.data);
@@ -53,7 +53,7 @@ const AdminWithdrawalDashboard = () => {
   useEffect(() => {
     api.get("/admin/referrals")
       .then((res) => setReferrals(res.data || []))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -68,7 +68,7 @@ const AdminWithdrawalDashboard = () => {
 
   /* ── Actions ─────────────────────────────────────────── */
   const approve = async (id) => {
-    const result = await Swal.fire({ title:"Approve Withdrawal?", text:"This will allow the user to receive payment.", icon:"question", showCancelButton:true, confirmButtonText:"Yes, Approve" });
+    const result = await Swal.fire({ title: "Approve Withdrawal?", text: "This will allow the user to receive payment.", icon: "question", showCancelButton: true, confirmButtonText: "Yes, Approve" });
     if (!result.isConfirmed) return;
     try {
       await api.post(`/admin/withdrawals/${id}/approve`);
@@ -81,14 +81,14 @@ const AdminWithdrawalDashboard = () => {
 
   const reject = async (id) => {
     const { value: note } = await Swal.fire({
-      title:"Reject Withdrawal", input:"textarea", inputLabel:"Enter rejection reason",
-      inputPlaceholder:"Reason for rejection...", inputAttributes:{ maxlength:200 },
-      showCancelButton:true, confirmButtonText:"Reject",
-      inputValidator:(v) => { if (!v) return "Rejection reason is required"; }
+      title: "Reject Withdrawal", input: "textarea", inputLabel: "Enter rejection reason",
+      inputPlaceholder: "Reason for rejection...", inputAttributes: { maxlength: 200 },
+      showCancelButton: true, confirmButtonText: "Reject",
+      inputValidator: (v) => { if (!v) return "Rejection reason is required"; }
     });
     if (!note) return;
     try {
-      await api.post(`/admin/withdrawals/${id}/reject`, null, { params:{ note } });
+      await api.post(`/admin/withdrawals/${id}/reject`, null, { params: { note } });
       toast.success("Withdrawal rejected.");
       loadData();
     } catch (err) {
@@ -97,7 +97,7 @@ const AdminWithdrawalDashboard = () => {
   };
 
   const markPaid = async (id) => {
-    const result = await Swal.fire({ title:"Mark as Paid?", text:"Confirm that the payment has been sent.", icon:"warning", showCancelButton:true, confirmButtonText:"Yes, Mark Paid" });
+    const result = await Swal.fire({ title: "Mark as Paid?", text: "Confirm that the payment has been sent.", icon: "warning", showCancelButton: true, confirmButtonText: "Yes, Mark Paid" });
     if (!result.isConfirmed) return;
     try {
       await api.post(`/admin/withdrawals/${id}/paid`);
@@ -112,23 +112,23 @@ const AdminWithdrawalDashboard = () => {
   const filtered = withdrawals
     .filter((w) => {
       if (status === "APPROVED") return w.status === "APPROVED";
-      if (status === "PAID")     return w.status === "PAID";
+      if (status === "PAID") return w.status === "PAID";
       return true;
     })
     .filter((w) => {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
       return (
-        (w.userName  || "").toLowerCase().includes(q) ||
-        (w.userId    || "").toLowerCase().includes(q) ||
-        (w.upiId     || "").toLowerCase().includes(q) ||
+        (w.userName || "").toLowerCase().includes(q) ||
+        (w.userId || "").toLowerCase().includes(q) ||
+        (w.upiId || "").toLowerCase().includes(q) ||
         String(w.amount).includes(q) ||
         String(w.points).includes(q)
       );
     })
     .sort((a, b) => {
       const parseDate = (x) => Array.isArray(x)
-        ? new Date(x[0], x[1]-1, x[2], x[3]||0, x[4]||0)
+        ? new Date(x[0], x[1] - 1, x[2], x[3] || 0, x[4] || 0)
         : new Date(x || 0);
       return sortOrder === "desc"
         ? parseDate(b.requestedAt) - parseDate(a.requestedAt)
@@ -159,7 +159,7 @@ const AdminWithdrawalDashboard = () => {
 
         {/* STATUS TABS */}
         <div className="withdraw-tabs">
-          {["PENDING","APPROVED","REJECTED","PAID"].map((s) => (
+          {["PENDING", "APPROVED", "REJECTED", "PAID"].map((s) => (
             <button
               key={s}
               className={`tab${status === s ? " active" : ""}`}
@@ -214,70 +214,70 @@ const AdminWithdrawalDashboard = () => {
               </thead>
               <tbody>
                 {loading ? (
-                // SKELETON 
-                <TableSkeleton rows={8} cols={colSpan} />
+                  // SKELETON 
+                  <TableSkeleton rows={8} cols={colSpan} />
 
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={colSpan}>
-                    <div className="empty-state">
-                      <div className="empty-icon"><FaInbox /></div>
-                      <p>No {status.toLowerCase()} withdrawals found.</p>
-                    </div>
-                  </td>
-                </tr>
-
-              ) : (
-                filtered.map((w, index) => (
-                  <tr key={w.id}>
-                    <td><span className="srno-cell">{index + 1}</span></td>
-                    <td>
-                      <div className="user-cell">
-                        <div className="user-avatar">{getInitial(w.userName)}</div>
-                        <div className="user-info">
-                          <span className="user-name">{w.userName || w.userId}</span>
-                          {/* referred-by shown only if this user was referred by someone */}
-                          <ReferredByTag userId={w.userId} />
-                        </div>
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={colSpan}>
+                      <div className="empty-state">
+                        <div className="empty-icon"><FaInbox /></div>
+                        <p>No {status.toLowerCase()} withdrawals found.</p>
                       </div>
                     </td>
-                    <td><span className="points-cell">{w.points} pts</span></td>
-                    <td><span className="amount-cell">₹{w.amount}</span></td>
-                    <td><span className="upi-cell">{w.upiId}</span></td>
-                    <td><span className="date-cell">{formatDate(w.requestedAt)}</span></td>
-                    <td>
-                      <span className={`status-badge ${w.status}`}>
-                        <span className="status-dot" />
-                        {w.status}
-                      </span>
-                      {w.status === "REJECTED" && w.adminNote && (
-                        <div className="rejection-note">
-                          <span className="rejection-label">Reason:</span>{w.adminNote}
-                        </div>
-                      )}
-                    </td>
-                    {status === "PENDING" && (
-                      <td>
-                        <div className="actions-cell">
-                          {w.status === "PENDING" ? (
-                            <>
-                              <button className="btn approve" onClick={() => approve(w.id)}>✓ Approve</button>
-                              <button className="btn reject"  onClick={() => reject(w.id)}>✕ Reject</button>
-                            </>
-                          ) : <span className="no-action">—</span>}
-                        </div>
-                      </td>
-                    )}
-                    {status === "APPROVED" && (
-                      <td>
-                        <div className="actions-cell">
-                          {w.status === "APPROVED"
-                            ? <button className="btn paid" onClick={() => markPaid(w.id)}>✓ Mark Paid</button>
-                            : <span className="no-action">—</span>}
-                        </div>
-                      </td>
-                    )}
                   </tr>
+
+                ) : (
+                  filtered.map((w, index) => (
+                    <tr key={w.id}>
+                      <td><span className="srno-cell">{index + 1}</span></td>
+                      <td>
+                        <div className="user-cell">
+                          <div className="user-avatar">{getInitial(w.userName)}</div>
+                          <div className="user-info">
+                            <span className="user-name">{w.userName || w.userId}</span>
+                            {/* referred-by shown only if this user was referred by someone */}
+                            <ReferredByTag userId={w.userId} />
+                          </div>
+                        </div>
+                      </td>
+                      <td><span className="points-cell">{w.points} pts</span></td>
+                      <td><span className="amount-cell">₹{w.amount}</span></td>
+                      <td><span className="upi-cell">{w.upiId}</span></td>
+                      <td><span className="date-cell">{formatDate(w.requestedAt)}</span></td>
+                      <td>
+                        <span className={`status-badge ${w.status}`}>
+                          <span className="status-dot" />
+                          {w.status}
+                        </span>
+                        {w.status === "REJECTED" && w.adminNote && (
+                          <div className="rejection-note">
+                            <span className="rejection-label">Reason:</span>{w.adminNote}
+                          </div>
+                        )}
+                      </td>
+                      {status === "PENDING" && (
+                        <td>
+                          <div className="actions-cell">
+                            {w.status === "PENDING" ? (
+                              <>
+                                <button className="btn approve" onClick={() => approve(w.id)}>✓ Approve</button>
+                                <button className="btn reject" onClick={() => reject(w.id)}>✕ Reject</button>
+                              </>
+                            ) : <span className="no-action">—</span>}
+                          </div>
+                        </td>
+                      )}
+                      {status === "APPROVED" && (
+                        <td>
+                          <div className="actions-cell">
+                            {w.status === "APPROVED"
+                              ? <button className="btn paid" onClick={() => markPaid(w.id)}>✓ Mark Paid</button>
+                              : <span className="no-action">—</span>}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
                   ))
                 )}
               </tbody>
@@ -287,86 +287,86 @@ const AdminWithdrawalDashboard = () => {
           {/* ══ MOBILE CARDS ══ */}
           <div className="withdraw-card-list">
             {loading ? (
-            <OwnerCardSkeleton count={4} />
+              <OwnerCardSkeleton count={4} />
 
-          ) : filtered.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon"><FaInbox /></div>
-              <p>No {status.toLowerCase()} withdrawals found.</p>
-            </div>
+            ) : filtered.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon"><FaInbox /></div>
+                <p>No {status.toLowerCase()} withdrawals found.</p>
+              </div>
 
-          ) : (
-            filtered.map((w, index) => (
-              <div key={w.id} className="wd-card">
-                <div className={`wd-card-bar ${w.status}`} />
-                <div className="wd-card-body">
+            ) : (
+              filtered.map((w, index) => (
+                <div key={w.id} className="wd-card">
+                  <div className={`wd-card-bar ${w.status}`} />
+                  <div className="wd-card-body">
 
-                  {/* user + status */}
-                  <div className="wd-card-top">
-                    <div className="wd-card-user">
-                      <div className="user-avatar">{getInitial(w.userName)}</div>
-                      <div>
-                        <div className="wd-card-name">{w.userName || w.userId}</div>
-                        <ReferredByTag userId={w.userId} />
+                    {/* user + status */}
+                    <div className="wd-card-top">
+                      <div className="wd-card-user">
+                        <div className="user-avatar">{getInitial(w.userName)}</div>
+                        <div>
+                          <div className="wd-card-name">{w.userName || w.userId}</div>
+                          <ReferredByTag userId={w.userId} />
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                        <span className="srno-badge">#{index + 1}</span>
+                        <span className={`status-badge ${w.status}`}>
+                          <span className="status-dot" />{w.status}
+                        </span>
                       </div>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                      <span className="srno-badge">#{index + 1}</span>
-                      <span className={`status-badge ${w.status}`}>
-                        <span className="status-dot" />{w.status}
-                      </span>
+
+                    {/* amounts */}
+                    <div className="wd-card-amounts">
+                      <div className="wd-card-amount-block">
+                        <span className="wd-card-amount-label">Amount</span>
+                        <span className="wd-card-amount-val green">₹{w.amount}</span>
+                      </div>
+                      <div className="wd-card-amount-block">
+                        <span className="wd-card-amount-label">Points</span>
+                        <span className="wd-card-amount-val">{w.points} pts</span>
+                      </div>
                     </div>
+
+                    {/* upi */}
+                    <div className="wd-card-upi">
+                      <i className="bi bi-phone me-1" style={{ color: "#94a3b8", fontSize: 11 }}></i>
+                      {w.upiId}
+                    </div>
+
+                    {/* meta */}
+                    <div className="wd-card-meta">
+                      <div className="wd-card-meta-item">
+                        <i className="bi bi-calendar3"></i>{formatDate(w.requestedAt)}
+                      </div>
+                    </div>
+
+                    {/* rejection note */}
+                    {w.status === "REJECTED" && w.adminNote && (
+                      <div className="wd-card-rejection">
+                        <span className="rejection-label">Reason:</span> {w.adminNote}
+                      </div>
+                    )}
+
+                    {/* actions */}
+                    {status === "PENDING" && w.status === "PENDING" && (
+                      <div className="wd-card-actions">
+                        <button className="btn approve" onClick={() => approve(w.id)}>✓ Approve</button>
+                        <button className="btn reject" onClick={() => reject(w.id)}>✕ Reject</button>
+                      </div>
+                    )}
+                    {status === "APPROVED" && w.status === "APPROVED" && (
+                      <div className="wd-card-actions">
+                        <button className="btn paid" onClick={() => markPaid(w.id)}>✓ Mark Paid</button>
+                      </div>
+                    )}
+
                   </div>
-
-                  {/* amounts */}
-                  <div className="wd-card-amounts">
-                    <div className="wd-card-amount-block">
-                      <span className="wd-card-amount-label">Amount</span>
-                      <span className="wd-card-amount-val green">₹{w.amount}</span>
-                    </div>
-                    <div className="wd-card-amount-block">
-                      <span className="wd-card-amount-label">Points</span>
-                      <span className="wd-card-amount-val">{w.points} pts</span>
-                    </div>
-                  </div>
-
-                  {/* upi */}
-                  <div className="wd-card-upi">
-                    <i className="bi bi-phone me-1" style={{color:"#94a3b8",fontSize:11}}></i>
-                    {w.upiId}
-                  </div>
-
-                  {/* meta */}
-                  <div className="wd-card-meta">
-                    <div className="wd-card-meta-item">
-                      <i className="bi bi-calendar3"></i>{formatDate(w.requestedAt)}
-                    </div>
-                  </div>
-
-                  {/* rejection note */}
-                  {w.status === "REJECTED" && w.adminNote && (
-                    <div className="wd-card-rejection">
-                      <span className="rejection-label">Reason:</span> {w.adminNote}
-                    </div>
-                  )}
-
-                  {/* actions */}
-                  {status === "PENDING" && w.status === "PENDING" && (
-                    <div className="wd-card-actions">
-                      <button className="btn approve" onClick={() => approve(w.id)}>✓ Approve</button>
-                      <button className="btn reject"  onClick={() => reject(w.id)}>✕ Reject</button>
-                    </div>
-                  )}
-                  {status === "APPROVED" && w.status === "APPROVED" && (
-                    <div className="wd-card-actions">
-                      <button className="btn paid" onClick={() => markPaid(w.id)}>✓ Mark Paid</button>
-                    </div>
-                  )}
-
                 </div>
-              </div>
               ))
-              )}
+            )}
           </div>
 
         </div>
