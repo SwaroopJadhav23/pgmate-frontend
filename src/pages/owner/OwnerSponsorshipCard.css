@@ -649,3 +649,41 @@
     cursor: not-allowed;
   }
 }
+
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px; /* was likely 20-24px default */
+}
+
+.step-card {
+  padding: 14px 16px;   /* smaller box */
+  border-radius: 12px;
+  min-height: unset;
+}
+
+.step-top {
+  margin-bottom: 8px;
+}
+
+.step-number {
+  font-size: 22px;    /* shrink big faded number */
+}
+
+.step-icon {
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+}
+
+.step-card h5 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.step-card p {
+  font-size: 12.5px;
+  line-height: 1.4;
+  margin: 0;
+}
