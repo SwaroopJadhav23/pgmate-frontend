@@ -365,6 +365,8 @@
   display: flex;
   gap: 12px;
   margin-top: 26px;
+}
+
 .om-desktop-cell.offer-actions {
   display: flex !important;
   align-items: center;
