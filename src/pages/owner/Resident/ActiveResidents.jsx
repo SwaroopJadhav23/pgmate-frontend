@@ -8,6 +8,7 @@ import { digitsOnly, isValidEmail, isValidPhone } from "../../../utils/formValid
 import "./ActiveResidents.css";
 import "./Resident.css";
 import "./Agreement.css";
+import "./AddResidentModal.css";   // ← gives arm-page / arm-page-header / arm-page-actions
 import { TableSkeleton } from "../../public/Skeleton";
 import AgreementSignaturePad from "./AgreementSignaturePad";
 
@@ -264,6 +265,155 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
     });
   };
 
+  // ── EDIT TENANT — full page, same style as Add Tenant. Must sit BEFORE
+  //    the component's main "return (" below — never nest an `if` inside JSX. ──
+  if (showEdit) {
+    return (
+      <div className="arm-page">
+        <div className="arm-page-header">
+          <div>
+            <h4 style={{ margin: 0 }}>Edit Tenant</h4>
+            <p className="arm-page-subtitle">Update tenant and room details</p>
+          </div>
+          <div className="arm-header-actions">
+            <button className="arm-btn-outline" onClick={() => setShowEdit(false)}>Cancel</button>
+            <button className="arm-btn-primary" disabled={saving} onClick={submitEdit}>
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+          </div>
+        </div>
+
+        <div className="arm-page-body">
+          <div className="arm-grid">
+            <div className="arm-field">
+              <label>Name</label>
+              <Form.Control value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.trimStart() })} />
+            </div>
+
+            <div className="arm-field">
+              <label>Phone</label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.phone} onChange={(e) => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })} />
+            </div>
+
+            <div className="arm-field">
+              <label>Email</label>
+              <Form.Control type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value.trim() })} />
+            </div>
+
+            <div className="arm-field">
+              <label>Stay Type</label>
+              <Form.Control value={currentEditIsDaily ? "Daily Basic" : "Monthly Basic"} disabled />
+            </div>
+
+            {currentEditIsDaily ? (
+              <>
+                <div className="arm-field">
+                  <label>Daily Rent</label>
+                  <Form.Control type="number" value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} />
+                </div>
+                <div className="arm-field">
+                  <label>Number of Days</label>
+                  <Form.Control type="number" value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="arm-field">
+                  <label>Monthly Rent</label>
+                  <Form.Control type="number" value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} />
+                </div>
+                <div className="arm-field">
+                  <label>Deposit</label>
+                  <Form.Control type="number" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} />
+                </div>
+              </>
+            )}
+
+            <hr className="arm-section-divider" />
+
+            <div className="arm-field">
+              <label>Check-in Date</label>
+              <Form.Control type="date" value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
+            </div>
+            <div className="arm-field">
+              <label>Expected Checkout</label>
+              <Form.Control type="date" value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
+            </div>
+            <div className="arm-field full">
+              <label>Total Payable</label>
+              <Form.Control type="text" value={formatMoney(currentEditTotal)} disabled />
+            </div>
+
+            <div className="arm-field">
+              <label>Onboarding Payment Mode</label>
+              <Form.Select value={form.onboardingPaymentMode} onChange={(e) => { const value = e.target.value; setForm({ ...form, onboardingPaymentMode: value }); if (value === "CASH") { setPaymentFile(null); setRemovePaymentProof(true); } else { setRemovePaymentProof(false); } }}>
+                <option value="">Select</option>{PAYMENT_MODES.map((m) => <option key={m} value={m}>{m.replace("_", " ")}</option>)}
+              </Form.Select>
+            </div>
+
+            {form.onboardingPaymentMode && form.onboardingPaymentMode !== "CASH" && (
+              <div className="arm-field">
+                <label>Replace Payment Proof</label>
+                <Form.Control ref={fileRef} type="file" accept="image/*,.pdf" onChange={(e) => { setPaymentFile(e.target.files[0]); setRemovePaymentProof(false); }} />
+              </div>
+            )}
+
+            {form.onboardingPaymentMode !== "CASH" && (
+              <div className="arm-field full">
+                <Form.Check className="edit-check" label="Remove existing payment proof" checked={removePaymentProof} onChange={(e) => setRemovePaymentProof(e.target.checked)} />
+              </div>
+            )}
+
+            <div className="arm-field" data-mobile-full="true">
+              <label>Replace ID Proof</label>
+              <Form.Control ref={idFileRef} type="file" accept="image/*,.pdf" onChange={(e) => { setIdProofFile(e.target.files[0]); setRemoveIdProof(false); }} />
+            </div>
+            <div className="arm-field full">
+              <Form.Check className="edit-check" label="Remove existing ID proof" checked={removeIdProof} onChange={(e) => setRemoveIdProof(e.target.checked)} />
+            </div>
+
+            <hr className="arm-section-divider" />
+
+            <div className="arm-field">
+              <label>Food Preference</label>
+              <Form.Select value={form.foodPreference} onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}>
+                <option value="">Select</option>
+                <option value="VEG"><FaLeaf /> Veg</option>
+                <option value="NON_VEG"><FaDrumstickBite /> Non-Veg</option>
+              </Form.Select>
+            </div>
+
+            <div className="arm-field" data-mobile-full="true">
+              <label>Emergency Contact Name</label>
+              <Form.Control value={form.emergencyContactName} placeholder="e.g. Ramesh Kumar" onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value.trimStart() })} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Emergency Contact Number</label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.emergencyContact} placeholder="10-digit mobile number" onChange={(e) => setForm({ ...form, emergencyContact: digitsOnly(e.target.value).slice(0, 10) })} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Relation</label>
+              <Form.Select value={form.emergencyContactRelation} onChange={(e) => setForm({ ...form, emergencyContactRelation: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Father">Father</option>
+                <option value="Mother">Mother</option>
+                <option value="Brother">Brother</option>
+                <option value="Sister">Sister</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Friend">Friend</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+          </div>
+        </div>
+
+        <div className="arm-page-actions">
+          <button className="modal-btn cancel" onClick={() => setShowEdit(false)}>Cancel</button>
+          <button className="modal-btn success" onClick={submitEdit} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -413,77 +563,6 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
       )}
 
       {hasMore && <div className="residents-load-more-wrap"><button className="residents-load-more-btn" onClick={() => loadResidents(page + 1, true)} disabled={loadingMore}>{loadingMore ? "Loading..." : "Load More"}</button></div>}
-
-      {/* EDIT MODAL */}
-      {showEdit && (
-        <div className="modal-backdrop-custom">
-          <div className="modal-box ar-modal-fullscreen-mobile">
-            <div className="modal-header-custom"><h4>Edit Tenant</h4><button className="modal-close-btn" onClick={() => setShowEdit(false)} aria-label="Close">✕</button></div>
-            <div className="modal-body ar-modal-scrollable-body">
-              <Form.Group className="mb-3"><Form.Label>Name</Form.Label><Form.Control value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.trimStart() })} /></Form.Group>
-              <Form.Group className="mb-3"><Form.Label>Phone</Form.Label><Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.phone} onChange={(e) => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })} /></Form.Group>
-              <Form.Group className="mb-3"><Form.Label>Email</Form.Label><Form.Control type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value.trim() })} /></Form.Group>
-              <Form.Group className="mb-3"><Form.Label>Stay Type</Form.Label><Form.Control value={currentEditIsDaily ? "Daily Basic" : "Monthly Basic"} disabled /></Form.Group>
-              {currentEditIsDaily ? (
-                <>
-                  <Form.Group className="mb-3"><Form.Label>Daily Rent</Form.Label><Form.Control type="number" value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} /></Form.Group>
-                  <Form.Group className="mb-3"><Form.Label>Number of Days</Form.Label><Form.Control type="number" value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} /></Form.Group>
-                </>
-              ) : (
-                <>
-                  <Form.Group className="mb-3"><Form.Label>Monthly Rent</Form.Label><Form.Control type="number" value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} /></Form.Group>
-                  <Form.Group className="mb-3"><Form.Label>Deposit</Form.Label><Form.Control type="number" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></Form.Group>
-                </>
-              )}
-              <Form.Group className="mb-2"><Form.Label>Check-in Date</Form.Label><Form.Control type="date" value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} /></Form.Group>
-              <Form.Group className="mb-2"><Form.Label>Expected Checkout</Form.Label><Form.Control type="date" value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} /></Form.Group>
-              <Form.Group className="mb-2"><Form.Label>Total Payable</Form.Label><Form.Control type="text" value={formatMoney(currentEditTotal)} disabled /></Form.Group>
-              <Form.Group className="mb-2"><Form.Label>Onboarding Payment Mode</Form.Label>
-                <Form.Select value={form.onboardingPaymentMode} onChange={(e) => { const value = e.target.value; setForm({ ...form, onboardingPaymentMode: value }); if (value === "CASH") { setPaymentFile(null); setRemovePaymentProof(true); } else { setRemovePaymentProof(false); } }}>
-                  <option value="">Select</option>{PAYMENT_MODES.map((m) => <option key={m} value={m}>{m.replace("_", " ")}</option>)}
-                </Form.Select>
-              </Form.Group>
-              {form.onboardingPaymentMode && form.onboardingPaymentMode !== "CASH" && (<Form.Group className="mb-2"><Form.Label>Replace Payment Proof</Form.Label><Form.Control ref={fileRef} type="file" accept="image/*,.pdf" onChange={(e) => { setPaymentFile(e.target.files[0]); setRemovePaymentProof(false); }} /></Form.Group>)}
-              {form.onboardingPaymentMode !== "CASH" && (<Form.Check className="edit-check" label="Remove existing payment proof" checked={removePaymentProof} onChange={(e) => setRemovePaymentProof(e.target.checked)} />)}
-              <Form.Group className="mb-2 mt-3"><Form.Label>Replace ID Proof</Form.Label><Form.Control ref={idFileRef} type="file" accept="image/*,.pdf" onChange={(e) => { setIdProofFile(e.target.files[0]); setRemoveIdProof(false); }} /></Form.Group>
-              <Form.Check className="edit-check" label="Remove existing ID proof" checked={removeIdProof} onChange={(e) => setRemoveIdProof(e.target.checked)} />
-              <Form.Group className="mb-3 mt-3">
-                <Form.Label>Food Preference</Form.Label>
-                <Form.Select value={form.foodPreference} onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}>
-                  <option value="">Select</option>
-                  <option value="VEG"><FaLeaf /> Veg</option>
-                  <option value="NON_VEG"><FaDrumstickBite /> Non-Veg</option>
-                </Form.Select>
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Emergency Contact Name</Form.Label>
-                <Form.Control value={form.emergencyContactName} placeholder="e.g. Ramesh Kumar" onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value.trimStart() })} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Emergency Contact Number</Form.Label>
-                <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.emergencyContact} placeholder="10-digit mobile number" onChange={(e) => setForm({ ...form, emergencyContact: digitsOnly(e.target.value).slice(0, 10) })} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Relation</Form.Label>
-                <Form.Select value={form.emergencyContactRelation} onChange={(e) => setForm({ ...form, emergencyContactRelation: e.target.value })}>
-                  <option value="">Select</option>
-                  <option value="Father">Father</option>
-                  <option value="Mother">Mother</option>
-                  <option value="Brother">Brother</option>
-                  <option value="Sister">Sister</option>
-                  <option value="Spouse">Spouse</option>
-                  <option value="Friend">Friend</option>
-                  <option value="Other">Other</option>
-                </Form.Select>
-              </Form.Group>
-            </div>
-            <div className="modal-actions ar-modal-sticky-actions">
-              <button className="modal-btn cancel" onClick={() => setShowEdit(false)}>Cancel</button>
-              <button className="modal-btn success" onClick={submitEdit} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* SETTLEMENT MODAL */}
       {showSettlement && settlementResident && (

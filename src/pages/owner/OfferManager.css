@@ -133,10 +133,11 @@
 OFFER ACTION BUTTONS
 ================================ */
 
-.offer-actions {
-  display: flex;
+.om-desktop-cell.offer-actions {
+  display: flex !important;
+  align-items: center;
   justify-content: center;
-  gap: 16px !important;
+  gap: 10px;
   flex-wrap: nowrap;
 }
 
