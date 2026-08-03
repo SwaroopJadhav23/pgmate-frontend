@@ -949,9 +949,25 @@
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-.pg-search-clear {
+.pg-search-actions {
   position: absolute;
   right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pg-search-spinner {
+  color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pg-search-clear {
   background: none;
   border: none;
   font-size: 13px;
