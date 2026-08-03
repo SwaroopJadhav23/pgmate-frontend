@@ -7,6 +7,7 @@ import "./App.css";
 import ErrorBoundary from "./Errors/ErrorBoundary";
 import "./styles/colors.css";
 import { CityFilterProvider } from "./context/CityFilterContext";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ErrorBoundary>

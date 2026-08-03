@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import { MapPin, Home, MessageSquareMore  } from "lucide-react";
+import { MapPin, Home, MessageSquareMore } from "lucide-react";
 
 import api from "../../api/axios";
 import "../../CSS/pgDetail.css";
@@ -395,14 +395,14 @@ const PGDetail = () => {
       : null;
 
   const sharingLabel = (t) => {
-    if (t === "SINGLE") return "🚪 Private";
-    if (t === "DOUBLE") return "🛏 Double";
-    if (t === "TRIPLE") return "🛏 Triple";
-    if (t === "QUADRUPLE") return "🛏 4 Sharing";
-    if (t.startsWith("CUSTOM_")) return `🛏 ${t.split("_")[1]} Sharing`;
+    if (t === "SINGLE") return <><i className="fa-solid fa-door-closed"></i> Private</>;
+    if (t === "DOUBLE") return <><i className="fa-solid fa-bed"></i> Double</>;
+    if (t === "TRIPLE") return <><i className="fa-solid fa-bed"></i> Triple</>;
+    if (t === "QUADRUPLE") return <><i className="fa-solid fa-bed"></i> 4 Sharing</>;
+    if (t.startsWith("CUSTOM_")) return <><i className="fa-solid fa-bed"></i> {t.split("_")[1]} Sharing</>;
     if (t === "CUSTOM") {
       const customRoom = sharingGroups.find((r) => r.sharingType === "CUSTOM");
-      return customRoom?.totalBeds ? `🛏 ${customRoom.totalBeds} Sharing` : "🛏 Custom";
+      return customRoom?.totalBeds ? <><i className="fa-solid fa-bed"></i> {customRoom.totalBeds} Sharing</> : <><i className="fa-solid fa-bed"></i> Custom</>;
     }
     return t;
   };
@@ -583,7 +583,7 @@ const PGDetail = () => {
 
           {pg.reservationAmount > 0 && (
             <div className="bc-token">
-              <span className="bc-token-icon">🔒</span>
+              <span className="bc-token-icon"><i className="fa-solid fa-lock"></i></span>
               <div>
                 <div className="bc-token-label">RESERVATION TOKEN</div>
                 <div className="bc-token-amount">
@@ -599,7 +599,7 @@ const PGDetail = () => {
           {(pg.reservationEnabled || pg.dailyReservationEnabled) &&
             pg.reservationAmount > 0 && (
               <button className="bc-reserve-btn" onClick={openReserve}>
-                ⚡ Reserve Bed
+                <i className="fa-solid fa-bolt"></i> Reserve Bed
               </button>
             )}
 
@@ -608,13 +608,13 @@ const PGDetail = () => {
               className="bc-avail-btn"
               onClick={() => setShowAvailability(true)}
             >
-              🛏 Availability
+              <i className="fa-solid fa-bed"></i> Availability
             </button>
             <button
               className="bc-enquiry-btn"
               onClick={() => setShowEnquiry(true)}
             >
-              <MessageSquareMore  size={16} strokeWidth={2} /> Enquiry
+              <MessageSquareMore size={16} strokeWidth={2} /> Enquiry
             </button>
           </div>
 
