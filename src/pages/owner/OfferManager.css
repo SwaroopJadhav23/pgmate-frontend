@@ -1,217 +1,219 @@
+/* ==========================================================================
+   OFFER MANAGER MASTER STYLES (DESKTOP, TABLET & MOBILE)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. FILTER BAR & SELECT PG DROPDOWN
+   -------------------------------------------------------------------------- */
 .offer-filter-bar {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  background: #fff;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-}
-
-.offer-table {
-  background: white;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
-}
-
-.offer-table thead {
-  background: #f1f5ff;
-}
-
-.offer-table th,
-.offer-table td {
-  text-align: center;
-  padding: 14px;
-}
-
-.empty-state {
-  height: 120px;
-  text-align: center;
-  vertical-align: middle;
-  font-weight: 600;
-  color: #2563eb;
-}
-
-.offer-modal-subtitle {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin-top: 4px;
-}
-
-/* AFTER — add after .offer-modal-subtitle */
-.offer-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #f1f5f9;
-  border: 1.5px solid #e2e8f0;
-  color: #64748b;
-  font-size: 14px;
-  cursor: pointer;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+}
+
+/* Custom styled PG Select dropdown */
+.offer-select-pg {
+  flex: 1;
+  height: 48px;
+  padding: 0 40px 0 16px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background-color: #f8fafc;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e293b;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.offer-select-pg:hover {
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+}
+
+.offer-select-pg:focus {
+  background-color: #ffffff;
+  border-color: #6366f1;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+/* Apply Offer Button */
+.add-room-btn {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
-}
-.offer-modal-close:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #ef4444;
-}
-
-
-
-
-
-/* -------- FILTER BAR -------- */
-.offer-filter-bar {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  background: #fff;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
-/* -------- TABLE -------- */
+.add-room-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+}
+
+.add-room-btn:disabled {
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   2. DESKTOP TABLE & ACTION BUTTONS
+   -------------------------------------------------------------------------- */
 .offer-table {
-  background: white;
-  border-radius: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
 }
 
 .offer-table thead {
-  background: #f1f5ff;
+  background: #f8fafc;
 }
 
-.offer-table th,
-.offer-table td {
+.offer-table th {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #f1f5f9;
   text-align: center;
-  padding: 14px;
 }
 
-/* -------- EMPTY STATE -------- */
-.empty-state {
-  height: 120px;
+.offer-table th:last-child {
+  border-right: none;
+}
+
+.offer-table td {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
   vertical-align: middle;
+  color: #334155;
+  font-size: 14px;
+}
+
+.offer-table td:last-child {
+  border-right: none;
+}
+
+.offer-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.empty-state {
+  height: 140px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 15px;
   font-weight: 600;
-  color: #2563eb;
+  color: #6366f1;
 }
 
-/* -------- MODAL -------- */
-.offer-modal {
-  max-width: 420px;
-  width: 95%;
+/* Desktop Action Column Alignment */
+.om-desktop-cell.offer-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 12px 16px !important;
+  border: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
 }
 
-.offer-modal-title {
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.offer-modal-subtitle {
-  font-size: 0.85rem;
-  color: #6b7280;
-  margin-bottom: 16px;
-}
-
-.offer-table td .btn {
-  white-space: nowrap;
-}
-
-/* ===============================
-OFFER ACTION BUTTONS
-================================ */
-
-.offer-actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px !important;
-  flex-wrap: nowrap;
-}
-
-/* EDIT BUTTON */
+/* Edit Button */
 .offer-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
   background: #fef3c7;
   color: #92400e;
-  border: none;
-  font-weight: 600;
+  border: 1px solid #fde68a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .offer-edit-btn:hover {
   background: #fde68a;
+  color: #78350f;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 }
 
-/* DELETE BUTTON */
+/* Delete Button */
 .offer-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
   background: #fee2e2;
   color: #991b1b;
-  border: none;
-  font-weight: 600;
+  border: 1px solid #fca5a5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .offer-delete-btn:hover {
   background: #fecaca;
+  color: #7f1d1d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
-/* APPLY OFFER BUTTON (MATCH ROOM MANAGER) */
-
-.add-room-btn {
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: none;
-
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  color: white;
-
-  font-weight: 600;
-  cursor: pointer;
-  transition: .25s;
-}
-
-.add-room-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(79, 70, 229, .35);
-}
-
-/* ===== MOBILE RESPONSIVE ===== */
-@media (max-width: 768px) {
-
-  .offer-filter-bar {
-    grid-template-columns: 1fr;
-  }
-
-  .offer-filter-bar button {
-    width: 100%;
-  }
-
-  .offer-table th,
-  .offer-table td {
-    font-size: 0.85rem;
-    padding: 10px;
-  }
-
-  .offer-modal {
-    width: 92%;
-    padding: 18px;
-  }
-}
-
-/* ================================================
-   OM MOBILE CARDS  —  om- prefix to avoid conflicts
-   ================================================ */
-
-/* ── DESKTOP DEFAULT: show desktop cells, hide card cell ── */
+/* --------------------------------------------------------------------------
+   3. MOBILE CARDS VS DESKTOP VISIBILITY
+   -------------------------------------------------------------------------- */
 .om-card-cell {
   display: none !important;
   padding: 0 !important;
@@ -223,15 +225,272 @@ OFFER ACTION BUTTONS
   display: table-cell !important;
 }
 
-/* ── MOBILE: flip visibility at 768px ── */
-@media (max-width: 768px) {
+/* --------------------------------------------------------------------------
+   4. MODAL BACKDROP & BOX STYLING
+   -------------------------------------------------------------------------- */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 16px;
+  animation: omFadeIn 0.2s ease-out;
+}
 
-  /* Hide entire thead */
+.modal-box.offer-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+  position: relative;
+  animation: omSlideUp 0.25s ease-out;
+  border: 1px solid #f1f5f9;
+}
+
+.offer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.offer-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.text-indigo {
+  color: #6366f1;
+}
+
+.offer-modal-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 22px;
+  font-weight: 500;
+}
+
+.pg-badge-tag {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.offer-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  color: #64748b;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.offer-modal-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+/* Form inputs inside Modal */
+.offer-form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.offer-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.offer-form-input,
+.offer-form-select {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.offer-form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.offer-form-input:focus,
+.offer-form-select:focus {
+  border-color: #6366f1;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  background-color: #ffffff;
+}
+
+/* Modal Action Buttons */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.modal-btn.cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.modal-btn.cancel:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.modal-btn.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+}
+
+.modal-btn.primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.so-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: soSpin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes soSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes omFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes omSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   5. TABLET RESPONSIVE STYLES (769px - 1024px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .offer-filter-bar {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .offer-select-pg {
+    height: 48px;
+    font-size: 14.5px;
+  }
+
+  .add-room-btn {
+    height: 48px;
+    padding: 0 20px;
+    font-size: 14.5px;
+  }
+
+  .modal-box.offer-modal {
+    max-width: 460px;
+    padding: 26px 22px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. MOBILE RESPONSIVE STYLES (<= 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .offer-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+
+  .offer-select-pg {
+    width: 100%;
+    height: 46px;
+    font-size: 14px;
+  }
+
+  .add-room-btn {
+    width: 100%;
+    height: 46px;
+    font-size: 14px;
+    justify-content: center;
+  }
+
+  /* Table Mobile Flip */
   .om-offer-table thead tr {
     display: none !important;
   }
 
-  /* Row becomes a block container */
   .om-offer-table tbody tr.om-table-row {
     display: block !important;
     border: none !important;
@@ -239,12 +498,10 @@ OFFER ACTION BUTTONS
     margin-bottom: 14px;
   }
 
-  /* Hide ALL desktop cells */
   .om-offer-table tbody tr.om-table-row td.om-desktop-cell {
     display: none !important;
   }
 
-  /* Show only the card cell */
   .om-offer-table tbody tr.om-table-row td.om-card-cell {
     display: block !important;
     padding: 0 !important;
@@ -252,28 +509,27 @@ OFFER ACTION BUTTONS
     background: transparent !important;
   }
 
-  /* ── CARD SHELL ── */
+  /* Mobile Card Shell */
   .om-card {
-    background: var(--color-background-primary, #fff);
+    background: #ffffff;
     border: 1px solid #e5e7f0;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(79, 70, 229, 0.08);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.08);
   }
 
-  /* ── HEADER ── */
   .om-card-header {
     display: flex !important;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px 12px;
+    padding: 14px 16px;
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   }
 
   .om-card-pg-name {
     font-size: 15px;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff;
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -283,22 +539,20 @@ OFFER ACTION BUTTONS
 
   .om-card-badge {
     background: rgba(255, 255, 255, 0.22);
-    color: #fff;
+    color: #ffffff;
     font-size: 12px;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 20px;
     white-space: nowrap;
-    letter-spacing: 0.3px;
     border: 1px solid rgba(255, 255, 255, 0.35);
   }
 
-  /* ── BODY ROWS ── */
   .om-card-body {
-    padding: 12px 16px 8px;
+    padding: 14px 16px 8px;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 8px;
   }
 
   .om-card-row {
@@ -317,13 +571,12 @@ OFFER ACTION BUTTONS
 
   .om-card-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: #9ca3af;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
     flex-shrink: 0;
-    padding-top: 2px;
   }
 
   .om-card-value {
@@ -334,14 +587,14 @@ OFFER ACTION BUTTONS
     flex: 1;
   }
 
-  /* ── FOOTER ── */
   .om-card-footer {
     display: flex !important;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px 14px;
+    padding: 12px 16px;
     border-top: 1px solid #f0f0f5;
-    gap: 10px;
+    gap: 12px;
+    background: #fafafa;
   }
 
   .om-card-actions {
@@ -353,27 +606,25 @@ OFFER ACTION BUTTONS
   .om-card-actions .btn {
     flex: 1;
     font-size: 13px;
-    padding: 7px 0;
+    padding: 8px 0;
     border-radius: 8px;
-
+    justify-content: center;
   }
 
-  /* Select checkbox + label */
   .om-card-select-label {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
     cursor: pointer;
     flex-shrink: 0;
   }
 
   .om-card-select-label span {
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     color: #9ca3af;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
   }
 
   .om-card-select-label .form-check-input {
@@ -382,178 +633,25 @@ OFFER ACTION BUTTONS
     cursor: pointer;
     margin: 0;
   }
-}
 
-/* ── MODAL BACKDROP ── */
-.modal-backdrop-custom {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1050;
-}
-
-/* ── MODAL BOX ── */
-.modal-box {
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px 24px;
-  width: 50%;
-  max-width: 520px;
-  min-width: 320px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  position: relative;
-}
-
-/* ── MOBILE: full-width on small screens ── */
-@media (max-width: 768px) {
-  .modal-box {
-    width: 92%;
-    max-width: 92%;
-  }
-}
-
-.om-desktop-cell.offer-actions .offer-edit-btn {
-  margin-right: 10px !important;
-}
-
-
-/*Tablet view for Apply offer form*/
-/* AFTER — add at end */
-@media (min-width: 601px) and (max-width: 900px) {
+  /* Mobile Modal */
   .modal-box.offer-modal {
-    width: 480px !important;
-    max-width: 92vw !important;
-    padding: 28px 26px 24px !important;
-    border-radius: 22px !important;
-    position: relative !important;
+    width: 95%;
+    max-width: 95%;
+    padding: 22px 18px;
+    border-radius: 18px;
   }
 
-  .modal-box.offer-modal h5 {
-    font-size: 18px !important;
+  .offer-modal-title {
+    font-size: 18px;
   }
 
-  .modal-box.offer-modal .form-control,
-  .modal-box.offer-modal select {
-    font-size: 14px !important;
-    padding: 11px 13px !important;
-    border-radius: 10px !important;
-    min-height: 46px !important;
-  }
-
-  .modal-btn {
-    height: 48px !important;
-    font-size: 15px !important;
-  }
-
-  .offer-modal-close {
-    width: 34px !important;
-    height: 34px !important;
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1024px) {
-  .modal-box.offer-modal {
-    width: 540px !important;
-    max-width: 88vw !important;
-    padding: 34px 32px 28px !important;
-    border-radius: 24px !important;
-    position: relative !important;
-  }
-
-  .modal-box.offer-modal h5 {
-    font-size: 20px !important;
-  }
-
-  .modal-box.offer-modal .form-control,
-  .modal-box.offer-modal select {
-    font-size: 15px !important;
-    padding: 13px 15px !important;
-    border-radius: 11px !important;
-    min-height: 50px !important;
-  }
-
-  .modal-btn {
-    height: 52px !important;
-    font-size: 16px !important;
-  }
-
-  .offer-modal-close {
-    width: 38px !important;
-    height: 38px !important;
-    top: 16px !important;
-    right: 16px !important;
-  }
-}
-
-/* =========================================
-   MODAL ACTIONS & INPUTS
-========================================= */
-
-.modal-box input,
-.modal-box select {
-  border-radius: 8px;
-  height: 44px;
-  border: 1px solid #e2e8f0;
-  padding: 0 14px;
-  width: 100%;
-  font-size: 15px;
-  box-sizing: border-box;
-}
-
-.modal-box input:focus,
-.modal-box select:focus {
-  border-color: #6366f1;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.modal-actions {
-  display: flex;
-  gap: 14px;
-  margin-top: 24px;
-  flex-wrap: nowrap !important;
-}
-
-.modal-btn {
-  flex: 1;
-  height: 44px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .25s;
-}
-
-.modal-btn.cancel {
-  background: #e5e8f7;
-  color: rgb(101, 105, 109);
-}
-
-.modal-btn.cancel:hover {
-  background: #f0f2fa;
-}
-
-.modal-btn.primary {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  color: white;
-}
-
-.modal-btn.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(79, 70, 229, .35);
-}
-
-@media (max-width: 768px) {
   .modal-actions {
-    flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
+
   .modal-btn {
-    width: 100%;
-    margin: 0;
+    height: 46px;
+    font-size: 14px;
   }
 }

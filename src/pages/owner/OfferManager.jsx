@@ -191,7 +191,7 @@ const OfferManager = () => {
             {/* FILTER BAR */}
             <div className="offer-filter-bar">
               <select
-                className="form-control"
+                className="form-control offer-select-pg"
                 value={selectedPg}
                 onChange={(e) => setSelectedPg(e.target.value)}
               >
@@ -238,7 +238,7 @@ const OfferManager = () => {
                   }
                 }}
               >
-                + Apply Offer
+                <i className="bi bi-plus-lg me-1"></i> Apply Offer
               </button>
             </div>
 
@@ -256,10 +256,7 @@ const OfferManager = () => {
                 </div>
               )}
 
-              {/* ── TABLE ──
-                  Added class: om-offer-table
-                  Desktop uses .om-desktop-cell columns (visible on ≥769px)
-                  Mobile uses .om-card-cell (visible on ≤768px, one per row) */}
+              {/* ── TABLE ── */}
               <table className="table table-bordered offer-table om-offer-table">
                 <thead>
                   <tr>
@@ -268,9 +265,9 @@ const OfferManager = () => {
                     <th>Discount %</th>
                     <th>Discount</th>
                     <th width="200">Actions</th>
-                    <th width="80" className="text-center fw-semibold text-muted">
+                    <th width="90" className="text-center fw-semibold text-muted">
                       <div className="d-flex flex-column align-items-center">
-                        <span>Select to Delete</span>
+                        <span style={{ fontSize: "11px", fontWeight: "600" }}>Select</span>
                         <input
                           type="checkbox"
                           className="form-check-input mt-1"
@@ -346,14 +343,13 @@ const OfferManager = () => {
                                     setShowModal(true);
                                   }}
                                 >
-                                  Edit
+                                  <i className="bi bi-pencil-square me-1"></i> Edit
                                 </button>
                                 <button
                                   className="btn btn-sm offer-delete-btn"
-                                  style={{ marginLeft: "10px" }}
                                   onClick={() => deleteOffer(pg.id)}
                                 >
-                                  Delete
+                                  <i className="bi bi-trash me-1"></i> Delete
                                 </button>
                               </div>
                               <label className="om-card-select-label">
@@ -403,13 +399,13 @@ const OfferManager = () => {
                               setShowModal(true);
                             }}
                           >
-                            Edit
+                            <i className="bi bi-pencil-square me-1"></i> Edit
                           </button>
                           <button
                             className="btn btn-sm offer-delete-btn"
                             onClick={() => deleteOffer(pg.id)}
                           >
-                            Delete
+                            <i className="bi bi-trash me-1"></i> Delete
                           </button>
                         </td>
                         <td className="om-desktop-cell text-center">
@@ -432,105 +428,115 @@ const OfferManager = () => {
             {showModal && (
               <div className="modal-backdrop-custom">
                 <div className="modal-box offer-modal">
-                  <h5 className="offer-modal-title">{isEdit ? "Edit Offer" : "Apply Offer"}</h5>
-                  <button className="offer-modal-close" onClick={() => setShowModal(false)}>✕</button>
+                  <div className="offer-modal-header">
+                    <h5 className="offer-modal-title">
+                      <i className="bi bi-tag-fill me-2 text-indigo"></i>
+                      {isEdit ? "Edit Offer" : "Apply Offer"}
+                    </h5>
+                    <button
+                      className="offer-modal-close"
+                      onClick={() => setShowModal(false)}
+                      aria-label="Close"
+                    >
+                      ✕
+                    </button>
+                  </div>
 
                   {selectedPg === "ALL" ? (
                     <p className="offer-modal-subtitle">
-                      <strong>Applying to ALL PGs</strong>
+                      Target: <span className="pg-badge-tag">All PGs</span>
                     </p>
                   ) : (
                     selectedPgData && (
                       <p className="offer-modal-subtitle">
-                        for <strong>{selectedPgData.name}</strong>
+                        Target: <span className="pg-badge-tag">{selectedPgData.name}</span>
                       </p>
                     )
                   )}
 
-                  <input
-                    className="form-control mb-3"
-                    placeholder="Offer Title"
-                    value={offerForm.offerTitle}
-                    onChange={(e) =>
-                      setOfferForm({
-                        ...offerForm,
-                        offerTitle: e.target.value,
-                      })
-                    }
-                  />
+                  <div className="offer-form-group">
+                    <label className="offer-form-label">
+                      Offer Title <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control offer-form-input"
+                      placeholder="e.g. Summer Special Offer"
+                      value={offerForm.offerTitle}
+                      onChange={(e) =>
+                        setOfferForm({
+                          ...offerForm,
+                          offerTitle: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
 
-                  <input
-                    type="number"
-                    className="form-control mb-3"
-                    placeholder="Offer % (1-100)"
-                    maxLength="10"
-                    min="1"
-                    max="100"
-                    value={offerForm.offerPercent}
-                    onChange={(e) =>
-                      setOfferForm({
-                        ...offerForm,
-                        offerPercent: e.target.value,
-                      })
-                    }
-                  />
+                  <div className="offer-form-group">
+                    <label className="offer-form-label">
+                      Discount Percentage (%) <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control offer-form-input"
+                      placeholder="Enter percentage (1-100)"
+                      min="1"
+                      max="100"
+                      value={offerForm.offerPercent}
+                      onChange={(e) =>
+                        setOfferForm({
+                          ...offerForm,
+                          offerPercent: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
 
-                  <select
-                    className="form-control mb-3"
-                    value={offerForm.offerType}
-                    onChange={(e) =>
-                      setOfferForm({
-                        ...offerForm,
-                        offerType: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Select Offer Type</option>
-                    <option value="DISCOUNT">Discount (Reduce Price)</option>
-                    <option value="NO_PRICE_CHANGE">
-                      No Price Change (Badge Only)
-                    </option>
-                  </select>
+                  <div className="offer-form-group">
+                    <label className="offer-form-label">
+                      Offer Type <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-control offer-form-select"
+                      value={offerForm.offerType}
+                      onChange={(e) =>
+                        setOfferForm({
+                          ...offerForm,
+                          offerType: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select Offer Type</option>
+                      <option value="DISCOUNT">Discount (Reduce Room Rent)</option>
+                      <option value="NO_PRICE_CHANGE">
+                        Badge Only (No Price Change)
+                      </option>
+                    </select>
+                  </div>
 
                   <div className="modal-actions">
                     <button
+                      type="button"
                       className="modal-btn cancel"
                       onClick={() => setShowModal(false)}
                     >
                       Cancel
                     </button>
                     <button
+                      type="button"
                       className="modal-btn primary"
                       onClick={saveOffer}
                       disabled={saving}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        opacity: saving ? 0.85 : 1,
-                      }}
                     >
                       {saving ? (
                         <>
-                          <span
-                            style={{
-                              width: "15px",
-                              height: "15px",
-                              border: "2px solid rgba(255,255,255,0.4)",
-                              borderTopColor: "#fff",
-                              borderRadius: "50%",
-                              display: "inline-block",
-                              animation: "so-spin 0.7s linear infinite",
-                              flexShrink: 0,
-                            }}
-                          />
+                          <span className="so-spinner" />
                           Saving...
                         </>
                       ) : (
-                        "Save Offer"
+                        <>
+                          <i className="bi bi-check2-circle me-1"></i> Save Offer
+                        </>
                       )}
-                      <style>{`@keyframes so-spin { to { transform: rotate(360deg); } }`}</style>
                     </button>
                   </div>
                 </div>
