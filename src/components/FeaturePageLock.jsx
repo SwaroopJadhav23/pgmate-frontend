@@ -1,3 +1,4 @@
+import { Lock } from "lucide-react";
 import "./FeaturePageLock.css";
 const FeaturePageLock = ({ feature, onUnlock }) => {
 
@@ -7,7 +8,7 @@ const FeaturePageLock = ({ feature, onUnlock }) => {
       <div className="feature-lock-box">
 
         <div className="feature-lock-icon">
-          🔒
+          <Lock size={40} strokeWidth={2} />
         </div>
 
         <h3>{feature} Locked</h3>
