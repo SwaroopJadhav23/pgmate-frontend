@@ -1,14 +1,14 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import api from "../../../api/axios";
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import {TableSkeleton} from "../../public/Skeleton";
+import { TableSkeleton } from "../../public/Skeleton";
 import "./ResidentRecords.css";
 
 const PAGE_SIZE = 20;
 const STAY_FILTERS = [
-  {key: "ALL", label: "All"},
-  {key: "MONTHLY_BASIC", label: "Monthly"},
-  {key: "DAILY_BASIC", label: "Daily"},
+  { key: "ALL", label: "All" },
+  { key: "MONTHLY_BASIC", label: "Monthly" },
+  { key: "DAILY_BASIC", label: "Daily" },
 ];
 const formatDate = (dt) =>
   dt ? new Date(dt).toLocaleDateString("en-GB") : "-";
@@ -23,7 +23,7 @@ const extraLabel = (resident) =>
     ? `${resident.numberOfDays || 0} day(s)`
     : formatMoney(resident.deposit);
 
-const ResidentRecords = ({apiPrefix}) => {
+const ResidentRecords = ({ apiPrefix }) => {
   const [records, setRecords] = useState([]);
   const stats = {
     totalCheckouts: records.length,
@@ -47,6 +47,7 @@ const ResidentRecords = ({apiPrefix}) => {
   const [roomNumber, setRoomNumber] = useState("");
   const [bedNumber, setBedNumber] = useState("");
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [detailRecord, setDetailRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
@@ -499,66 +500,47 @@ const ResidentRecords = ({apiPrefix}) => {
         <table className="modern-table">
           <thead>
             <tr>
+              <th>S.No</th>
               <th>Name</th>
               <th>Phone</th>
               <th>PG</th>
-              <th>Room</th>
-              <th>Bed</th>
               <th>Stay</th>
               <th>Charge</th>
-              <th>Extra</th>
               <th>Check-in</th>
               <th>Checkout</th>
-              <th>Deducted</th>
-              <th>Refunded</th>
               <th>Refund Mode</th>
-              <th>Settlement Date</th>
               <th>Refund Proof</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <TableSkeleton rows={8} cols={15} />
+              <TableSkeleton rows={8} cols={10} />
             ) : records.length === 0 ? (
               <tr>
-                <td colSpan="15" className="rrc-table-empty">
-                  No records found
-                </td>
+                <td colSpan="10" className="rrc-table-empty">No records found</td>
               </tr>
             ) : (
-              records.map((r) => {
+              records.map((r, index) => {
                 const isDailyStay = isDaily(r);
                 return (
-                  <tr key={r.residentId}>
+                  <tr
+                    key={r.residentId}
+                    onClick={() => setDetailRecord(r)}
+                    className="rrc-cursor-pointer"
+                  >
+                    <td>{index + 1}</td>
                     <td>{r.name}</td>
                     <td>{r.phone}</td>
                     <td>{r.pgName}</td>
-                    <td>{r.roomNumber}</td>
-                    <td>{r.bedNumber}</td>
                     <td>{isDailyStay ? "Daily" : "Monthly"}</td>
                     <td>{chargeLabel(r)}</td>
-                    <td>{extraLabel(r)}</td>
                     <td>{formatDate(r.checkinDate)}</td>
                     <td>{formatDate(r.actualCheckoutDate)}</td>
-                    <td className="text-danger fw-bold">
-                      {formatMoney(r.deductedAmount)}
-                    </td>
-                    <td className="text-success fw-bold">
-                      {formatMoney(r.refundAmount)}
-                    </td>
-                    <td>{r.refundPaymentMode || "-"}</td>
-                    <td>{formatDate(r.settlementDate)}</td>
-                    <td>
+                    <td>{r.refundPaymentMode || "Not Recorded"}</td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       {r.refundProofUrl ? (
-                        <button
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={() => setPreviewUrl(r.refundProofUrl)}
-                        >
-                          View
-                        </button>
-                      ) : (
-                        "-"
-                      )}
+                        <button className="btn btn-sm btn-outline-primary" onClick={() => setPreviewUrl(r.refundProofUrl)}>View</button>
+                      ) : "-"}
                     </td>
                   </tr>
                 );
@@ -567,6 +549,56 @@ const ResidentRecords = ({apiPrefix}) => {
           </tbody>
         </table>
       </div>
+
+      {/* detail modal — hidden cols: Room, Bed, Bonus, Deducted, Refunded, Settlement Date */}
+      {detailRecord && (
+        <div className="rrp-backdrop" onClick={() => setDetailRecord(null)}>
+          <div className="rrp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="rrp-header">
+              <div className="rrp-avatar">{detailRecord.name?.charAt(0).toUpperCase()}</div>
+              <div className="rrp-header-text">
+                <h4>{detailRecord.name}</h4>
+                <span>{detailRecord.phone}</span>
+              </div>
+              <button className="rrp-close-btn" onClick={() => setDetailRecord(null)}>✕</button>
+            </div>
+
+            <div className="rrp-body">
+              <div className="rrp-col">
+                <div className="rrp-col-title">STAY INFO</div>
+                <span className="rrp-label">PG</span><span className="rrp-value">{detailRecord.pgName}</span>
+                <span className="rrp-label">Room / Bed</span><span className="rrp-value">{detailRecord.roomNumber} / Bed {detailRecord.bedNumber}</span>
+                <span className="rrp-label">Stay Type</span><span className="rrp-value">{isDaily(detailRecord) ? "Daily" : "Monthly"}</span>
+              </div>
+
+              <div className="rrp-col">
+                <div className="rrp-col-title">CHARGES</div>
+                <span className="rrp-label">Charge</span><span className="rrp-value">{chargeLabel(detailRecord)}</span>
+                <span className="rrp-label">Bonus</span><span className="rrp-value">{extraLabel(detailRecord)}</span>
+                <span className="rrp-label">Deducted</span><span className="rrp-value rrp-danger">{formatMoney(detailRecord.deductedAmount)}</span>
+                <span className="rrp-label">Refunded</span><span className="rrp-value rrp-success">{formatMoney(detailRecord.refundAmount)}</span>
+                <span className="rrp-label">Refund Mode</span><span className="rrp-value">{detailRecord.refundPaymentMode || "Not Recorded"}</span>
+              </div>
+
+              <div className="rrp-col">
+                <div className="rrp-col-title">DATES</div>
+                <span className="rrp-label">Check-in</span><span className="rrp-value">{formatDate(detailRecord.checkinDate)}</span>
+                <span className="rrp-label">Checkout</span><span className="rrp-value">{formatDate(detailRecord.actualCheckoutDate)}</span>
+                <span className="rrp-label">Settlement Date</span><span className="rrp-value">{formatDate(detailRecord.settlementDate)}</span>
+              </div>
+            </div>
+
+            {detailRecord.refundProofUrl && (
+              <button
+                className="rrp-link-btn"
+                onClick={() => { setPreviewUrl(detailRecord.refundProofUrl); setDetailRecord(null); }}
+              >
+                View Refund Proof ↗
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════
           MOBILE CARDS — completely outside the table,
@@ -702,7 +734,7 @@ const ResidentRecords = ({apiPrefix}) => {
                   <div className="rrcm-finance-cell">
                     <span className="rrcm-finance-label">Mode</span>
                     <span className="rrcm-finance-val">
-                      {r.refundPaymentMode || "—"}
+                      {r.refundPaymentMode || "Not Recorded"}
                     </span>
                   </div>
                 </div>
