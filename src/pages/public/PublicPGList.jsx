@@ -22,7 +22,7 @@ const PublicPGList = () => {
   const [cityOptions, setCityOptions] = useState([]);
   const [localityOptions, setLocalityOptions] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   // const [cityLocked, setCityLocked] = useState(false);
@@ -240,10 +240,12 @@ const PublicPGList = () => {
         }
         setHasMore(false);
       } finally {
-        setIsLoading(false);
-        setIsSearching(false);
-        setLoadingMore(false);
-        initialLoadDone.current = true;
+        if (abortControllerRef.current === controller) {
+          setIsLoading(false);
+          setIsSearching(false);
+          setLoadingMore(false);
+          initialLoadDone.current = true;
+        }
       }
     },
     [],
@@ -251,17 +253,19 @@ const PublicPGList = () => {
 
   useEffect(() => {
     if (!isInitialized) return;
-    lastFetchKey.current = null;
-    fetchPGs(filters, searchQuery, 0, false);
-  }, [filters, searchQuery, isInitialized, fetchPGs]);
-
-  useEffect(() => {
-    if (!isInitialized) return;
     clearTimeout(searchDebounceRef.current);
+    
+    if (!initialLoadDone.current) {
+      lastFetchKey.current = null;
+      fetchPGs(filters, searchQuery, 0, false);
+      return;
+    }
+
     searchDebounceRef.current = setTimeout(() => {
       lastFetchKey.current = null;
       fetchPGs(filters, searchQuery, 0, false);
     }, 350);
+    
     return () => clearTimeout(searchDebounceRef.current);
   }, [searchQuery, filters, isInitialized, fetchPGs]);
 
@@ -362,7 +366,7 @@ const PublicPGList = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading || (isSearching && pgs.length === 0) ? (
           <PGListingSkeleton count={9} />
         ) : (
           <div className={`pg-results-grid ${isSearching ? "is-loading" : ""}`}>
@@ -380,7 +384,7 @@ const PublicPGList = () => {
           </div>
         )}
 
-        {!isLoading && pgs.length === 0 && (
+        {!isLoading && !isSearching && isInitialized && pgs.length === 0 && (
           <div className="pg-empty">No PGs found matching your filters.</div>
         )}
 
