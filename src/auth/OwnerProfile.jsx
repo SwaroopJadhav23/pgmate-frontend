@@ -125,13 +125,13 @@ const OwnerProfile = () => {
     }
   };
 
-  if (loading) return <HomeLayout>Loading...</HomeLayout>;
-  if (!profile) return <HomeLayout>No profile found</HomeLayout>;
+  if (loading) return <HomeLayout noFooterMargin>Loading...</HomeLayout>;
+  if (!profile) return <HomeLayout noFooterMargin>No profile found</HomeLayout>;
 
   if (!editMode) {
     return (
       <>
-        <HomeLayout>
+        <HomeLayout noFooterMargin>
           <div className="profile-container">
             <div className="profile-card">
               <img
@@ -144,23 +144,46 @@ const OwnerProfile = () => {
               <div className="profile-role">PG Owner</div>
 
               <div className="profile-view">
-                <p><b>Email:</b> {profile.email}</p>
-                <p><b>Phone:</b> {profile.phone}</p>
-                <p><b>City:</b> {profile.city}</p>
+                <div className="profile-info-row">
+                  <div className="profile-row-icon"><i className="bi bi-envelope"></i></div>
+                  <div className="profile-row-text">
+                    <span className="profile-row-label">Email</span>
+                    <span className="profile-row-value">{profile.email}</span>
+                  </div>
+                </div>
+
+                <div className="profile-info-row">
+                  <div className="profile-row-icon"><i className="bi bi-telephone"></i></div>
+                  <div className="profile-row-text">
+                    <span className="profile-row-label">Phone</span>
+                    <span className="profile-row-value">{profile.phone}</span>
+                  </div>
+                </div>
+
+                <div className="profile-info-row">
+                  <div className="profile-row-icon"><i className="bi bi-geo-alt"></i></div>
+                  <div className="profile-row-text">
+                    <span className="profile-row-label">City</span>
+                    <span className="profile-row-value">{profile.city || "Not provided"}</span>
+                  </div>
+                </div>
 
                 {profile.idProofUrl && (
-                  <p>
-                    <b>ID Proof:</b>{" "}
-                    <a href={profile.idProofUrl} target="_blank" rel="noreferrer">
-                      View Document
-                    </a>
-                  </p>
+                  <div className="profile-info-row">
+                    <div className="profile-row-icon"><i className="bi bi-person-badge"></i></div>
+                    <div className="profile-row-text">
+                      <span className="profile-row-label">ID Proof</span>
+                      <a className="profile-row-link" href={profile.idProofUrl} target="_blank" rel="noreferrer">
+                        View Document <i className="bi bi-box-arrow-up-right ms-1" style={{fontSize: "12px"}}></i>
+                      </a>
+                    </div>
+                  </div>
                 )}
               </div>
 
               <div className="profile-actions">
-                <button className="btn btn-outline-primary w-100" onClick={() => setEditMode(true)}>
-                  Edit Profile
+                <button className="profile-edit-btn" onClick={() => setEditMode(true)}>
+                  <i className="bi bi-pencil-square"></i> Edit Profile
                 </button>
               </div>
             </div>
@@ -180,7 +203,7 @@ const OwnerProfile = () => {
 
   return (
     <>
-      <HomeLayout>
+      <HomeLayout noFooterMargin>
         <div className="profile-container">
           <div className="profile-card">
             <img
