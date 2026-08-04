@@ -26,6 +26,7 @@ const OwnerManagers = () => {
   const [newPassword, setNewPassword] = useState("");
   const [subSummary, setSubSummary] = useState(null);
 const [openMenuId, setOpenMenuId] = useState(null);
+const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
 
 useEffect(() => {
   const closeMenu = () => setOpenMenuId(null);
@@ -314,25 +315,40 @@ useEffect(() => {
   <div className="mgr-menu-wrap" onClick={(e) => e.stopPropagation()}>
     <button
       className="action-btn-dots"
-      onClick={() => setOpenMenuId(openMenuId === m.id ? null : m.id)}
+     onClick={(e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const menuHeight = 150; // approx height of the 3-item dropdown
+  const spaceBelow = window.innerHeight - rect.bottom;
+
+  const top = spaceBelow < menuHeight + 12
+    ? rect.top - menuHeight - 6   // not enough room below → open upward
+    : rect.bottom + 6;            // enough room → open downward
+
+  setMenuPos({ top, left: rect.right - 170 });
+  setOpenMenuId(openMenuId === m.id ? null : m.id);
+}}
     >
       <i className="bi bi-three-dots-vertical"></i>
     </button>
 
- {openMenuId === m.id && (
-  <div className="mgr-dropdown">
-    <button onClick={() => { openResetModal(m); setOpenMenuId(null); }}>
-      <i className="bi bi-key-fill"></i> Reset Password
-    </button>
-    <button onClick={() => { toggleStatus(m.id); setOpenMenuId(null); }}>
-      <i className={`bi ${m.active ? "bi-toggle2-off" : "bi-toggle2-on"}`}></i>
-      {m.active ? "Deactivate" : "Activate"}
-    </button>
-    <button className="danger" onClick={() => { handleDelete(m.id); setOpenMenuId(null); }}>
-      <i className="bi bi-trash-fill"></i> Delete
-    </button>
-  </div>
-)}
+    {openMenuId === m.id && createPortal(
+      <div
+        className="mgr-dropdown mgr-dropdown--portal"
+        style={{ top: menuPos.top, left: menuPos.left }}
+      >
+        <button onClick={() => { openResetModal(m); setOpenMenuId(null); }}>
+          <i className="bi bi-key-fill"></i> Reset Password
+        </button>
+        <button onClick={() => { toggleStatus(m.id); setOpenMenuId(null); }}>
+          <i className={`bi ${m.active ? "bi-toggle2-off" : "bi-toggle2-on"}`}></i>
+          {m.active ? "Deactivate" : "Activate"}
+        </button>
+        <button className="danger" onClick={() => { handleDelete(m.id); setOpenMenuId(null); }}>
+          <i className="bi bi-trash-fill"></i> Delete
+        </button>
+      </div>,
+      document.body
+    )}
   </div>
 </td>
                     </tr>

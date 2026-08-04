@@ -931,9 +931,6 @@ TOPBAR RESPONSIVE FIX
 }
 
 .mgr-dropdown {
-  position: absolute;
-  right: 0;
-  top: 40px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -941,9 +938,13 @@ TOPBAR RESPONSIVE FIX
   display: flex;
   flex-direction: column;
   min-width: 170px;
-  z-index: 30;
   overflow: hidden;
   animation: modalFade 0.15s ease;
+}
+
+.mgr-dropdown--portal {
+  position: fixed;
+  z-index: 2000;
 }
 
 .mgr-dropdown button {
