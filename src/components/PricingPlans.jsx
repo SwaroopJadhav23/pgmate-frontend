@@ -88,7 +88,7 @@ const PricingPlans = () => {
   useEffect(() => {
     if (!isOwner) return;
     api
-      .get("/api/wallet/me", { silent: true })
+      .get("/wallet/me", { silent: true })
       .then((res) => setWalletBalance(res.data?.points || 0))
       .catch(() => setWalletBalance(0));
   }, [isOwner]);
