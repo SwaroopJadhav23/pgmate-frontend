@@ -9,6 +9,7 @@ import "./Resident.css";
 import "./Agreement.css";
 import { TableSkeleton } from "../../public/Skeleton";
 import AgreementSignaturePad from "./AgreementSignaturePad";
+import PoliceVerificationModal from "./PoliceVerificationModal";
 
 const UploadSignatureModal = ({ resident, onClose, onSave, saving }) => {
   const [sigDataUrl, setSigDataUrl] = useState(null);
@@ -94,6 +95,7 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
   const [agreementPopup, setAgreementPopup] = useState(null);
   const [uploadSigResident, setUploadSigResident] = useState(null);
   const [uploadingSig, setUploadingSig] = useState(false);
+  const [policeResident, setPoliceResident] = useState(null);
   const [settlementForm, setSettlementForm] = useState({ deductedAmount: "", deductionReason: "", refundPaymentMode: "" });
   const [refundFile, setRefundFile] = useState(null);
 
@@ -567,9 +569,10 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
             )}
 
             <div className="rdp-actions">
-              <button className="rdp-btn-edit" onClick={() => { navigate(`/owner/residents/edit/${liveDetail.residentId}`, { state: { resident: liveDetail, apiPrefix } }); setDetailResident(null); }}>Edit</button>
-              <button className="rdp-btn-checkout" onClick={() => { openCheckout(liveDetail); setDetailResident(null); }}>{isDailyResident(liveDetail) ? "Complete" : "Checkout"}</button>
-            </div>
+  <button className="rdp-btn-edit" onClick={() => { navigate(`/owner/residents/edit/${liveDetail.residentId}`, { state: { resident: liveDetail, apiPrefix } }); setDetailResident(null); }}>Edit</button>
+ <button className="rdp-btn-police" onClick={() => { setPoliceResident(liveDetail); setDetailResident(null); }}>Police Verification</button>
+  <button className="rdp-btn-checkout" onClick={() => { openCheckout(liveDetail); setDetailResident(null); }}>{isDailyResident(liveDetail) ? "Complete" : "Checkout"}</button>
+</div>
           </div>
         </div>
       )}
@@ -627,6 +630,9 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
 
       {uploadSigResident && (
         <UploadSignatureModal resident={uploadSigResident} onClose={() => setUploadSigResident(null)} onSave={uploadSignatureForResident} saving={uploadingSig} />
+      )}
+      {policeResident && (
+        <PoliceVerificationModal resident={policeResident} onClose={() => setPoliceResident(null)} />
       )}
     </>
   );
