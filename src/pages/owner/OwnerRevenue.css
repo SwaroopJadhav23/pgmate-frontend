@@ -723,3 +723,18 @@
     font-size: 13px !important;
   }
 }
+
+
+/* ================= TOTAL REVENUE ================= */
+
+.kpi-orange .kpi-icon {
+  background: linear-gradient(135deg, #fed7aa, #fdba74);
+  color: #b45309;
+}
+
+.kpi-orange .kpi-info h2,
+.kpi-orange h2 {
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
