@@ -122,7 +122,7 @@ const S = {
   inner: { minWidth: 480 },
 
   thead: {
-    display: "grid", 
+    display: "grid",
     background: "#eef0ff", borderBottom: "1px solid #dde0f7",
     position: "sticky", top: 0, zIndex: 2,
   },
@@ -144,7 +144,7 @@ const S = {
   },
 
   row: {
-    display: "grid", 
+    display: "grid",
     borderBottom: "1px solid #f1f2fb", alignItems: "stretch",
   },
   floorLabel: { padding: "10px 4px", display: "flex", flexDirection: "column", gap: 3, alignItems: "center", justifyContent: "flex-start" },
@@ -343,7 +343,7 @@ const BedPickerPopup = ({ pg, onConfirm, onClose = () => { }, mode = "pick", cur
   const [selRoom, setSelRoom] = useState(null);
   const [selFloor, setSelFloor] = useState(null);
   const [activeRooms, setActiveRooms] = useState({});
-  
+
   const floors = useMemo(() => pg?.floors || [], [pg?.floors]);
 
   const customBedCounts = useMemo(() => {
@@ -357,18 +357,18 @@ const BedPickerPopup = ({ pg, onConfirm, onClose = () => { }, mode = "pick", cur
   }, [floors]);
 
   const fixedTypesPresent = useMemo(() => {
-  const present = new Set();
-  floors.forEach(f =>
-    f.rooms?.forEach(r => {
-      if (["SINGLE", "DOUBLE", "TRIPLE", "QUADRUPLE"].includes(r.sharingType)) {
-        present.add(r.sharingType);
-      }
-    })
-  );
-  return ["SINGLE", "DOUBLE", "TRIPLE", "QUADRUPLE"].filter(t => present.has(t));
-}, [floors]);
+    const present = new Set();
+    floors.forEach(f =>
+      f.rooms?.forEach(r => {
+        if (["SINGLE", "DOUBLE", "TRIPLE", "QUADRUPLE"].includes(r.sharingType)) {
+          present.add(r.sharingType);
+        }
+      })
+    );
+    return ["SINGLE", "DOUBLE", "TRIPLE", "QUADRUPLE"].filter(t => present.has(t));
+  }, [floors]);
 
-const allTypes = [...fixedTypesPresent, ...customBedCounts.map(n => `CUSTOM_${n}`)];
+  const allTypes = [...fixedTypesPresent, ...customBedCounts.map(n => `CUSTOM_${n}`)];
 
 
   const getActive = (fid, type, rooms) => activeRooms[`${fid}_${type}`] || rooms[0]?.roomId;
@@ -395,7 +395,13 @@ const allTypes = [...fixedTypesPresent, ...customBedCounts.map(n => `CUSTOM_${n}
         {/* Header */}
         <div style={S.header}>
           <div>
-            <div style={S.headerTitle}>🏠 Beds Availability</div>
+            <div style={S.headerTitle}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ marginRight: 5, verticalAlign: "-2px" }}>
+                <path d="M3 10.5L12 3l9 7.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M5 9.5V20a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V9.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Beds Availability
+            </div>
             <div style={S.headerSub}>{pg?.name || "PG"} · tap a green bed to select</div>
           </div>
           <button style={S.closeBtn} onClick={(e) => { e.stopPropagation(); onClose(); }}>✕</button>
@@ -465,44 +471,44 @@ const allTypes = [...fixedTypesPresent, ...customBedCounts.map(n => `CUSTOM_${n}
         </div>
 
         {/* Footer */}
-<div style={S.footer}>
-  <div style={S.selRow}>
-    {ready ? (
-      <div style={S.selRow}>
-        <span style={S.hint}>Selected:</span>
+        <div style={S.footer}>
+          <div style={S.selRow}>
+            {ready ? (
+              <div style={S.selRow}>
+                <span style={S.hint}>Selected:</span>
 
-        <span style={S.badge}>
-          Floor {selFloor?.floorNumber} · Room {selRoom?.roomNumber} · Bed {selBed?.bedNumber}
-        </span>
+                <span style={S.badge}>
+                  Floor {selFloor?.floorNumber} · Room {selRoom?.roomNumber} · Bed {selBed?.bedNumber}
+                </span>
 
-        {selRoom?.monthlyRent > 0 && (
-          <span style={{ ...S.badge, background: "#f0fdf4", borderColor: "#86efac", color: "#16a34a" }}>
-            ₹{selRoom.monthlyRent.toLocaleString()}/mo
-          </span>
-        )}
+                {selRoom?.monthlyRent > 0 && (
+                  <span style={{ ...S.badge, background: "#f0fdf4", borderColor: "#86efac", color: "#16a34a" }}>
+                    ₹{selRoom.monthlyRent.toLocaleString()}/mo
+                  </span>
+                )}
 
-        {selRoom?.deposit > 0 && (
-          <span style={{ ...S.badge, background: "#fffbeb", borderColor: "#fde68a", color: "#92400e" }}>
-            dep ₹{selRoom.deposit.toLocaleString()}
-          </span>
-        )}
-      </div>
-    ) : (pg?.reservationEnabled || pg?.dailyReservationEnabled) ? (
-      <span style={S.hint}>Select a bed above to continue</span>
-    ) : (
-      <span style={S.closedHint}>⚠️ Reservation is temporarily closed</span>
-    )}
-  </div>
-  {(pg?.reservationEnabled || pg?.dailyReservationEnabled) && (
-    <button
-      style={S.confirmBtn(ready, mode)}
-      disabled={!ready}
-      onClick={confirm}
-    >
-      {btnLabel}
-    </button>
-  )}
-</div>
+                {selRoom?.deposit > 0 && (
+                  <span style={{ ...S.badge, background: "#fffbeb", borderColor: "#fde68a", color: "#92400e" }}>
+                    dep ₹{selRoom.deposit.toLocaleString()}
+                  </span>
+                )}
+              </div>
+            ) : (pg?.reservationEnabled || pg?.dailyReservationEnabled) ? (
+              <span style={S.hint}>Select a bed above to continue</span>
+            ) : (
+              <span style={S.closedHint}>⚠️ Reservation is temporarily closed</span>
+            )}
+          </div>
+          {(pg?.reservationEnabled || pg?.dailyReservationEnabled) && (
+            <button
+              style={S.confirmBtn(ready, mode)}
+              disabled={!ready}
+              onClick={confirm}
+            >
+              {btnLabel}
+            </button>
+          )}
+        </div>
 
       </div>
     </div>
