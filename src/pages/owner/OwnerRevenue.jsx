@@ -278,6 +278,15 @@ const OwnerRevenue = () => {
     return held > 0 ? sum + held : sum;
 
   }, 0);
+
+
+
+  /* ================= FUTURE DEPOSIT REFUND ================= */
+  const futureDepositRefund = residents.reduce((sum, r) => {
+    if (r.status !== "ACTIVE") return sum; // still living here, refund pending future
+    return sum + Number(r.futureDepositRefund || 0);
+  }, 0);
+
   /* ================= OCCUPANCY ================= */
 
   const occupancyRate = useMemo(() => {
@@ -374,6 +383,8 @@ const OwnerRevenue = () => {
   const animatedTotalRevenue = useCountUp(totalRevenue);
   const animatedAvg = useCountUp(avgRevenuePerResident);
 
+  const animatedFutureRefund = useCountUp(futureDepositRefund);
+
 
 
 
@@ -432,6 +443,7 @@ const OwnerRevenue = () => {
       value: totalRentCollected,
       type: "currency",
     },
+    { label: "Future Deposit Refund", value: futureDepositRefund, type: "currency" },
     {
       label: "Deposit Held",
       value: totalDepositHeld,
@@ -798,12 +810,7 @@ const OwnerRevenue = () => {
                 color="kpi-orange"
               />
 
-              <KPI
-                title="Net Revenue"
-                value={`₹${animatedRevenue.toLocaleString()}`}
-                icon="bi bi-currency-rupee"
-                color="kpi-blue"
-              />
+             
               <KPI
                 title="Rent Collected"
                 value={`₹${animatedRent.toLocaleString()}`}
@@ -816,6 +823,14 @@ const OwnerRevenue = () => {
                 icon="bi bi-safe"
                 color="kpi-green"
               />
+
+               <KPI
+                title="Future Deposit Refund"
+                value={`₹${animatedFutureRefund.toLocaleString()}`}
+                icon="bi bi-calendar-check"
+                color="kpi-red"
+              />
+
               <KPI
                 title="Active Residents"
                 value={totalActiveResidents}
@@ -830,12 +845,7 @@ const OwnerRevenue = () => {
                 color="kpi-purple"
                 onClick={() => navigate("/owner/residents")}
               />
-              <KPI
-                title="Avg Revenue / Resident"
-                value={`₹${animatedAvg.toLocaleString()}`}
-                icon="bi bi-graph-up-arrow"
-                color="kpi-blue"
-              />
+             
               {/*
               <KPI
                 title="Total Enquiries"
@@ -846,13 +856,22 @@ const OwnerRevenue = () => {
               />
               */}
 
-              <KPI
-                title="Future Deposit Refund"
-                value={format(new Date(), "MMMM yyyy")}
-                icon="bi bi-calendar-check"
-                color="kpi-green"
+             
+
+               <KPI
+                title="Net Revenue"
+                value={`₹${animatedRevenue.toLocaleString()}`}
+                icon="bi bi-currency-rupee"
+                color="kpi-blue"
               />
 
+               <KPI
+                title="Avg Revenue / Resident"
+                value={`₹${animatedAvg.toLocaleString()}`}
+                icon="bi bi-graph-up-arrow"
+                color="kpi-blue"
+              />
+              
 
             </div>
 

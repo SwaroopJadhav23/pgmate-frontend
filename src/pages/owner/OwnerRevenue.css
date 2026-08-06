@@ -738,3 +738,19 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+/* ================= FUTURE DEPOSIT REFUND (RED) ================= */
+
+.kpi-red .kpi-icon {
+  background: linear-gradient(135deg, #fecaca, #fca5a5);
+  color: #dc2626;
+}
+
+.kpi-red .kpi-info h2,
+.kpi-red h2 {
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  color: #dc2626;
+}
