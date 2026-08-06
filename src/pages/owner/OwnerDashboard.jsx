@@ -289,6 +289,10 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
         )}
       </div>
       <div className="rev-pills-row">
+        <div className="rev-pill rev-pill-total">
+          <span className="rev-pill-label">Total</span>
+          <span className="rev-pill-val">{fmtINR(total)}</span>
+        </div>
         <div className="rev-pill rev-pill-pending">
           <span className="rev-pill-label">Pending</span>
           <span className="rev-pill-val">{fmtINR(pending)}</span>
