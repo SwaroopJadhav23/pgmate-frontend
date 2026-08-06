@@ -1,0 +1,235 @@
+.rules-table-wrapper {
+  background: #f8f9fc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 10px 0 16px;
+}
+
+.rules-table-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rules-table-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 2px;
+}
+
+.rules-table-subtitle {
+  font-size: 12.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+.rules-restore-btn {
+  background: #fff;
+  border: 1px solid #d8d5fb;
+  color: #4f46e5;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rules-restore-btn:hover {
+  background: #f5f4ff;
+}
+
+.rules-table-columns-header {
+  display: grid;
+  grid-template-columns: 70px 1.1fr 1.6fr 90px 80px;
+  gap: 10px;
+  padding: 0 10px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.rules-table-row {
+  display: grid;
+  grid-template-columns: 70px 1.1fr 1.6fr 90px 80px;
+  gap: 10px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e9ecf3;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.rules-col-order {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rules-drag-handle {
+  cursor: grab;
+  color: #94a3b8;
+  font-size: 15px;
+  touch-action: none;
+}
+
+.rules-order-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ece9fd;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rules-col-title {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.rules-col-desc {
+  color: #64748b;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.rules-edit-input,
+.rules-edit-textarea {
+  width: 100%;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12.5px;
+  font-family: inherit;
+}
+
+.rules-edit-textarea {
+  min-height: 44px;
+  resize: vertical;
+}
+
+.rules-col-status {
+  display: flex;
+  justify-content: center;
+}
+
+.rules-toggle {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+.rules-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.rules-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.rules-toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+.rules-toggle input:checked + .rules-toggle-slider {
+  background: #4f46e5;
+}
+.rules-toggle input:checked + .rules-toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.rules-col-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.rules-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rules-action-btn:hover {
+  background: #f5f4ff;
+}
+.rules-save-btn {
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+.rules-delete-btn {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.rules-add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.rules-add-input {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.rules-add-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rules-add-btn:hover {
+  background: #4338ca;
+}
+
+@media (max-width: 768px) {
+  .rules-table-columns-header {
+    display: none;
+  }
+  .rules-table-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .rules-col-status,
+  .rules-col-actions {
+    justify-content: flex-start;
+  }
+}

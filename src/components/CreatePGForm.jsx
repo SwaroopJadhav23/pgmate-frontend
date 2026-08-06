@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import "../CSS/CreatePGForm.css"; // Import the new CSS
 import api from "../api/axios";
 import Swal from "sweetalert2";
+import RulesClausesTable, { DEFAULT_RULES } from "./RulesClausesTable";
 const AMENITIES_LIST = [
   "Parking", "Wifi", "Refrigerator", "Almirah", "Bed Sheet",
   "CCTV", "House Keeping", "Pillow", "Drinking Water",
@@ -63,11 +64,39 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
     amenities: [],
     houseRules: [],
     customHouseRules: [],
-    customRuleInput: ""
+    customRuleInput: "",
+
+    // Rules & Regulations Settings
+    rentDueDate: "",
+    lateFeeAmount: "",
+    curfewTime: "",
+    noticePeriodDays: "",
+    depositRefundDays: "",
+    damageCharges: "",
+    washingMachineCharges: "",
+    foodFacility: "",
+    visitorPolicy: "",
+    overnightGuestAllowed: "",
+    electricityUsage: "",
+    breakfastTime: "",
+    lunchTime: "",
+    dinnerTime: "",
+    firstTimeFine: "",
+    repeatedFine: "",
+    addictionFine: "",
+    cleanlinessFine: "",
+    acTempMin: "",
+    acTempMax: "",
+    otherCustomFine: "",
+    rulesCustomNote: "",
+    policeFormType: "WITH_RULES"
   });
 
   const [imageList, setImageList] = useState([]);
   const [videoList, setVideoList] = useState([]);
+  const [rulesClauses, setRulesClauses] = useState(
+    DEFAULT_RULES.map((r) => ({ ...r }))
+  );
   const videoInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -217,6 +246,9 @@ Object.entries(formData).forEach(([k, v]) => {
     fd.append(k, v);
   }
 });
+
+    // ---- rules & clauses table ----
+    fd.append("rulesClauses", JSON.stringify(rulesClauses));
 
     // ---- append images directly ----
     imageList.forEach((img) => {
@@ -423,6 +455,325 @@ const removeCustomRule = (index) => {
 
         <hr className="create-pg-section-divider" />
 
+        {/* ================= RULES & REGULATIONS SETTINGS ================= */}
+        <div className="create-pg-form-group create-pg-form-row-single">
+          <h3 className="create-pg-section-title">Police Verification Form Settings</h3>
+          <p className="create-pg-section-subtitle">
+            Choose how you want the Police Verification document to be generated for your tenants.
+          </p>
+
+          <label className="create-pg-form-label">Include in Police Verification Form</label>
+          <div className="police-form-option-grid">
+            <label
+              className={`police-form-option ${formData.policeFormType === "WITH_RULES" ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name="policeFormType"
+                value="WITH_RULES"
+                checked={formData.policeFormType === "WITH_RULES"}
+                onChange={handleInputChange}
+              />
+              <span className="police-form-radio-dot" />
+              <span className="police-form-icon">🛡️📄</span>
+              <span className="police-form-option-title">Police Form with Rules & Regulations</span>
+              <span className="police-form-option-desc">
+                Generate a 2-page document with police verification details and rules & regulations.
+              </span>
+            </label>
+
+            <label
+              className={`police-form-option ${formData.policeFormType === "ONLY" ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name="policeFormType"
+                value="ONLY"
+                checked={formData.policeFormType === "ONLY"}
+                onChange={handleInputChange}
+              />
+              <span className="police-form-radio-dot" />
+              <span className="police-form-icon">📄</span>
+              <span className="police-form-option-title">Police Form Only</span>
+              <span className="police-form-option-desc">
+                Generate a 1-page document with only police verification details.
+              </span>
+            </label>
+          </div>
+
+          <div className="police-form-info-banner">
+            ℹ️ This will be the default preference for all police verification reports.
+            You can change this anytime from PG Settings.
+          </div>
+        </div>
+
+        {formData.policeFormType === "WITH_RULES" && (
+          <>
+          <div className="create-pg-form-group create-pg-form-row-single">
+          <h3 className="create-pg-section-title" style={{ marginTop: "18px" }}>
+            Rules & Regulations
+          </h3>
+
+          <label className="create-pg-amenities-label">General Policy Settings</label>
+          <div className="create-pg-form-row create-pg-form-row-3">
+            <div>
+              <label className="create-pg-form-label required">Rent Due Date</label>
+              <select
+                name="rentDueDate"
+                className="create-pg-form-select"
+                value={formData.rentDueDate}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Date (1st - 31st)</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Late Fee Amount (₹)</label>
+              <input
+                type="number"
+                name="lateFeeAmount"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.lateFeeAmount}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Curfew Time / Entry Time</label>
+              <input
+                type="time"
+                name="curfewTime"
+                className="create-pg-form-input"
+                value={formData.curfewTime}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Notice Period (Days)</label>
+              <input
+                type="number"
+                name="noticePeriodDays"
+                className="create-pg-form-input"
+                placeholder="Enter days"
+                value={formData.noticePeriodDays}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Security Deposit Refund (Days)</label>
+              <input
+                type="number"
+                name="depositRefundDays"
+                className="create-pg-form-input"
+                placeholder="Enter days"
+                value={formData.depositRefundDays}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label">Damage Charges (₹)</label>
+              <input
+                type="number"
+                name="damageCharges"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.damageCharges}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label">Washing Machine Charges (₹)</label>
+              <input
+                type="number"
+                name="washingMachineCharges"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.washingMachineCharges}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Food Facility</label>
+              <select
+                name="foodFacility"
+                className="create-pg-form-select"
+                value={formData.foodFacility}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Visitor Policy</label>
+              <select
+                name="visitorPolicy"
+                className="create-pg-form-select"
+                value={formData.visitorPolicy}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Option</option>
+                <option value="Not Allowed">Not Allowed</option>
+                <option value="Day Time Only">Day Time Only</option>
+                <option value="Allowed with Permission">Allowed with Permission</option>
+              </select>
+            </div>
+            <div>
+              <label className="create-pg-form-label required">Overnight Guest Allowed</label>
+              <select
+                name="overnightGuestAllowed"
+                className="create-pg-form-select"
+                value={formData.overnightGuestAllowed}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label className="create-pg-form-label">Electricity Usage</label>
+              <select
+                name="electricityUsage"
+                className="create-pg-form-select"
+                value={formData.electricityUsage}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Option</option>
+                <option value="Included in Rent">Included in Rent</option>
+                <option value="Billed Separately">Billed Separately</option>
+              </select>
+            </div>
+          </div>
+
+          {formData.foodFacility === "Yes" && (
+            <>
+              <label className="create-pg-amenities-label">Meal Timings</label>
+              <div className="create-pg-form-row create-pg-form-row-3">
+                <div>
+                  <label className="create-pg-form-label">Breakfast Time</label>
+                  <input
+                    type="time"
+                    name="breakfastTime"
+                    className="create-pg-form-input"
+                    value={formData.breakfastTime}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label className="create-pg-form-label">Lunch Time</label>
+                  <input
+                    type="time"
+                    name="lunchTime"
+                    className="create-pg-form-input"
+                    value={formData.lunchTime}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label className="create-pg-form-label">Dinner Time</label>
+                  <input
+                    type="time"
+                    name="dinnerTime"
+                    className="create-pg-form-input"
+                    value={formData.dinnerTime}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <label className="create-pg-amenities-label">Penalty & Fine Settings</label>
+          <div className="create-pg-form-row create-pg-form-row-3">
+            <div>
+              <label className="create-pg-form-label">First Time Rule Violation Fine (₹)</label>
+              <input
+                type="number"
+                name="firstTimeFine"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.firstTimeFine}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label">Repeated Violation Fine (₹)</label>
+              <input
+                type="number"
+                name="repeatedFine"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.repeatedFine}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label">Addiction / Smoking / Alcohol Fine (₹)</label>
+              <input
+                type="number"
+                name="addictionFine"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.addictionFine}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label">Cleanliness / Garbage Fine (₹)</label>
+              <input
+                type="number"
+                name="cleanlinessFine"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.cleanlinessFine}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="create-pg-form-label">AC / Cooler Temperature Range (°C)</label>
+              <div className="create-pg-range-row">
+                <input
+                  type="number"
+                  name="acTempMin"
+                  className="create-pg-form-input"
+                  placeholder="16"
+                  value={formData.acTempMin}
+                  onChange={handleInputChange}
+                />
+                <span>to</span>
+                <input
+                  type="number"
+                  name="acTempMax"
+                  className="create-pg-form-input"
+                  placeholder="24"
+                  value={formData.acTempMax}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="create-pg-form-label">Other Custom Fine (₹) (Optional)</label>
+              <input
+                type="number"
+                name="otherCustomFine"
+                className="create-pg-form-input"
+                placeholder="Enter amount"
+                value={formData.otherCustomFine}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          <RulesClausesTable rules={rulesClauses} onChange={setRulesClauses} />
+        </div>
+
+        <hr className="create-pg-section-divider" />
+
         {/* ================= HOUSE RULES ================= */}
         <div className="create-pg-form-group create-pg-form-row-single">
           <label className="create-pg-amenities-label">House Rules</label>
@@ -488,8 +839,21 @@ const removeCustomRule = (index) => {
          ))}
         </div>
         )}
+
+        <label className="create-pg-form-label" style={{ marginTop: "10px", display: "block" }}>
+          Custom Note for Rules (Optional)
+        </label>
+        <textarea
+          name="rulesCustomNote"
+          className="create-pg-form-input create-pg-form-textarea"
+          placeholder="Enter any additional note or instructions for the rules..."
+          value={formData.rulesCustomNote}
+          onChange={handleInputChange}
+        />
       </div>
 </div>
+          </>
+          )}
 
         <hr className="create-pg-section-divider" />
 

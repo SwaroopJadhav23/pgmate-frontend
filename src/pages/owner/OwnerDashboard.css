@@ -546,7 +546,7 @@
 
 .rev-pills-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
 }
 
@@ -558,6 +558,9 @@
   gap: 2px;
 }
 
+.rev-pill-total {
+  background: #ece9fd;
+}
 .rev-pill-pending {
   background: #faeeda;
 }
@@ -576,6 +579,9 @@
 .rev-pill-val {
   font-size: 14px;
   font-weight: 800;
+}
+.rev-pill-total .rev-pill-val {
+  color: #4f46e5;
 }
 .rev-pill-pending .rev-pill-val {
   color: #ba7517;

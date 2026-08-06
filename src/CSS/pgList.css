@@ -1463,6 +1463,7 @@
       padding: 16px 16px 24px !important;
       margin: 0 !important;
       overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
    }
 
    .edit-pg-form-row {

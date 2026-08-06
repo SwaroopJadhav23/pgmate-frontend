@@ -70,6 +70,8 @@
 .edit-pg-form-select {
   display: block !important;
   width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   
   padding: 11px 13px !important;
   
@@ -83,6 +85,12 @@
   
   transition: all 0.2s ease !important;
   box-sizing: border-box !important;
+}
+
+.edit-pg-form-select {
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
 }
 
 .edit-pg-form-input::placeholder,
@@ -116,6 +124,9 @@
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 12px !important;
+}
+.edit-pg-form-row > div {
+  min-width: 0 !important;
 }
 
 .edit-pg-form-row-single {
@@ -480,10 +491,45 @@
   
   .edit-pg-form-actions {
     flex-direction: column-reverse !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    background: #fff !important;
+    padding: 10px 0 !important;
+    margin: 0 !important;
+    z-index: 5 !important;
   }
   
   .edit-pg-btn-cancel,
   .edit-pg-btn-submit {
     width: 100% !important;
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+
+  .edit-pg-form-input,
+  .edit-pg-form-select,
+  .edit-pg-form-label + input,
+  .edit-pg-form-label + select,
+  .edit-pg-form-label + textarea {
+    font-size: 16px !important;
+  }
+
+  .edit-pg-modal-header {
+    position: sticky !important;
+    top: 0 !important;
+    background: #fff !important;
+    z-index: 6 !important;
+    padding-bottom: 10px !important;
+  }
+
+  .edit-pg-form-group {
+    margin-bottom: 14px !important;
   }
 }
+
+@media (max-width: 420px) {
+  .edit-pg-modal-header h4 {
+    font-size: 17px !important;
+  }
+}
+

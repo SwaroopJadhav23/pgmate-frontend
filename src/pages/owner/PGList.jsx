@@ -8,6 +8,8 @@ import "../../CSS/pgList.css";
 import FloorManagerContent from "../manager/FloorManagerContent";
 import NextStepBanner from "../../components/NextStepBanner";
 import {useLocation} from "react-router-dom";
+import RulesClausesTable, {DEFAULT_RULES} from "../../components/RulesClausesTable";
+import "../../CSS/CreatePGForm.css";
 import {PGListingSkeleton} from "../public/Skeleton";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
@@ -253,7 +255,35 @@ const PGList = ({role = "OWNER"}) => {
     houseRules: [],
     customHouseRules: [],
     customRuleInput: "",
+
+    // Rules & Regulations Settings
+    policeFormType: "WITH_RULES",
+    rentDueDate: "",
+    lateFeeAmount: "",
+    curfewTime: "",
+    noticePeriodDays: "",
+    depositRefundDays: "",
+    damageCharges: "",
+    washingMachineCharges: "",
+    foodFacility: "",
+    visitorPolicy: "",
+    overnightGuestAllowed: "",
+    electricityUsage: "",
+    breakfastTime: "",
+    lunchTime: "",
+    dinnerTime: "",
+    firstTimeFine: "",
+    repeatedFine: "",
+    addictionFine: "",
+    cleanlinessFine: "",
+    acTempMin: "",
+    acTempMax: "",
+    otherCustomFine: "",
+    rulesCustomNote: "",
   });
+  const [editRulesClauses, setEditRulesClauses] = useState(
+    DEFAULT_RULES.map((r) => ({...r}))
+  );
 
   /* ===============================
      EFFECTS
@@ -541,7 +571,41 @@ const PGList = ({role = "OWNER"}) => {
       houseRules: staticRules,
       customHouseRules: customRules,
       customRuleInput: "",
+
+      policeFormType: pg.policeFormType ?? "WITH_RULES",
+      rentDueDate: pg.rentDueDate ?? "",
+      lateFeeAmount: pg.lateFeeAmount ?? "",
+      curfewTime: pg.curfewTime ?? "",
+      noticePeriodDays: pg.noticePeriodDays ?? "",
+      depositRefundDays: pg.depositRefundDays ?? "",
+      damageCharges: pg.damageCharges ?? "",
+      washingMachineCharges: pg.washingMachineCharges ?? "",
+      foodFacility: pg.foodFacility ?? "",
+      visitorPolicy: pg.visitorPolicy ?? "",
+      overnightGuestAllowed: pg.overnightGuestAllowed ?? "",
+      electricityUsage: pg.electricityUsage ?? "",
+      breakfastTime: pg.breakfastTime ?? "",
+      lunchTime: pg.lunchTime ?? "",
+      dinnerTime: pg.dinnerTime ?? "",
+      firstTimeFine: pg.firstTimeFine ?? "",
+      repeatedFine: pg.repeatedFine ?? "",
+      addictionFine: pg.addictionFine ?? "",
+      cleanlinessFine: pg.cleanlinessFine ?? "",
+      acTempMin: pg.acTempMin ?? "",
+      acTempMax: pg.acTempMax ?? "",
+      otherCustomFine: pg.otherCustomFine ?? "",
+      rulesCustomNote: pg.rulesCustomNote ?? "",
     });
+    try {
+      const savedRules = pg.rulesClauses ? JSON.parse(pg.rulesClauses) : null;
+      setEditRulesClauses(
+        savedRules && savedRules.length
+          ? savedRules
+          : DEFAULT_RULES.map((r) => ({...r}))
+      );
+    } catch {
+      setEditRulesClauses(DEFAULT_RULES.map((r) => ({...r})));
+    }
     setLocalitySearch(pg.locality || "");
 
     setImageList(
@@ -1242,6 +1306,290 @@ const PGList = ({role = "OWNER"}) => {
               </div>
             </div>
             <div className="edit-pg-form-group edit-pg-form-row-single">
+                  <label className="edit-pg-form-label">Include in Police Verification Form</label>
+                  <div className="police-form-option-grid police-form-readonly">
+                    <div
+                      className={`police-form-option ${editForm.policeFormType === "WITH_RULES" ? "selected" : "police-form-dimmed"}`}
+                    >
+                      <span className="police-form-icon">🛡️📄</span>
+                      <span className="police-form-option-title">Police Form with Rules & Regulations</span>
+                      <span className="police-form-option-desc">
+                        Generate a 2-page document with police verification details and rules & regulations.
+                      </span>
+                      {editForm.policeFormType === "WITH_RULES" && (
+                        <span className="police-form-selected-tag">✓ Selected</span>
+                      )}
+                    </div>
+
+                    <div
+                      className={`police-form-option ${editForm.policeFormType === "ONLY" ? "selected" : "police-form-dimmed"}`}
+                    >
+                      <span className="police-form-icon">📄</span>
+                      <span className="police-form-option-title">Police Form Only</span>
+                      <span className="police-form-option-desc">
+                        Generate a 1-page document with only police verification details.
+                      </span>
+                      {editForm.policeFormType === "ONLY" && (
+                        <span className="police-form-selected-tag">✓ Selected</span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="create-pg-section-subtitle" style={{marginTop: "6px"}}>
+                    Chosen during PG creation. Change it from Add New PG or PG Settings.
+                  </p>
+
+                  <h3 className="create-pg-section-title" style={{marginTop: "16px"}}>
+                    Rules & Regulations
+                  </h3>
+
+                  <label className="edit-pg-amenities-label">General Policy Settings</label>
+                  <div className="create-pg-form-row create-pg-form-row-3">
+                    <div>
+                      <label className="create-pg-form-label required">Rent Due Date</label>
+                      <select
+                        className="create-pg-form-select"
+                        value={editForm.rentDueDate}
+                        onChange={(e) => setEditForm({...editForm, rentDueDate: e.target.value})}
+                      >
+                        <option value="">Select Date (1st - 31st)</option>
+                        {Array.from({length: 31}, (_, i) => i + 1).map((d) => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Late Fee Amount (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.lateFeeAmount}
+                        onChange={(e) => setEditForm({...editForm, lateFeeAmount: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Curfew Time / Entry Time</label>
+                      <input
+                        type="time"
+                        className="create-pg-form-input"
+                        value={editForm.curfewTime}
+                        onChange={(e) => setEditForm({...editForm, curfewTime: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Notice Period (Days)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter days"
+                        value={editForm.noticePeriodDays}
+                        onChange={(e) => setEditForm({...editForm, noticePeriodDays: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Security Deposit Refund (Days)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter days"
+                        value={editForm.depositRefundDays}
+                        onChange={(e) => setEditForm({...editForm, depositRefundDays: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Damage Charges (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.damageCharges}
+                        onChange={(e) => setEditForm({...editForm, damageCharges: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Washing Machine Charges (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.washingMachineCharges}
+                        onChange={(e) => setEditForm({...editForm, washingMachineCharges: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Food Facility</label>
+                      <select
+                        className="create-pg-form-select"
+                        value={editForm.foodFacility}
+                        onChange={(e) => setEditForm({...editForm, foodFacility: e.target.value})}
+                      >
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Visitor Policy</label>
+                      <select
+                        className="create-pg-form-select"
+                        value={editForm.visitorPolicy}
+                        onChange={(e) => setEditForm({...editForm, visitorPolicy: e.target.value})}
+                      >
+                        <option value="">Select Option</option>
+                        <option value="Not Allowed">Not Allowed</option>
+                        <option value="Day Time Only">Day Time Only</option>
+                        <option value="Allowed with Permission">Allowed with Permission</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label required">Overnight Guest Allowed</label>
+                      <select
+                        className="create-pg-form-select"
+                        value={editForm.overnightGuestAllowed}
+                        onChange={(e) => setEditForm({...editForm, overnightGuestAllowed: e.target.value})}
+                      >
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Electricity Usage</label>
+                      <select
+                        className="create-pg-form-select"
+                        value={editForm.electricityUsage}
+                        onChange={(e) => setEditForm({...editForm, electricityUsage: e.target.value})}
+                      >
+                        <option value="">Select Option</option>
+                        <option value="Included in Rent">Included in Rent</option>
+                        <option value="Billed Separately">Billed Separately</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {editForm.foodFacility === "Yes" && (
+                    <>
+                      <label className="edit-pg-amenities-label">Meal Timings</label>
+                      <div className="create-pg-form-row create-pg-form-row-3">
+                        <div>
+                          <label className="create-pg-form-label">Breakfast Time</label>
+                          <input
+                            type="time"
+                            className="create-pg-form-input"
+                            value={editForm.breakfastTime}
+                            onChange={(e) => setEditForm({...editForm, breakfastTime: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <label className="create-pg-form-label">Lunch Time</label>
+                          <input
+                            type="time"
+                            className="create-pg-form-input"
+                            value={editForm.lunchTime}
+                            onChange={(e) => setEditForm({...editForm, lunchTime: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <label className="create-pg-form-label">Dinner Time</label>
+                          <input
+                            type="time"
+                            className="create-pg-form-input"
+                            value={editForm.dinnerTime}
+                            onChange={(e) => setEditForm({...editForm, dinnerTime: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <label className="edit-pg-amenities-label">Penalty & Fine Settings</label>
+                  <div className="create-pg-form-row create-pg-form-row-3">
+                    <div>
+                      <label className="create-pg-form-label">First Time Rule Violation Fine (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.firstTimeFine}
+                        onChange={(e) => setEditForm({...editForm, firstTimeFine: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Repeated Violation Fine (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.repeatedFine}
+                        onChange={(e) => setEditForm({...editForm, repeatedFine: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Addiction / Smoking / Alcohol Fine (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.addictionFine}
+                        onChange={(e) => setEditForm({...editForm, addictionFine: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Cleanliness / Garbage Fine (₹)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.cleanlinessFine}
+                        onChange={(e) => setEditForm({...editForm, cleanlinessFine: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">AC / Cooler Temperature Range (°C)</label>
+                      <div className="create-pg-range-row">
+                        <input
+                          type="number"
+                          className="create-pg-form-input"
+                          placeholder="16"
+                          value={editForm.acTempMin}
+                          onChange={(e) => setEditForm({...editForm, acTempMin: e.target.value})}
+                        />
+                        <span>to</span>
+                        <input
+                          type="number"
+                          className="create-pg-form-input"
+                          placeholder="24"
+                          value={editForm.acTempMax}
+                          onChange={(e) => setEditForm({...editForm, acTempMax: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="create-pg-form-label">Other Custom Fine (₹) (Optional)</label>
+                      <input
+                        type="number"
+                        className="create-pg-form-input"
+                        placeholder="Enter amount"
+                        value={editForm.otherCustomFine}
+                        onChange={(e) => setEditForm({...editForm, otherCustomFine: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <RulesClausesTable rules={editRulesClauses} onChange={setEditRulesClauses} />
+
+                  <label className="create-pg-form-label" style={{marginTop: "10px", display: "block"}}>
+                    Custom Note for Rules (Optional)
+                  </label>
+                  <textarea
+                    className="create-pg-form-input create-pg-form-textarea"
+                    placeholder="Enter any additional note or instructions for the rules..."
+                    value={editForm.rulesCustomNote}
+                    onChange={(e) => setEditForm({...editForm, rulesCustomNote: e.target.value})}
+                  />
+                </div>
+
+            <div className="edit-pg-form-group edit-pg-form-row-single">
               <label className="edit-pg-amenities-label">House Rules</label>
               <div className="edit-pg-amenities-grid">
                 {HOUSE_RULES_LIST.map((rule) => (
@@ -1518,6 +1866,7 @@ const PGList = ({role = "OWNER"}) => {
                         if (k !== "customHouseRules") fd.append(k, v.join(","));
                       } else fd.append(k, v);
                     });
+                    fd.append("rulesClauses", JSON.stringify(editRulesClauses));
                     imageList.forEach((img) => {
                       if (img.type === "existing")
                         fd.append("existingImageUrls", img.src);
