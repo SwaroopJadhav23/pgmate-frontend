@@ -1,7 +1,7 @@
 import React from "react";
 import {FiClock, FiFileText, FiTrendingUp, FiPieChart} from "react-icons/fi";
 import {FaRupeeSign, FaCalculator} from "react-icons/fa";
-import {BsInfinity} from "react-icons/bs";
+import { BsArrowRight } from 'react-icons/bs';
 import ExpenseReportTemplate from "./ExpenseReportTemplate";
 
 export const mockExpenseData = {

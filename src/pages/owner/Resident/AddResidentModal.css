@@ -28,6 +28,18 @@
   .arm-page-body {
     padding: 10px 14px 10px;
   }
+  .arm-page-actions {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .arm-page-actions > div {
+    gap: 8px !important;
+  }
+  .arm-page-actions button {
+    padding: 8px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
 }
 
 .arm-page-actions {
@@ -48,4 +60,55 @@
   margin: 12px 0;
   border: none;
   border-top: none;
+}
+
+/* Premium File Input Styling */
+.arm-field input[type="file"] {
+  padding: 3px 3px;
+  background: #fbfbfe;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.arm-field input[type="file"]:hover {
+  border-color: #9ca3af;
+  background: #f4f5f7;
+}
+
+.arm-field input[type="file"]:focus {
+  border-color: #5B5BD6;
+  box-shadow: 0 0 0 4px rgba(91, 91, 214, 0.1);
+  outline: none;
+}
+
+.arm-field input[type="file"]::file-selector-button {
+  margin: 0 12px 0 0 !important;
+  padding: 6px 16px;
+  border: none;
+  background: #5B5BD6;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(91, 91, 214, 0.2);
+}
+
+.arm-field input[type="file"]::file-selector-button:hover {
+  background: #4a4ac0;
+  box-shadow: 0 4px 6px rgba(91, 91, 214, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Fix Bootstrap validation icon overlapping native calendar icon */
+.arm-field input[type="date"].is-invalid,
+.arm-field input[type="date"].is-valid {
+  background-image: none !important;
 }

@@ -1,15 +1,16 @@
 import { } from "react-icons/fa";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import api from "../../../api/axios";
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { digitsOnly, isValidEmail, isValidPhone } from "../../../utils/formValidators";
+import { digitsOnly } from "../../../utils/formValidators";
 // import AgreementSignaturePad from "./AgreementSignaturePad";
 import "./Resident.css";
 import "./Agreement.css";
 import "./AddResidentModal.css";   // ← contains the scroll fix
+import { State, City } from "country-state-city";
 
 const EMPTY_FORM = {
   pgId: "",
@@ -26,11 +27,30 @@ const EMPTY_FORM = {
   stayType: "MONTHLY_BASIC",
   monthlyRent: "",
   deposit: "",
+  futureDepositRefund: "",
   dailyRent: "",
   numberOfDays: "",
   onboardingPaymentMode: "",
   checkinDate: "",
   expectedCheckoutDate: "",
+  dob: "",
+  gender: "",
+  occupation: "",
+  education: "",
+  collegeOrCompanyName: "",
+  aadhaarNumber: "",
+  permanentAddress: "",
+  permanentCity: "",
+  permanentState: "",
+  permanentPincode: "",
+  guardianName: "",
+  guardianRelation: "",
+  guardianPhone: "",
+  localGuardianName: "",
+  localGuardianRelation: "",
+  localGuardianPhone: "",
+  localGuardianAddress: "",
+  foodFacility: "",
 };
 
 const PAYMENT_MODES = ["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "WALLET"];
@@ -50,7 +70,11 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
   const [beds, setBeds] = useState([]);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [idProof, setIdProof] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState({});
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [aadhaarCard, setAadhaarCard] = useState(null);
+  const [securityDepositReceipt, setSecurityDepositReceipt] = useState(null);
   // eslint-disable-next-line
   {/*const [signatureDataUrl, setSignatureDataUrl] = useState(null);*/ }
   // eslint-disable-next-line
@@ -67,7 +91,9 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
       bedId: prefill?.bedId || "",
     });
     setFile(null);
-    setIdProof(null);
+    setProfilePhoto(null);
+    setAadhaarCard(null);
+    setSecurityDepositReceipt(null);
   }, [prefill]);
 
   // prefill effect — fix ...prev bug too
@@ -82,6 +108,10 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
       });
     }
   }, [prefill]);
+
+  const indianStates = useMemo(() => State.getStatesOfCountry("IN"), []);
+  const selectedStateObj = useMemo(() => indianStates.find(s => s.name === form.permanentState), [indianStates, form.permanentState]);
+  const indianCities = useMemo(() => selectedStateObj ? City.getCitiesOfState("IN", selectedStateObj.isoCode) : [], [selectedStateObj]);
 
   // ── cascading dropdowns ───────────────────────────────────────────
   useEffect(() => {
@@ -150,6 +180,18 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
     // eslint-disable-next-line
   }, [beds]);
 
+  useEffect(() => {
+    const valNum = Number(form.deposit);
+    let refund = form.futureDepositRefund;
+    if (valNum === 2000) refund = "1000";
+    else if (valNum === 5000) refund = "2000";
+    else if (valNum === 10000) refund = "4000";
+
+    if (refund !== form.futureDepositRefund) {
+      setForm((prev) => ({ ...prev, futureDepositRefund: refund }));
+    }
+  }, [form.deposit]); // Only run when deposit changes
+
   // ── auto checkout date ────────────────────────────────────────────
   useEffect(() => {
     if (!form.checkinDate) return;
@@ -181,46 +223,69 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
     return new File([u8], filename, { type: mime });
   };
 
+  const validateStep = (step) => {
+    const newErrors = {};
+    if (step === 1) {
+      if (!form.pgId) newErrors.pgId = true;
+      if (!form.floorId) newErrors.floorId = true;
+      if (!form.roomId) newErrors.roomId = true;
+      if (!form.bedId) newErrors.bedId = true;
+    } else if (step === 2) {
+      if (!form.name.trim()) newErrors.name = true;
+      if (form.phone.length !== 10) newErrors.phone = true;
+      if (!form.email.trim()) newErrors.email = true;
+      if (!form.dob) newErrors.dob = true;
+      if (!form.foodFacility) newErrors.foodFacility = true;
+    } else if (step === 3) {
+      if (!form.guardianName.trim()) newErrors.guardianName = true;
+      if (form.guardianPhone.length !== 10) newErrors.guardianPhone = true;
+    } else if (step === 4) {
+      if (!form.onboardingPaymentMode) newErrors.onboardingPaymentMode = true;
+      if (!form.checkinDate) newErrors.checkinDate = true;
+      if (!form.expectedCheckoutDate) newErrors.expectedCheckoutDate = true;
+      if (!form.aadhaarNumber) newErrors.aadhaarNumber = true;
+      if (!aadhaarCard) newErrors.aadhaarCard = true;
+      if (isDaily && !form.dailyRent) newErrors.dailyRent = true;
+      if (isDaily && !form.numberOfDays) newErrors.numberOfDays = true;
+      if (!isDaily && !form.monthlyRent) newErrors.monthlyRent = true;
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(prev => ({ ...prev, ...newErrors }));
+      toast("Please fill all required fields in this step.", { icon: "⚠️" });
+      setTimeout(() => {
+        const firstErrorEl = document.querySelector('.is-invalid');
+        if (firstErrorEl) {
+          firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          firstErrorEl.focus();
+        }
+      }, 100);
+      return false;
+    }
+    return true;
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  const prevStep = () => {
+    setCurrentStep(prev => prev - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // ── submit ────────────────────────────────────────────────────────
   const submit = async () => {
-    if (!form.pgId || !form.floorId || !form.roomId || !form.bedId) {
-      toast("Please select PG, Floor, Room and Bed.", { icon: "⚠️" });
-      return;
-    }
-
-    const basicIncomplete = !form.name.trim() || !form.phone || !form.onboardingPaymentMode || !form.checkinDate;
-    const monthlyIncomplete = !isDaily && (!form.monthlyRent || form.deposit === "");
-    const dailyIncomplete = isDaily && (!form.dailyRent || !form.numberOfDays);
-
-    if (basicIncomplete || monthlyIncomplete || dailyIncomplete) {
-      toast("Please fill all required fields.", { icon: "⚠️" });
-      return;
-    }
-    if (form.phone.length !== 10) {
-      toast("Phone must be exactly 10 digits.", { icon: "⚠️" });
-      return;
-    }
-    if (!isValidPhone(form.phone)) {
-      toast("Enter valid phone number.", { icon: "⚠️" });
-      return;
-    }
-    if (form.email && !isValidEmail(form.email)) {
-      toast("Please enter a valid email address.", { icon: "⚠️" });
-      return;
-    }
-    // eslint-disable-next-line
-    {/*
-    if (!signatureDataUrl) {
-      await Swal.fire({ icon: "warning", title: "Signature Required", text: "Please collect the tenant's signature on the agreement before saving.", confirmButtonColor: "#5B5BD6" });
-      setShowAgreement(true);
-      return;
-    }
-      */}
+    if (!validateStep(4)) return;
 
     const fd = new FormData();
     Object.entries(form).forEach(([k, v]) => { if (v !== "") fd.append(k, v); });
     if (file) fd.append("onboardingPaymentProof", file);
-    fd.append("idProof", idProof);
+    if (profilePhoto) fd.append("profilePhoto", profilePhoto);
+    if (aadhaarCard) fd.append("aadhaarCard", aadhaarCard);
+    if (securityDepositReceipt) fd.append("securityDepositReceipt", securityDepositReceipt);
     // eslint-disable-next-line
     {/*fd.append("agreementSignature", dataUrlToFile(signatureDataUrl, "agreement_signature.png")); */ }
 
@@ -230,8 +295,9 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
       toast.success("Resident Added successfully.");
       onSuccess?.();
       navigate(-1); // go back to Tenants list
-    } catch {
-      toast.error("Failed to add resident.");
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || error.response?.data || "Failed to add resident.";
+      toast.error(typeof errorMsg === 'string' ? errorMsg : "Failed to add resident.");
     } finally {
       setLoading(false);
     }
@@ -246,13 +312,17 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
     form.name.trim().length > 0,
     form.phone.length === 10,
     form.email.trim().length > 0,
-    !!form.foodPreference,
+    !!form.dob,
+    !!form.guardianName,
+    form.guardianPhone.length === 10,
+    !!form.aadhaarNumber,
+    !!form.foodFacility,
     !!form.onboardingPaymentMode,
     !!form.checkinDate,
     !!form.expectedCheckoutDate,
-    !!idProof,
+    !!aadhaarCard,
     isDaily ? Number(form.dailyRent) > 0 : Number(form.monthlyRent) > 0,
-    isDaily ? Number(form.numberOfDays) > 0 : form.deposit !== "",
+    isDaily ? Number(form.numberOfDays) > 0 : true,
   ];
   const filledCount = requiredChecks.filter(Boolean).length;
   const progressPct = Math.round((filledCount / requiredChecks.length) * 100);
@@ -264,42 +334,44 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
       rightAction={
         <div className="arm-header-actions">
           <button className="arm-btn-outline" onClick={() => navigate(-1)}>Cancel</button>
-          <button className="arm-btn-primary" disabled={loading} onClick={submit}>
-            {loading ? "Saving…" : "Save Tenant"}
-          </button>
         </div>
       }
     >
       <div className="arm-page">
 
         {/* ── Stepper ── */}
-        <div className="arm-stepper">
-          <div className="arm-step">
-            <div className="arm-step-circle active">1</div>
-            <span className="arm-step-label active">Tenant Information</span>
-          </div>
-
-          <div className="arm-step-line">
-            <div className="arm-step-line-fill" style={{ width: `${progressPct}%` }} />
-          </div>
-
-          <div className="arm-step">
-            <div className={`arm-step-circle ${progressPct === 100 ? "active" : ""}`}>2</div>
-            <span className={`arm-step-label ${progressPct === 100 ? "active" : ""}`}>Review &amp; Save</span>
-          </div>
+        <div className="arm-stepper" style={{ marginBottom: '24px' }}>
+          {[
+            { num: 1, label: "Allocation" },
+            { num: 2, label: "Personal Info" },
+            { num: 3, label: "Guardian" },
+            { num: 4, label: "Payment & Docs" }
+          ].map((step, idx, arr) => (
+            <React.Fragment key={step.num}>
+              <div className="arm-step">
+                <div className={`arm-step-circle ${currentStep >= step.num ? "active" : ""}`}>{step.num}</div>
+                <span className={`arm-step-label ${currentStep >= step.num ? "active" : ""}`}>{step.label}</span>
+              </div>
+              {idx < arr.length - 1 && (
+                <div className="arm-step-line">
+                  <div className="arm-step-line-fill" style={{ width: currentStep > step.num ? "100%" : "0%" }} />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
         </div>
-
         {/* ── Body ── */}
         <div className="arm-page-body">
 
+          {currentStep === 1 && (
+          <>
           {/* Location */}
           <div className="arm-grid">
             {/* PG — own row, pairs with Floor on desktop via arm-row-4, full-width alone on mobile */}
             <div className="arm-row-4 full">
               <div className="arm-field">
                 <label>PG</label>
-                <Form.Select
-                  value={form.pgId}
+                <Form.Select isInvalid={errors.pgId} value={form.pgId}
                   onChange={(e) => setForm({ ...EMPTY_FORM, pgId: e.target.value, stayType: form.stayType })}
                 >
                   <option value="">Select PG</option>
@@ -309,8 +381,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
               <div className="arm-field">
                 <label>Floor</label>
-                <Form.Select
-                  value={form.floorId}
+                <Form.Select isInvalid={errors.floorId} value={form.floorId}
                   onChange={(e) => setForm({ ...form, floorId: e.target.value, roomId: "", bedId: "" })}
                 >
                   <option value="">Select Floor</option>
@@ -321,8 +392,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
               {/* Room / Bed — desktop: stay in same arm-row-4 grid (2x2 visual via wrap) */}
               <div className="arm-field">
                 <label>Room</label>
-                <Form.Select
-                  value={form.roomId}
+                <Form.Select isInvalid={errors.roomId} value={form.roomId}
                   onChange={(e) => {
                     const room = rooms.find((r) => r.id === e.target.value);
                     setForm({ ...form, roomId: e.target.value, bedId: "", monthlyRent: room?.monthlyRent ?? "", deposit: room?.deposit ?? "", dailyRent: room?.dailyRent ?? "" });
@@ -335,8 +405,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
               <div className="arm-field">
                 <label>Bed</label>
-                <Form.Select
-                  value={form.bedId}
+                <Form.Select isInvalid={errors.bedId} value={form.bedId}
                   onChange={(e) => setForm({ ...form, bedId: e.target.value })}
                 >
                   <option value="">Select Bed</option>
@@ -347,24 +416,25 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             {/* Stay type — full width on desktop, pairs with Bed on mobile */}
             <div className="arm-field full arm-rent-type-field">
               <label>Rent Type</label>
-              <Form.Select
-                value={form.stayType}
+              <Form.Select isInvalid={errors.stayType} value={form.stayType}
                 onChange={(e) => setForm({ ...form, stayType: e.target.value })}
               >
                 <option value="MONTHLY_BASIC">Monthly Basic</option>
-                <option value="DAILY_BASIC" disabled={!selectedRoom?.dailyRent}>Daily Basic</option>
+                <option value="DAILY_BASIC">Daily Basic</option>
               </Form.Select>
             </div>
-
-            <hr className="arm-section-divider" />
-
-            {/* Tenant details */}
+            </div>
+          </>
+          )}
+          {currentStep === 2 && (
+          <>
+          <div className="arm-grid">
+          {/* Tenant details */}
             <div className="arm-field" data-mobile-full="true">
               <label>Full Name</label>
               <Form.Control
-                placeholder="Enter full name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value.trimStart() })}
+                placeholder="Enter full name" isInvalid={errors.name} value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
               />
             </div>
 
@@ -374,8 +444,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
                 placeholder="Enter phone number (10 digits)"
                 type="tel"
                 inputMode="numeric"
-                maxLength={10}
-                value={form.phone}
+                maxLength={10} isInvalid={errors.phone} value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })}
               />
             </div>
@@ -385,46 +454,264 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
               <label>Email</label>
               <Form.Control
                 type="email"
-                placeholder="Enter email address"
-                value={form.email}
+                placeholder="Enter email address" isInvalid={errors.email} value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value.trim() })}
               />
             </div>
 
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Food Preference</label>
-              <Form.Select
-                value={form.foodPreference}
-                onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}
+              <label>Gender</label>
+              <Form.Select isInvalid={errors.gender} value={form.gender}
+                onChange={(e) => setForm({ ...form, gender: e.target.value })}
               >
-                <option value="">Select food preference</option>
-                <option value="VEG">Veg</option>
-                <option value="NON_VEG">Non-Veg</option>
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </Form.Select>
             </div>
 
-            {/* Rent */}
+            <div className="arm-field" data-mobile-full="true">
+              <label>Date of Birth</label>
+              <Form.Control
+                type="date"
+                max={new Date(Date.now() - 86400000).toISOString().split("T")[0]}
+                isInvalid={errors.dob} value={form.dob}
+                onChange={(e) => setForm({ ...form, dob: e.target.value })}
+              />
+            </div>
+
+            <div className="arm-field" data-mobile-full="true">
+              <label>Occupation</label>
+              <Form.Select isInvalid={errors.occupation} value={form.occupation}
+                onChange={(e) => setForm({ ...form, occupation: e.target.value })}
+              >
+                <option value="">Select occupation</option>
+                <option value="Student">Student</option>
+                <option value="Working Professional">Working Professional</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+
+            <div className="arm-field" data-mobile-full="true">
+              <label>Education</label>
+              <Form.Control
+                placeholder="Highest qualification / Current course" isInvalid={errors.education} value={form.education}
+                onChange={(e) => setForm({ ...form, education: e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart() })}
+              />
+            </div>
+
+            <div className="arm-field" data-mobile-full="true">
+              <label>College / Company Name</label>
+              <Form.Control
+                placeholder="Enter college or company name" isInvalid={errors.collegeOrCompanyName} value={form.collegeOrCompanyName}
+                onChange={(e) => setForm({ ...form, collegeOrCompanyName: e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart() })}
+              />
+            </div>
+
+            <div className="arm-field" data-mobile-full="true">
+              <label>Food Facility</label>
+              <Form.Select isInvalid={errors.foodFacility} value={form.foodFacility}
+                onChange={(e) => setForm({ ...form, foodFacility: e.target.value })}
+              >
+                <option value="">Select food facility</option>
+                <option value="With Food">With Food</option>
+                <option value="Without Food">Without Food</option>
+              </Form.Select>
+            </div>
+          </div>
+          </>
+          )}
+          {currentStep === 3 && (
+          <>
+          <div className="arm-grid">
+          {/* Address Details */}
+            <h6 className="mt-3" style={{ gridColumn: "1 / -1" }}>Permanent Address</h6>
+            <div className="arm-field full">
+              <label>Address Line</label>
+              <Form.Control
+                placeholder="Enter address" isInvalid={errors.permanentAddress} value={form.permanentAddress}
+                onChange={(e) => setForm({ ...form, permanentAddress: e.target.value })}
+              />
+            </div>
+            <div className="arm-field">
+              <label>State</label>
+              <Form.Select isInvalid={errors.permanentState} value={form.permanentState}
+                onChange={(e) => setForm({ ...form, permanentState: e.target.value, permanentCity: "" })}
+              >
+                <option value="">Select State</option>
+                {indianStates.map((s) => (
+                  <option key={s.isoCode} value={s.name}>{s.name}</option>
+                ))}
+              </Form.Select>
+            </div>
+            <div className="arm-field">
+              <label>City</label>
+              <Form.Select isInvalid={errors.permanentCity} value={form.permanentCity}
+                onChange={(e) => setForm({ ...form, permanentCity: e.target.value })}
+                disabled={!form.permanentState}
+              >
+                <option value="">Select City</option>
+                {indianCities.map((c) => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
+                ))}
+              </Form.Select>
+            </div>
+            <div className="arm-field">
+              <label>Pincode</label>
+              <Form.Control
+                placeholder="Pincode"
+                type="tel"
+                inputMode="numeric"
+                maxLength={6} isInvalid={errors.permanentPincode} value={form.permanentPincode}
+                onChange={(e) => setForm({ ...form, permanentPincode: digitsOnly(e.target.value).slice(0, 6) })}
+              />
+            </div>
+
+            <hr className="arm-section-divider" />
+
+            {/* Guardian Information */}
+            <h6 className="mt-3" style={{ gridColumn: "1 / -1" }}>Guardian Information</h6>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Father's / Guardian's Name *</label>
+              <Form.Control
+                placeholder="Guardian Name" isInvalid={errors.guardianName} value={form.guardianName}
+                onChange={(e) => setForm({ ...form, guardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
+              />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Relation</label>
+              <Form.Select value={form.guardianRelation} onChange={(e) => setForm({ ...form, guardianRelation: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Father">Father</option>
+                <option value="Mother">Mother</option>
+                <option value="Brother">Brother</option>
+                <option value="Sister">Sister</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Friend">Friend</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Father's / Guardian's Phone *</label>
+              <Form.Control
+                placeholder="Guardian Phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10} isInvalid={errors.guardianPhone} value={form.guardianPhone}
+                onChange={(e) => setForm({ ...form, guardianPhone: digitsOnly(e.target.value).slice(0, 10) })}
+              />
+            </div>
+            
+            <div className="arm-field" data-mobile-full="true">
+              <label>Local Guardian's Name</label>
+              <Form.Control
+                placeholder="Local Guardian Name" isInvalid={errors.localGuardianName} value={form.localGuardianName}
+                onChange={(e) => setForm({ ...form, localGuardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
+              />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Local Guardian's Relation</label>
+              <Form.Select value={form.localGuardianRelation} onChange={(e) => setForm({ ...form, localGuardianRelation: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Father">Father</option>
+                <option value="Mother">Mother</option>
+                <option value="Brother">Brother</option>
+                <option value="Sister">Sister</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Friend">Friend</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Local Guardian's Phone</label>
+              <Form.Control
+                placeholder="Local Guardian Phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10} isInvalid={errors.localGuardianPhone} value={form.localGuardianPhone}
+                onChange={(e) => setForm({ ...form, localGuardianPhone: digitsOnly(e.target.value).slice(0, 10) })}
+              />
+            </div>
+            <div className="arm-field full">
+              <label>Local Guardian's Address</label>
+              <Form.Control
+                placeholder="Local Guardian Address" isInvalid={errors.localGuardianAddress} value={form.localGuardianAddress}
+                onChange={(e) => setForm({ ...form, localGuardianAddress: e.target.value })}
+              />
+            </div>
+
+            <hr className="arm-section-divider" />
+            
+            {/* Emergency Contact */}
+            <h6 className="mt-3" style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Emergency Contact</h6>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Name</label>
+              <Form.Control
+                placeholder="Emergency Contact Name" value={form.emergencyContactName}
+                onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
+              />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Relation</label>
+              <Form.Select value={form.emergencyContactRelation} onChange={(e) => setForm({ ...form, emergencyContactRelation: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Father">Father</option>
+                <option value="Mother">Mother</option>
+                <option value="Brother">Brother</option>
+                <option value="Sister">Sister</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Friend">Friend</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Phone</label>
+              <Form.Control
+                placeholder="Emergency Contact Phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10} value={form.emergencyContact}
+                onChange={(e) => setForm({ ...form, emergencyContact: digitsOnly(e.target.value).slice(0, 10) })}
+              />
+            </div>
+          </div>
+          </>
+          )}
+          {currentStep === 4 && (
+          <>
+          <div className="arm-grid">
+          {/* Rent */}
             {isDaily ? (
               <>
                 <div className="arm-field">
                   <label>Daily Rent</label>
-                  <Form.Control type="number" placeholder="Enter daily rent" value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} />
+                  <Form.Control type="number" placeholder="Enter daily rent" isInvalid={errors.dailyRent} value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
                 <div className="arm-field">
                   <label>Number of Days</label>
-                  <Form.Control type="number" placeholder="Enter number of days" value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} />
+                  <Form.Control type="number" placeholder="Enter number of days" isInvalid={errors.numberOfDays} value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
               </>
             ) : (
               <>
                 <div className="arm-field">
                   <label>Monthly Rent</label>
-                  <Form.Control type="number" placeholder="Enter monthly rent" value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} />
+                  <Form.Control type="number" placeholder="Enter monthly rent" isInvalid={errors.monthlyRent} value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
                 <div className="arm-field">
                   <label>Security Deposit</label>
-                  <Form.Control type="number" placeholder="Enter security deposit" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} />
+                  <Form.Control 
+                    type="number" 
+                    placeholder="Enter security deposit" isInvalid={errors.deposit} value={form.deposit} 
+                    onChange={(e) => setForm({ ...form, deposit: e.target.value })} 
+                    onWheel={(e) => e.target.blur()}
+                  />
+                </div>
+                <div className="arm-field">
+                  <label>Future Deposit Refund</label>
+                  <Form.Control type="number" placeholder="Enter future deposit refund" isInvalid={errors.futureDepositRefund} value={form.futureDepositRefund} onChange={(e) => setForm({ ...form, futureDepositRefund: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
               </>
             )}
@@ -434,12 +721,12 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             {/* Dates & payment */}
             <div className="arm-field">
               <label>Check-in Date</label>
-              <Form.Control type="date" value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
+              <Form.Control type="date" isInvalid={errors.checkinDate} value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
             </div>
 
             <div className="arm-field">
               <label>Expected Checkout Date</label>
-              <Form.Control type="date" value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
+              <Form.Control type="date" min={form.checkinDate || undefined} isInvalid={errors.expectedCheckoutDate} value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
             </div>
 
             <div className="arm-field full">
@@ -449,8 +736,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
             <div className="arm-field">
               <label>Payment Mode</label>
-              <Form.Select
-                value={form.onboardingPaymentMode}
+              <Form.Select isInvalid={errors.onboardingPaymentMode} value={form.onboardingPaymentMode}
                 onChange={(e) => setForm({ ...form, onboardingPaymentMode: e.target.value })}
               >
                 <option value="">Select payment mode</option>
@@ -459,22 +745,44 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             </div>
 
             {form.onboardingPaymentMode && form.onboardingPaymentMode !== "CASH" && (
-              <div className="arm-field">
-                <label>Payment Proof</label>
-                <input
-                  className="form-control"
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => setFile(e.target.files[0])}
-                />
-              </div>
+              <>
+                <div className="arm-field">
+                  <label>Payment Proof</label>
+                  <input
+                    className="form-control"
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => setFile(e.target.files[0])}
+                  />
+                </div>
+                <div className="arm-field">
+                  <label>Security Deposit Receipt</label>
+                  <Form.Control type="file" accept="image/*,.pdf" onChange={(e) => setSecurityDepositReceipt(e.target.files[0])} />
+                </div>
+              </>
             )}
 
-            {/* ID Proof */}
+            <hr className="arm-section-divider" />
 
-            <div className="arm-field arm-id-proof-field" data-mobile-full="true">
-              <label>ID Proof</label>
-              <Form.Control type="file" accept="image/*,.pdf" onChange={(e) => setIdProof(e.target.files[0])} />
+            {/* Documents */}
+            <h6 className="mt-3" style={{ gridColumn: "1 / -1" }}>Documents</h6>
+            <div className="arm-field full">
+              <label>Aadhaar Card Number *</label>
+              <Form.Control
+                placeholder="12 digit Aadhaar Number"
+                type="tel"
+                inputMode="numeric"
+                maxLength={12} isInvalid={errors.aadhaarNumber} value={form.aadhaarNumber}
+                onChange={(e) => setForm({ ...form, aadhaarNumber: digitsOnly(e.target.value).slice(0, 12) })}
+              />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Profile Photo</label>
+              <Form.Control type="file" accept="image/*" onChange={(e) => setProfilePhoto(e.target.files[0])} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Aadhaar Card Upload *</label>
+              <Form.Control type="file" accept="image/*,.pdf" isInvalid={errors.aadhaarCard} onChange={(e) => { setAadhaarCard(e.target.files[0]); setErrors(prev => ({ ...prev, aadhaarCard: false })); }} />
             </div>
 
             <hr className="arm-section-divider" />
@@ -522,14 +830,26 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             )}
           </div> */}
 
+          </>
+          )}
         </div>{/* end .arm-page-body */}
 
         {/* ── Footer (bottom save bar) ── */}
-        <div className="arm-page-actions">
-          <button className="modal-btn cancel" onClick={() => navigate(-1)}>Cancel</button>
-          <button className="modal-btn primary" disabled={loading} onClick={submit}>
-            {loading ? "Saving…" : "Add Resident"}
-          </button>
+        <div className="arm-page-actions" style={{ justifyContent: currentStep > 1 ? "space-between" : "flex-end" }}>
+          {currentStep > 1 && (
+            <button className="arm-btn-outline" onClick={prevStep}>Previous</button>
+          )}
+          
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="arm-btn-outline" onClick={() => navigate(-1)}>Cancel</button>
+            {currentStep < 4 ? (
+              <button className="arm-btn-primary" onClick={nextStep}>Next</button>
+            ) : (
+              <button className="arm-btn-primary" disabled={loading} onClick={submit}>
+                {loading ? "Saving…" : "Add Resident"}
+              </button>
+            )}
+          </div>
         </div>
 
       </div>{/* end .arm-page */}

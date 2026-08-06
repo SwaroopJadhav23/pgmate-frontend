@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import api from "../../../api/axios";
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { digitsOnly, isValidEmail, isValidPhone } from "../../../utils/formValidators";
+import { digitsOnly, isValidEmail } from "../../../utils/formValidators";
+import { State, City } from "country-state-city";
 import "./Resident.css";
 import "./Agreement.css";
-import "./AddResidentModal.css"; // ← gives arm-page / arm-page-header / arm-page-actions
+import "./AddResidentModal.css";
 
 const EMPTY_FORM = {
   name: "",
@@ -15,6 +16,7 @@ const EMPTY_FORM = {
   email: "",
   monthlyRent: "",
   deposit: "",
+  futureDepositRefund: "",
   dailyRent: "",
   numberOfDays: "",
   checkinDate: "",
@@ -22,9 +24,27 @@ const EMPTY_FORM = {
   onboardingPaymentMode: "",
   stayType: "MONTHLY_BASIC",
   foodPreference: "",
+  foodFacility: "",
   emergencyContactName: "",
   emergencyContact: "",
   emergencyContactRelation: "",
+  dob: "",
+  gender: "",
+  occupation: "",
+  education: "",
+  collegeOrCompanyName: "",
+  aadhaarNumber: "",
+  permanentAddress: "",
+  permanentCity: "",
+  permanentState: "",
+  permanentPincode: "",
+  guardianName: "",
+  guardianRelation: "",
+  guardianPhone: "",
+  localGuardianName: "",
+  localGuardianRelation: "",
+  localGuardianPhone: "",
+  localGuardianAddress: "",
 };
 
 const PAYMENT_MODES = ["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "WALLET"];
@@ -57,40 +77,75 @@ const EditTenantPage = ({ apiPrefix }) => {
   const location = useLocation();
   const residentEndpoint = apiPrefix || location.state?.apiPrefix || "/owner/residents";
 
-  const [resident, setResident] = useState(location.state?.resident || null);
-  const [loadingResident, setLoadingResident] = useState(!location.state?.resident);
+  const [resident, setResident] = useState(null);
+  const [loadingResident, setLoadingResident] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
+  // Files
   const [paymentFile, setPaymentFile] = useState(null);
   const [removePaymentProof, setRemovePaymentProof] = useState(false);
   const [idProofFile, setIdProofFile] = useState(null);
   const [removeIdProof, setRemoveIdProof] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [removeProfilePhoto, setRemoveProfilePhoto] = useState(false);
+  const [securityDepositReceipt, setSecurityDepositReceipt] = useState(null);
+  const [removeSecurityDepositReceipt, setRemoveSecurityDepositReceipt] = useState(false);
 
-  // ── fetch resident if not passed via navigate() state (e.g. direct URL / refresh) ──
+  // ── fetch resident (always fresh from API) ──
   useEffect(() => {
-    if (resident) return;
     let cancelled = false;
     (async () => {
       try {
         setLoadingResident(true);
-        const res = await api.get(residentEndpoint);
-        const found = (res.data || []).find((r) => String(r.residentId) === String(residentId));
-        if (!cancelled) {
-          if (found) setResident(found);
-          else toast.error("Tenant not found.");
+        // Try single-resident endpoint first (returns all fields)
+        try {
+          const res = await api.get(`${residentEndpoint}/${residentId}`);
+          if (!cancelled && res.data) {
+            setResident(res.data);
+            // Check if key fields are missing (old tenant without new data)
+            const hasEmptyFields = !res.data.dob && !res.data.gender && !res.data.occupation && !res.data.aadhaarNumber;
+            if (hasEmptyFields) {
+              toast.error("Please fill the empty data to continue.");
+            }
+            return;
+          }
+        } catch {
+          // Single endpoint not available (old backend) — fall through to list fallback
         }
-      } catch {
-        if (!cancelled) toast.error("Failed to load tenant.");
+
+        // Fallback: fetch from list and find by ID
+        try {
+          const listRes = await api.get(residentEndpoint);
+          const found = (listRes.data?.content || listRes.data || []).find(
+            (r) => String(r.residentId || r.id) === String(residentId)
+          );
+          if (!cancelled) {
+            if (found) {
+              setResident(found);
+              toast.error("Please fill the empty data to continue.");
+            } else {
+              // Resident not found — open blank form with a message
+              setResident({});
+              toast.error("Please fill the empty data to continue.");
+            }
+          }
+        } catch {
+          if (!cancelled) {
+            // All fetches failed — open blank form so user can still fill data
+            setResident({});
+            toast.error("Please fill the empty data to continue.");
+          }
+        }
       } finally {
         if (!cancelled) setLoadingResident(false);
       }
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line
-  }, [residentId]);
+  }, [residentId, residentEndpoint]);
 
-  // ── populate form once resident is available ──
+  // ── populate form ──
   useEffect(() => {
     if (!resident) return;
     setForm({
@@ -99,6 +154,7 @@ const EditTenantPage = ({ apiPrefix }) => {
       email: resident.email || "",
       monthlyRent: resident.monthlyRent || "",
       deposit: resident.deposit || "",
+      futureDepositRefund: resident.futureDepositRefund || "",
       dailyRent: resident.dailyRent || "",
       numberOfDays: resident.numberOfDays || "",
       checkinDate: formatForInput(resident.checkinDate),
@@ -106,15 +162,41 @@ const EditTenantPage = ({ apiPrefix }) => {
       onboardingPaymentMode: resident.onboardingPaymentMode || "",
       stayType: resident.stayType || "MONTHLY_BASIC",
       foodPreference: resident.foodPreference || "",
+      foodFacility: resident.foodFacility || "",
       emergencyContactName: resident.emergencyContactName || "",
       emergencyContact: resident.emergencyContact || "",
       emergencyContactRelation: resident.emergencyContactRelation || "",
+      dob: formatForInput(resident.dob),
+      gender: resident.gender || "",
+      occupation: resident.occupation || "",
+      education: resident.education || "",
+      collegeOrCompanyName: resident.collegeOrCompanyName || "",
+      aadhaarNumber: resident.aadhaarNumber || "",
+      permanentAddress: resident.permanentAddress || "",
+      permanentCity: resident.permanentCity || "",
+      permanentState: resident.permanentState || "",
+      permanentPincode: resident.permanentPincode || "",
+      guardianName: resident.guardianName || "",
+      guardianRelation: resident.guardianRelation || "",
+      guardianPhone: resident.guardianPhone || "",
+      localGuardianName: resident.localGuardianName || "",
+      localGuardianRelation: resident.localGuardianRelation || "",
+      localGuardianPhone: resident.localGuardianPhone || "",
+      localGuardianAddress: resident.localGuardianAddress || "",
     });
     setPaymentFile(null);
     setIdProofFile(null);
+    setProfilePhoto(null);
+    setSecurityDepositReceipt(null);
     setRemovePaymentProof(false);
     setRemoveIdProof(false);
+    setRemoveProfilePhoto(false);
+    setRemoveSecurityDepositReceipt(false);
   }, [resident]);
+
+  const indianStates = useMemo(() => State.getStatesOfCountry("IN"), []);
+  const selectedStateObj = useMemo(() => indianStates.find(s => s.name === form.permanentState), [indianStates, form.permanentState]);
+  const indianCities = useMemo(() => selectedStateObj ? City.getCitiesOfState("IN", selectedStateObj.isoCode) : [], [selectedStateObj]);
 
   const isDaily = form.stayType === "DAILY_BASIC";
   const total = useMemo(
@@ -131,10 +213,10 @@ const EditTenantPage = ({ apiPrefix }) => {
     const dailyInvalid = isDaily && (!form.dailyRent || !form.numberOfDays);
 
     if (baseInvalid || monthlyInvalid || dailyInvalid) {
-      toast("Please fill all required fields.", { icon: "⚠️" });
+      toast("Please fill all required fields (Name, Phone, Rent, Check-in, Payment Mode).", { icon: "⚠️" });
       return;
     }
-    if (!isValidPhone(form.phone)) {
+    if (form.phone && form.phone.length !== 10) {
       toast("Phone must be exactly 10 digits.", { icon: "⚠️" });
       return;
     }
@@ -146,52 +228,45 @@ const EditTenantPage = ({ apiPrefix }) => {
     try {
       setSaving(true);
       const fd = new FormData();
-      fd.append("name", form.name.trim());
-      fd.append("phone", form.phone);
-      fd.append("email", form.email.trim());
-      fd.append("stayType", form.stayType);
-
-      if (isDaily) {
-        fd.append("dailyRent", Number(form.dailyRent));
-        fd.append("numberOfDays", Number(form.numberOfDays));
-      } else {
-        fd.append("monthlyRent", Number(form.monthlyRent));
-        fd.append("deposit", Number(form.deposit));
-      }
-
-      if (form.checkinDate) {
-        const f = normalizeDateForAPI(form.checkinDate);
-        if (f) fd.append("checkinDate", f);
-      }
-      if (form.expectedCheckoutDate) {
-        const f = normalizeDateForAPI(form.expectedCheckoutDate);
-        if (f) fd.append("expectedCheckoutDate", f);
-      }
+      Object.entries(form).forEach(([k, v]) => {
+        if (k === 'checkinDate' || k === 'expectedCheckoutDate' || k === 'dob') {
+           const norm = normalizeDateForAPI(v);
+           if (norm) fd.append(k, norm);
+        } else if (v !== "" && v !== null && v !== undefined) {
+           fd.append(k, v);
+        }
+      });
 
       if (form.onboardingPaymentMode === "CASH") {
-        fd.append("onboardingPaymentMode", "CASH");
-        fd.append("onboardingPaymentAmount", total);
+        fd.set("onboardingPaymentAmount", total);
         fd.append("removeOnboardingPaymentProof", "true");
       } else if (form.onboardingPaymentMode) {
-        fd.append("onboardingPaymentMode", form.onboardingPaymentMode);
-        fd.append("onboardingPaymentAmount", total);
+        fd.set("onboardingPaymentAmount", total);
         if (removePaymentProof) fd.append("removeOnboardingPaymentProof", "true");
         if (paymentFile) fd.append("onboardingPaymentProof", paymentFile);
       }
 
-      if (idProofFile) fd.append("idProof", idProofFile);
-      if (removeIdProof) fd.append("removeIdProof", "true");
-      if (form.foodPreference) fd.append("foodPreference", form.foodPreference);
-
-      fd.append("emergencyContactName", form.emergencyContactName.trim());
-      fd.append("emergencyContact", form.emergencyContact.trim());
-      fd.append("emergencyContactRelation", form.emergencyContactRelation.trim());
+      if (idProofFile) {
+        fd.append("idProof", idProofFile); 
+        fd.append("aadhaarCard", idProofFile); 
+      }
+      if (removeIdProof) {
+        fd.append("removeIdProof", "true");
+        fd.append("removeAadhaarCard", "true");
+      }
+      
+      if (profilePhoto) fd.append("profilePhoto", profilePhoto);
+      if (removeProfilePhoto) fd.append("removeProfilePhoto", "true");
+      
+      if (securityDepositReceipt) fd.append("securityDepositReceipt", securityDepositReceipt);
+      if (removeSecurityDepositReceipt) fd.append("removeSecurityDepositReceipt", "true");
 
       await api.put(`${residentEndpoint}/${residentId}`, fd);
       toast.success("Resident updated successfully.");
-      navigate(-1); // back to Tenants list
-    } catch {
-      toast.error("Failed to update resident.");
+      navigate(-1);
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || error.response?.data || "Failed to update resident.";
+      toast.error(typeof errorMsg === 'string' ? errorMsg : "Failed to update resident.");
     } finally {
       setSaving(false);
     }
@@ -211,7 +286,7 @@ const EditTenantPage = ({ apiPrefix }) => {
     return (
       <DashboardLayout title="Edit Tenant" subtitle="Update tenant and room details">
         <div className="arm-page">
-          <div className="arm-page-body">Tenant not found.</div>
+          <div className="arm-page-body">Loading tenant details…</div>
         </div>
       </DashboardLayout>
     );
@@ -233,16 +308,34 @@ const EditTenantPage = ({ apiPrefix }) => {
       <div className="arm-page">
         <div className="arm-page-body">
           <div className="arm-grid">
+            
+            <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Allocation</h6>
             <div className="arm-field" data-mobile-full="true">
-              <label>Name</label>
+              <label>PG</label>
+              <Form.Control value={resident.pgName || "-"} disabled />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Room</label>
+              <Form.Control value={resident.roomNumber || "-"} disabled />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Stay Type</label>
+              <Form.Control value={isDaily ? "Daily Basic" : "Monthly Basic"} disabled />
+            </div>
+            <div className="arm-field" data-mobile-full="true"></div>
+
+            <hr className="arm-section-divider" />
+
+            <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Personal Details</h6>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Name *</label>
               <Form.Control
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value.trimStart() })}
+                onChange={(e) => setForm({ ...form, name: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
               />
             </div>
-
             <div className="arm-field" data-mobile-full="true">
-              <label>Phone</label>
+              <label>Phone *</label>
               <Form.Control
                 type="tel"
                 inputMode="numeric"
@@ -251,7 +344,6 @@ const EditTenantPage = ({ apiPrefix }) => {
                 onChange={(e) => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })}
               />
             </div>
-
             <div className="arm-field" data-mobile-full="true">
               <label>Email</label>
               <Form.Control
@@ -260,69 +352,86 @@ const EditTenantPage = ({ apiPrefix }) => {
                 onChange={(e) => setForm({ ...form, email: e.target.value.trim() })}
               />
             </div>
-
             <div className="arm-field" data-mobile-full="true">
-              <label>Stay Type</label>
-              <Form.Control value={isDaily ? "Daily Basic" : "Monthly Basic"} disabled />
+              <label>Gender</label>
+              <Form.Select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Date of Birth</label>
+              <Form.Control type="date" value={form.dob} max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} onChange={(e) => setForm({ ...form, dob: e.target.value })} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Aadhaar Number</label>
+              <Form.Control
+                type="tel"
+                inputMode="numeric"
+                maxLength={12}
+                value={form.aadhaarNumber}
+                onChange={(e) => setForm({ ...form, aadhaarNumber: digitsOnly(e.target.value).slice(0, 12) })}
+              />
             </div>
 
+            <div className="arm-field" data-mobile-full="true">
+              <label>Occupation</label>
+              <Form.Select value={form.occupation} onChange={(e) => setForm({ ...form, occupation: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Student">Student</option>
+                <option value="Working Professional">Working Professional</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Education</label>
+              <Form.Control value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart() })} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>College / Company</label>
+              <Form.Control value={form.collegeOrCompanyName} onChange={(e) => setForm({ ...form, collegeOrCompanyName: e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart() })} />
+            </div>
+
+            <hr className="arm-section-divider" />
+
+            <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Rent Details</h6>
             {isDaily ? (
               <>
                 <div className="arm-field">
                   <label>Daily Rent</label>
-                  <Form.Control
-                    type="number"
-                    value={form.dailyRent}
-                    onChange={(e) => setForm({ ...form, dailyRent: e.target.value })}
-                  />
+                  <Form.Control type="number" value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
                 <div className="arm-field">
                   <label>Number of Days</label>
-                  <Form.Control
-                    type="number"
-                    value={form.numberOfDays}
-                    onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })}
-                  />
+                  <Form.Control type="number" value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
               </>
             ) : (
               <>
                 <div className="arm-field">
                   <label>Monthly Rent</label>
-                  <Form.Control
-                    type="number"
-                    value={form.monthlyRent}
-                    onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })}
-                  />
+                  <Form.Control type="number" value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
                 <div className="arm-field">
                   <label>Deposit</label>
-                  <Form.Control
-                    type="number"
-                    value={form.deposit}
-                    onChange={(e) => setForm({ ...form, deposit: e.target.value })}
-                  />
+                  <Form.Control type="number" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} onWheel={(e) => e.target.blur()} />
+                </div>
+                <div className="arm-field">
+                  <label>Future Deposit Refund</label>
+                  <Form.Control type="number" value={form.futureDepositRefund} onChange={(e) => setForm({ ...form, futureDepositRefund: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
               </>
             )}
 
-            <hr className="arm-section-divider" />
-
             <div className="arm-field">
-              <label>Check-in Date</label>
-              <Form.Control
-                type="date"
-                value={form.checkinDate}
-                onChange={(e) => setForm({ ...form, checkinDate: e.target.value })}
-              />
+              <label>Check-in Date *</label>
+              <Form.Control type="date" value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
             </div>
             <div className="arm-field">
               <label>Expected Checkout</label>
-              <Form.Control
-                type="date"
-                value={form.expectedCheckoutDate}
-                onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })}
-              />
+              <Form.Control type="date" value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
             </div>
             <div className="arm-field full">
               <label>Total Payable</label>
@@ -330,7 +439,7 @@ const EditTenantPage = ({ apiPrefix }) => {
             </div>
 
             <div className="arm-field full">
-              <label>Onboarding Payment Mode</label>
+              <label>Payment Mode *</label>
               <Form.Select
                 value={form.onboardingPaymentMode}
                 onChange={(e) => {
@@ -352,89 +461,92 @@ const EditTenantPage = ({ apiPrefix }) => {
             </div>
 
             {form.onboardingPaymentMode && form.onboardingPaymentMode !== "CASH" && (
-              <div className="arm-field">
-                <label>Replace Payment Proof</label>
-                <Form.Control
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => {
-                    setPaymentFile(e.target.files[0]);
-                    setRemovePaymentProof(false);
-                  }}
-                />
-              </div>
+              <>
+                <div className="arm-field">
+                  <label>Replace Payment Proof</label>
+                  <Form.Control type="file" accept="image/*,.pdf" onChange={(e) => { setPaymentFile(e.target.files[0]); setRemovePaymentProof(false); }} />
+                </div>
+                <div className="arm-field">
+                  <label>Replace Deposit Receipt</label>
+                  <Form.Control type="file" accept="image/*,.pdf" onChange={(e) => { setSecurityDepositReceipt(e.target.files[0]); setRemoveSecurityDepositReceipt(false); }} />
+                </div>
+              </>
             )}
 
             {form.onboardingPaymentMode !== "CASH" && (
               <div className="arm-field full">
-                <Form.Check
-                  className="edit-check"
-                  label="Remove existing payment proof"
-                  checked={removePaymentProof}
-                  onChange={(e) => setRemovePaymentProof(e.target.checked)}
-                />
+                <Form.Check className="edit-check" label="Remove existing payment proof" checked={removePaymentProof} onChange={(e) => setRemovePaymentProof(e.target.checked)} />
               </div>
             )}
 
+            <hr className="arm-section-divider" />
+
+            <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Documents</h6>
             <div className="arm-field" data-mobile-full="true">
-              <label>Replace ID Proof</label>
-              <Form.Control
-                type="file"
-                accept="image/*,.pdf"
-                onChange={(e) => {
-                  setIdProofFile(e.target.files[0]);
-                  setRemoveIdProof(false);
-                }}
-              />
+              <label>Replace ID/Aadhaar Proof</label>
+              <Form.Control type="file" accept="image/*,.pdf" onChange={(e) => { setIdProofFile(e.target.files[0]); setRemoveIdProof(false); }} />
+              <Form.Check className="mt-2 edit-check" label="Remove existing ID proof" checked={removeIdProof} onChange={(e) => setRemoveIdProof(e.target.checked)} />
             </div>
-            <div className="arm-field full">
-              <Form.Check
-                className="edit-check"
-                label="Remove existing ID proof"
-                checked={removeIdProof}
-                onChange={(e) => setRemoveIdProof(e.target.checked)}
-              />
+            
+            <div className="arm-field" data-mobile-full="true">
+              <label>Replace Profile Photo</label>
+              <Form.Control type="file" accept="image/*" onChange={(e) => { setProfilePhoto(e.target.files[0]); setRemoveProfilePhoto(false); }} />
+              <Form.Check className="mt-2 edit-check" label="Remove existing Profile Photo" checked={removeProfilePhoto} onChange={(e) => setRemoveProfilePhoto(e.target.checked)} />
             </div>
 
             <hr className="arm-section-divider" />
+            <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Additional Details</h6>
 
             <div className="arm-field" data-mobile-full="true">
+              <label>Food Facility</label>
+              <Form.Select value={form.foodFacility} onChange={(e) => setForm({ ...form, foodFacility: e.target.value })}>
+                <option value="">Select</option>
+                <option value="With Food">With Food</option>
+                <option value="Without Food">Without Food</option>
+              </Form.Select>
+            </div>
+            
+            <div className="arm-field" data-mobile-full="true">
               <label>Food Preference</label>
-              <Form.Select
-                value={form.foodPreference}
-                onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}
-              >
+              <Form.Select value={form.foodPreference} onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}>
                 <option value="">Select</option>
                 <option value="VEG">Veg</option>
                 <option value="NON_VEG">Non-Veg</option>
               </Form.Select>
             </div>
 
-            <div className="arm-field" data-mobile-full="true">
-              <label>Emergency Contact Name</label>
-              <Form.Control
-                placeholder="e.g. Ramesh Kumar"
-                value={form.emergencyContactName}
-                onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value.trimStart() })}
-              />
+            <h6 className="mt-4" style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Permanent Address</h6>
+            <div className="arm-field full">
+              <label>Address Line</label>
+              <Form.Control value={form.permanentAddress} onChange={(e) => setForm({ ...form, permanentAddress: e.target.value })} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Emergency Contact Number</label>
-              <Form.Control
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                placeholder="10-digit mobile number"
-                value={form.emergencyContact}
-                onChange={(e) => setForm({ ...form, emergencyContact: digitsOnly(e.target.value).slice(0, 10) })}
-              />
+              <label>State</label>
+              <Form.Select value={form.permanentState} onChange={(e) => setForm({ ...form, permanentState: e.target.value, permanentCity: "" })}>
+                <option value="">Select State</option>
+                {indianStates.map((s) => <option key={s.isoCode} value={s.name}>{s.name}</option>)}
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>City</label>
+              <Form.Select value={form.permanentCity} onChange={(e) => setForm({ ...form, permanentCity: e.target.value })} disabled={!form.permanentState}>
+                <option value="">Select City</option>
+                {indianCities.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Pincode</label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={6} value={form.permanentPincode} onChange={(e) => setForm({ ...form, permanentPincode: digitsOnly(e.target.value).slice(0, 6) })} />
+            </div>
+
+            <h6 className="mt-4" style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Guardian Information</h6>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Father's / Guardian's Name *</label>
+              <Form.Control value={form.guardianName} onChange={(e) => setForm({ ...form, guardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })} />
             </div>
             <div className="arm-field" data-mobile-full="true">
               <label>Relation</label>
-              <Form.Select
-                value={form.emergencyContactRelation}
-                onChange={(e) => setForm({ ...form, emergencyContactRelation: e.target.value })}
-              >
+              <Form.Select value={form.guardianRelation} onChange={(e) => setForm({ ...form, guardianRelation: e.target.value })}>
                 <option value="">Select</option>
                 <option value="Father">Father</option>
                 <option value="Mother">Mother</option>
@@ -445,14 +557,45 @@ const EditTenantPage = ({ apiPrefix }) => {
                 <option value="Other">Other</option>
               </Form.Select>
             </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Father's / Guardian's Phone *</label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.guardianPhone} onChange={(e) => setForm({ ...form, guardianPhone: digitsOnly(e.target.value).slice(0, 10) })} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Local Guardian's Name</label>
+              <Form.Control value={form.localGuardianName} onChange={(e) => setForm({ ...form, localGuardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })} />
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Local Guardian's Relation</label>
+              <Form.Select value={form.localGuardianRelation} onChange={(e) => setForm({ ...form, localGuardianRelation: e.target.value })}>
+                <option value="">Select</option>
+                <option value="Father">Father</option>
+                <option value="Mother">Mother</option>
+                <option value="Brother">Brother</option>
+                <option value="Sister">Sister</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Friend">Friend</option>
+                <option value="Other">Other</option>
+              </Form.Select>
+            </div>
+            <div className="arm-field" data-mobile-full="true">
+              <label>Local Guardian's Phone</label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.localGuardianPhone} onChange={(e) => setForm({ ...form, localGuardianPhone: digitsOnly(e.target.value).slice(0, 10) })} />
+            </div>
+            <div className="arm-field full">
+              <label>Local Guardian's Address</label>
+              <Form.Control value={form.localGuardianAddress} onChange={(e) => setForm({ ...form, localGuardianAddress: e.target.value })} />
+            </div>
           </div>
         </div>
 
-        <div className="arm-page-actions">
-          <button className="modal-btn cancel" onClick={() => navigate(-1)}>Cancel</button>
-          <button className="modal-btn success" disabled={saving} onClick={submit}>
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
+        <div className="arm-page-actions" style={{ justifyContent: "flex-end" }}>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="arm-btn-outline" onClick={() => navigate(-1)}>Cancel</button>
+            <button className="arm-btn-primary" disabled={saving} onClick={submit}>
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+          </div>
         </div>
       </div>
     </DashboardLayout>
