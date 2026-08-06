@@ -30,7 +30,7 @@ import {
   startOfMonth,
   isWithinInterval,
   parse,
-  // subMonths, 
+ // subMonths, 
   format,
 } from "date-fns";
 import "./OwnerRevenue.css";
@@ -76,23 +76,23 @@ const OwnerRevenue = () => {
   const [rentRecords, setRentRecords] = useState([]);
   const [chartType, setChartType] = useState("area");
   const isMobile = window.innerWidth < 768;
-
+  
 
   useEffect(() => {
     loadData();
     loadStats();
   }, []);
 
-
+  
 
   const loadData = async () => {
     try {
-      const [active, records, reserved, enq, rentRes] = await Promise.all([
+    const [active, records, reserved, enq, rentRes] = await Promise.all([
         api.get("/owner/residents"),
         api.get("/owner/residents/records"),
         api.get("/owner/residents/reserved"),
         api.get("/enquiry/enquiries"),
-        api.get("/owner/rent?status=PAID")
+        api.get("/owner/rent?status=PAID")  
       ]);
 
       setRentRecords(Array.isArray(rentRes.data) ? rentRes.data : []);
@@ -125,29 +125,29 @@ const OwnerRevenue = () => {
   };
 
   /* ================= DATE RANGE ================= */
-  const fromDate = useMemo(() => {
+const fromDate = useMemo(() => {
 
-    const now = new Date();
+  const now = new Date();
 
-    if (filter === "DAY") {
-      return startOfDay(now);
-    }
+  if (filter === "DAY") {
+    return startOfDay(now);
+  }
 
-    if (filter === "WEEK") {
-      return startOfWeek(now, { weekStartsOn: 1 });
-    }
+  if (filter === "WEEK") {
+    return startOfWeek(now, { weekStartsOn: 1 });
+  }
 
-    if (filter === "MONTH") {
-      return startOfMonth(now);
-    }
-
-    if (filter === "YEAR") {
-      return new Date(now.getFullYear(), 0, 1);
-    }
-
+  if (filter === "MONTH") {
     return startOfMonth(now);
+  }
 
-  }, [filter]);
+  if (filter === "YEAR") {
+    return new Date(now.getFullYear(), 0, 1);
+  }
+
+  return startOfMonth(now);
+
+}, [filter]);
   //  MONTH COMPARISON TEMPORARILY DISABLED
   /*
   const previousMonthStart = useMemo(() => {
@@ -156,76 +156,76 @@ const OwnerRevenue = () => {
   */
 
   const toDate = (value) => (value ? new Date(value) : null);
+  
+const isDateInFilter = useCallback(
+  (date) => {
 
-  const isDateInFilter = useCallback(
-    (date) => {
+    if (!date) return false;
 
-      if (!date) return false;
+    const today = new Date();
 
-      const today = new Date();
-
-      if (startDate && endDate) {
-        return isWithinInterval(date, {
-          start: startDate,
-          end: endDate
-        });
-      }
-
+    if (startDate && endDate) {
       return isWithinInterval(date, {
-        start: fromDate,
-        end: today
+        start: startDate,
+        end: endDate
       });
+    }
 
-    },
-    [fromDate, startDate, endDate]
+    return isWithinInterval(date, {
+      start: fromDate,
+      end: today
+    });
+
+  },
+  [fromDate, startDate, endDate]
+);
+
+const getRevenueDate = (r) => {
+  return toDate(
+    r.onboardingPaymentDate || r.createdAt || r.checkinDate
   );
-
-  const getRevenueDate = (r) => {
-    return toDate(
-      r.onboardingPaymentDate || r.createdAt || r.checkinDate
-    );
-  };
+};
 
 
   /* ================= REVENUE ================= */
-  const calculateRevenue = () => {
-    let total = 0;
+const calculateRevenue = () => {
+  let total = 0;
 
-    // 1. Rent from rentRecords (monthly payments)
-    rentRecords.forEach((rec) => {
-      const paidDate = toDate(rec.paidDate);
+  // 1. Rent from rentRecords (monthly payments)
+  rentRecords.forEach((rec) => {
+    const paidDate = toDate(rec.paidDate);
 
-      if (rec.status === "PAID" && isDateInFilter(paidDate)) {
-        total += Number(rec.rentAmount || 0);
+    if (rec.status === "PAID" && isDateInFilter(paidDate)) {
+      total += Number(rec.rentAmount || 0);
+    }
+  });
+
+  // 2. Onboarding / first rent (from residents)
+  residents.forEach((r) => {
+    const revenueDate = getRevenueDate(r);
+
+    if (isDateInFilter(revenueDate)) {
+      total += Number(r.monthlyRent || 0);
+    }
+  });
+
+  // 3. Deposit damage (extra income)
+  residents.forEach((r) => {
+    const checkoutDate = toDate(r.actualCheckoutDate);
+
+    if (isDateInFilter(checkoutDate)) {
+      const damage =
+        Number(r.deposit || 0) - Number(r.refundAmount || 0);
+
+      if (damage > 0) {
+        total += damage;
       }
-    });
+    }
+  });
 
-    // 2. Onboarding / first rent (from residents)
-    residents.forEach((r) => {
-      const revenueDate = getRevenueDate(r);
-
-      if (isDateInFilter(revenueDate)) {
-        total += Number(r.monthlyRent || 0);
-      }
-    });
-
-    // 3. Deposit damage (extra income)
-    residents.forEach((r) => {
-      const checkoutDate = toDate(r.actualCheckoutDate);
-
-      if (isDateInFilter(checkoutDate)) {
-        const damage =
-          Number(r.deposit || 0) - Number(r.refundAmount || 0);
-
-        if (damage > 0) {
-          total += damage;
-        }
-      }
-    });
-
-    return total;
-  };
-  const collectionsInRange = calculateRevenue();
+  return total;
+};
+ const collectionsInRange = calculateRevenue();
 
   //  MONTH COMPARISON + GROWTH DISABLED
   /*
@@ -240,44 +240,44 @@ const OwnerRevenue = () => {
   */
 
   /* ================= RENT COLLECTED ================= */
-  const totalRentCollected = (() => {
-    let total = 0;
+const totalRentCollected = (() => {
+  let total = 0;
 
-    // rent records (monthly payments)
-    rentRecords.forEach((rec) => {
-      const paidDate = toDate(rec.paidDate);
+  // rent records (monthly payments)
+  rentRecords.forEach((rec) => {
+    const paidDate = toDate(rec.paidDate);
 
-      if (rec.status === "PAID" && isDateInFilter(paidDate)) {
-        total += Number(rec.rentAmount || 0);
-      }
-    });
+    if (rec.status === "PAID" && isDateInFilter(paidDate)) {
+      total += Number(rec.rentAmount || 0);
+    }
+  });
 
-    // onboarding rent (first payment)
-    residents.forEach((r) => {
-      const revenueDate = getRevenueDate(r);
+  // onboarding rent (first payment)
+  residents.forEach((r) => {
+    const revenueDate = getRevenueDate(r);
 
-      if (isDateInFilter(revenueDate)) {
-        total += Number(r.monthlyRent || 0);
-      }
-    });
+    if (isDateInFilter(revenueDate)) {
+      total += Number(r.monthlyRent || 0);
+    }
+  });
 
-    return total;
-  })();
+  return total;
+})();
   /* ================= DEPOSIT HELD ================= */
-  const totalDepositHeld = residents.reduce((sum, r) => {
+const totalDepositHeld = residents.reduce((sum, r) => {
 
-    const date = getRevenueDate(r);
+  const date = getRevenueDate(r);  
 
-    if (!isDateInFilter(date)) return sum;
+  if (!isDateInFilter(date)) return sum;
 
-    const deposit = Number(r.deposit || 0);
-    const refund = Number(r.refundAmount ?? 0);
+  const deposit = Number(r.deposit || 0);
+  const refund = Number(r.refundAmount ?? 0);
 
-    const held = deposit - refund;
+  const held = deposit - refund;
 
-    return held > 0 ? sum + held : sum;
+  return held > 0 ? sum + held : sum;
 
-  }, 0);
+}, 0);
   /* ================= OCCUPANCY ================= */
 
   const occupancyRate = useMemo(() => {
@@ -292,7 +292,7 @@ const OwnerRevenue = () => {
   }, [stats]);
 
   const totalActiveResidents = residents.filter((r) => {
-    const revenueDate = getRevenueDate(r);
+   const revenueDate = getRevenueDate(r);
 
     return (
       r.status === "ACTIVE" &&
@@ -303,19 +303,19 @@ const OwnerRevenue = () => {
   const totalReservedResidents = residents.filter((r) => {
     return r.status === "RESERVED";
   }).length;
-  const totalEnquiries = enquiries.filter((e) => {
-    if (!e.createdAt) return false;
+ const totalEnquiries = enquiries.filter((e) => {
+  if (!e.createdAt) return false;
 
-    const parsedDate = parse(
-      e.createdAt,
-      "dd-MM-yyyy HH:mm:ss",
-      new Date()
-    );
+  const parsedDate = parse(
+    e.createdAt,
+    "dd-MM-yyyy HH:mm:ss",
+    new Date()
+  );
 
-    if (isNaN(parsedDate)) return false;
+  if (isNaN(parsedDate)) return false;
 
-    return isDateInFilter(parsedDate);
-  }).length;
+  return isDateInFilter(parsedDate);
+}).length;
 
   const avgRevenuePerResident =
     totalActiveResidents > 0
@@ -324,278 +324,269 @@ const OwnerRevenue = () => {
 
   /* ================= CHART DATA ================= */
 
-  const chartData = useMemo(() => {
-    const map = {};
+const chartData = useMemo(() => {
+  const map = {};
 
-    // RENT FROM RECORDS
-    rentRecords.forEach((rec) => {
-      const date = toDate(rec.paidDate);
-      if (!isDateInFilter(date)) return;
+  // RENT FROM RECORDS
+  rentRecords.forEach((rec) => {
+    const date = toDate(rec.paidDate);
+    if (!isDateInFilter(date)) return;
 
+    const key = format(date, "dd MMM");
+
+    if (!map[key]) {
+      map[key] = { date: key, revenue: 0 };
+    }
+
+    map[key].revenue += Number(rec.rentAmount || 0);
+  });
+
+  //  DAMAGE (deposit loss)
+  residents.forEach((r) => {
+    const date = toDate(r.actualCheckoutDate);
+    if (!isDateInFilter(date)) return;
+
+    const damage =
+      Number(r.deposit || 0) - Number(r.refundAmount || 0);
+
+    if (damage > 0) {
       const key = format(date, "dd MMM");
 
       if (!map[key]) {
         map[key] = { date: key, revenue: 0 };
       }
 
-      map[key].revenue += Number(rec.rentAmount || 0);
-    });
+      map[key].revenue += damage;
+    }
+  });
 
-    //  DAMAGE (deposit loss)
-    residents.forEach((r) => {
-      const date = toDate(r.actualCheckoutDate);
-      if (!isDateInFilter(date)) return;
-
-      const damage =
-        Number(r.deposit || 0) - Number(r.refundAmount || 0);
-
-      if (damage > 0) {
-        const key = format(date, "dd MMM");
-
-        if (!map[key]) {
-          map[key] = { date: key, revenue: 0 };
-        }
-
-        map[key].revenue += damage;
-      }
-    });
-
-    return Object.values(map).sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
-  }, [rentRecords, residents, isDateInFilter]);
+  return Object.values(map).sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
+}, [rentRecords, residents, isDateInFilter]);
   /* ================= ANIMATIONS ================= */
-
-  const totalRevenue = totalRentCollected + totalDepositHeld;
 
   const animatedRevenue = useCountUp(collectionsInRange);
   const animatedDeposit = useCountUp(totalDepositHeld);
   const animatedRent = useCountUp(totalRentCollected);
-  const animatedTotalRevenue = useCountUp(totalRevenue);
   const animatedAvg = useCountUp(avgRevenuePerResident);
 
 
 
 
-  const [showExport, setShowExport] = useState(false);
-  const exportRef = useRef(null);
-  /* ================= COMMON EXPORT DATA ================= */
-  const getRevenueLabel = () => {
+const [showExport, setShowExport] = useState(false);
+const exportRef = useRef(null);
+/* ================= COMMON EXPORT DATA ================= */
+const getRevenueLabel = () => {
 
-    if (startDate && endDate)
-      return `Revenue (${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")})`;
+  if (startDate && endDate)
+    return `Revenue (${format(startDate,"dd MMM yyyy")} - ${format(endDate,"dd MMM yyyy")})`;
 
-    if (filter === "DAY")
-      return startDate
-        ? `Revenue of ${format(startDate, "dd MMM yyyy")}`
-        : "Revenue of Selected Day";
+  if (filter === "DAY")
+  return startDate
+    ? `Revenue of ${format(startDate, "dd MMM yyyy")}`
+    : "Revenue of Selected Day";
 
-    if (filter === "WEEK")
-      return "Revenue of Current Week";
+  if (filter === "WEEK")
+    return "Revenue of Current Week";
 
-    if (filter === "MONTH")
-      return "Revenue of Current Month";
+  if (filter === "MONTH")
+    return "Revenue of Current Month";
 
-    if (filter === "YEAR")
-      return "Revenue of Current Year";
+  if (filter === "YEAR")
+    return "Revenue of Current Year";
 
-    return "Revenue Report";
-  };
+  return "Revenue Report";
+};
 
-  /* ---------- CURRENCY FORMATTERS ---------- */
+/* ---------- CURRENCY FORMATTERS ---------- */
 
-  /* Used for WORD + EXCEL */
-  const formatCurrency = (value) =>
-    `₹${Number(value || 0).toLocaleString("en-IN")}`;
+/* Used for WORD + EXCEL */
+const formatCurrency = (value) =>
+  `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
-  /*  Used ONLY for PDF  */
-  const formatCurrencyPDF = (value) =>
-    `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
+/*  Used ONLY for PDF  */
+const formatCurrencyPDF = (value) =>
+  `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
 
 
-  /* ---------- RAW REPORT DATA (NO FORMAT HERE) ---------- */
-  /* VERY IMPORTANT → keep numbers RAW */
+/* ---------- RAW REPORT DATA (NO FORMAT HERE) ---------- */
+/* VERY IMPORTANT → keep numbers RAW */
 
-  const reportRows = [
-    {
-      label: "Net Revenue",
-      value: collectionsInRange,
-      type: "currency",
-    },
-    {
-      label: "Total Revenue",
-      value: totalRevenue,
-      type: "currency",
-    },
-    {
-      label: "Rent Collected",
-      value: totalRentCollected,
-      type: "currency",
-    },
-    {
-      label: "Deposit Held",
-      value: totalDepositHeld,
-      type: "currency",
-    },
-    {
-      label: "Active Residents",
-      value: totalActiveResidents,
-      type: "number",
-    },
-    {
-      label: "Reserved Residents",
-      value: totalReservedResidents,
-      type: "number",
-    },
-    /*
-    {
-      label: "Total Enquiries",
-      value: totalEnquiries,
-      type: "number",
-    },*/
-    {
-      label: "Avg Revenue / Resident",
-      value: avgRevenuePerResident,
-      type: "currency",
-    },
-    {
-      label: "Occupancy Rate",
-      value: occupancyRate,
-      type: "percentage",
-    },
-  ];
-  /* ================= PDF ================= */
-  const exportPDF = () => {
+const reportRows = [
+  {
+    label: "Net Revenue",
+    value: collectionsInRange,
+    type: "currency",
+  },
+  {
+    label: "Rent Collected",
+    value: totalRentCollected,
+    type: "currency",
+  },
+  {
+    label: "Deposit Held",
+    value: totalDepositHeld,
+    type: "currency",
+  },
+  {
+    label: "Active Residents",
+    value: totalActiveResidents,
+    type: "number",
+  },
+  {
+    label: "Reserved Residents",
+    value: totalReservedResidents,
+    type: "number",
+  },
+  {
+    label: "Total Enquiries",
+    value: totalEnquiries,
+    type: "number",
+  },
+  {
+    label: "Avg Revenue / Resident",
+    value: avgRevenuePerResident,
+    type: "currency",
+  },
+  {
+    label: "Occupancy Rate",
+    value: occupancyRate,
+    type: "percentage",
+  },
+];
+/* ================= PDF ================= */
+const exportPDF = () => {
 
-    const pdf = new jsPDF("p", "mm", "a4");
+  const pdf = new jsPDF("p", "mm", "a4");
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
-    pdf.text("Revenue Analytics Report", 20, 20);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(18);
+  pdf.text("Revenue Analytics Report", 20, 20);
 
-    pdf.setFontSize(13);
-    pdf.text(getRevenueLabel(), 20, 30);
+  pdf.setFontSize(13);
+  pdf.text(getRevenueLabel(), 20, 30);
 
-    let y = 45;
+  let y = 45;
 
-    pdf.setFontSize(14);
-    pdf.text("Summary Metrics", 20, y);
-    y += 12;
+  pdf.setFontSize(14);
+  pdf.text("Summary Metrics", 20, y);
+  y += 12;
 
-    pdf.setFontSize(11);
-    pdf.setFont("helvetica", "normal");
-    const pageWidth = pdf.internal.pageSize.getWidth();
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+const pageWidth = pdf.internal.pageSize.getWidth();
 
-    const labelX = 25;              // left column
-    const valueX = pageWidth - 25;  // right column
+const labelX = 25;              // left column
+const valueX = pageWidth - 25;  // right column
 
-    reportRows.forEach((row) => {
+reportRows.forEach((row) => {
 
-      let formatted;
+  let formatted;
 
-      if (row.type === "currency")
-        formatted = formatCurrencyPDF(row.value);
-      else if (row.type === "percentage")
-        formatted = `${row.value}%`;
-      else
-        formatted = row.value;
+  if (row.type === "currency")
+    formatted = formatCurrencyPDF(row.value);
+  else if (row.type === "percentage")
+    formatted = `${row.value}%`;
+  else
+    formatted = row.value;
 
-      /* LEFT COLUMN */
-      pdf.text(row.label, labelX, y);
+  /* LEFT COLUMN */
+  pdf.text(row.label, labelX, y);
 
-      /* RIGHT COLUMN (PERFECT ALIGNMENT) */
-      pdf.text(
-        String(formatted),
-        valueX,
-        y,
-        { align: "right" }
-      );
+  /* RIGHT COLUMN (PERFECT ALIGNMENT) */
+  pdf.text(
+    String(formatted),
+    valueX,
+    y,
+    { align: "right" }
+  );
 
-      y += 9;
-    });
+  y += 9;
+});
 
-    pdf.save("RevenueAnalytics.pdf");
-    setShowExport(false);
-  };
+  pdf.save("RevenueAnalytics.pdf");
+  setShowExport(false);
+};
 
-  /* ================= EXCEL ================= */
-  const exportExcel = () => {
+/* ================= EXCEL ================= */
+const exportExcel = () => {
 
-    /* ---------- BUILD DATA ---------- */
-    const data = [
-      ["Revenue Analytics Report"],
-      [getRevenueLabel()],
-      [],
-      ["Metric", "Value"],
+  /* ---------- BUILD DATA ---------- */
+  const data = [
+    ["Revenue Analytics Report"],
+    [getRevenueLabel()],
+    [],
+    ["Metric", "Value"],
 
-      ...reportRows.map((row) => {
-
-        let formatted;
-
-        if (row.type === "currency")
-          formatted = formatCurrency(row.value);
-
-        else if (row.type === "percentage")
-          formatted = `${row.value}%`;
-
-        else
-          formatted = String(row.value);
-
-        return [row.label, formatted];
-      }),
-    ];
-
-    /* ---------- CREATE SHEET ---------- */
-    const ws = XLSX.utils.aoa_to_sheet(data);
-
-    /* ---------- COLUMN WIDTH ---------- */
-    ws["!cols"] = [
-      { wch: 38 }, // Metric column
-      { wch: 24 }, // Value column
-    ];
-
-    /* ---------- HEADER BOLD ---------- */
-    ws["A4"].s = { font: { bold: true } };
-    ws["B4"].s = { font: { bold: true } };
-
-    /* ---------- CREATE WORKBOOK ---------- */
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      wb,
-      ws,
-      "Revenue Analytics"
-    );
-
-    /* ---------- DOWNLOAD ---------- */
-    XLSX.writeFile(
-      wb,
-      "RevenueAnalytics.xlsx"
-    );
-
-    setShowExport(false);
-  };
-  /* ================= WORD ================= */
-  const exportWord = () => {
-    const rowsHTML = reportRows.map((row) => {
+    ...reportRows.map((row) => {
 
       let formatted;
 
       if (row.type === "currency")
         formatted = formatCurrency(row.value);
+
       else if (row.type === "percentage")
         formatted = `${row.value}%`;
-      else
-        formatted = row.value;
 
-      return `
+      else
+        formatted = String(row.value);
+
+      return [row.label, formatted];
+    }),
+  ];
+
+  /* ---------- CREATE SHEET ---------- */
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  /* ---------- COLUMN WIDTH ---------- */
+  ws["!cols"] = [
+    { wch: 38 }, // Metric column
+    { wch: 24 }, // Value column
+  ];
+
+  /* ---------- HEADER BOLD ---------- */
+  ws["A4"].s = { font: { bold: true } };
+  ws["B4"].s = { font: { bold: true } };
+
+  /* ---------- CREATE WORKBOOK ---------- */
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(
+    wb,
+    ws,
+    "Revenue Analytics"
+  );
+
+  /* ---------- DOWNLOAD ---------- */
+  XLSX.writeFile(
+    wb,
+    "RevenueAnalytics.xlsx"
+  );
+
+  setShowExport(false);
+};
+/* ================= WORD ================= */
+const exportWord = () => {
+const rowsHTML = reportRows.map((row) => {
+
+  let formatted;
+
+  if (row.type === "currency")
+    formatted = formatCurrency(row.value);
+  else if (row.type === "percentage")
+    formatted = `${row.value}%`;
+  else
+    formatted = row.value;
+
+  return `
     <tr>
       <td>${row.label}</td>
       <td style="text-align:right">${formatted}</td>
     </tr>
   `;
-    }).join("");
+}).join("");
 
-    const htmlContent = `
+  const htmlContent = `
   <html>
   <head>
     <meta charset="utf-8"/>
@@ -643,219 +634,199 @@ const OwnerRevenue = () => {
   </html>
   `;
 
-    const blob = new Blob(["\ufeff", htmlContent], {
-      type: "application/msword",
-    });
+  const blob = new Blob(["\ufeff", htmlContent], {
+    type: "application/msword",
+  });
 
-    saveAs(blob, "RevenueAnalytics.doc");
-    setShowExport(false);
+  saveAs(blob, "RevenueAnalytics.doc");
+  setShowExport(false);
+};
+useEffect(() => {
+
+  const handleClickOutside = (e) => {
+    if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+      setShowCalendar(false);
+    }
   };
-  useEffect(() => {
 
-    const handleClickOutside = (e) => {
-      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
-        setShowCalendar(false);
-      }
-    };
+  document.addEventListener("mousedown", handleClickOutside);
 
-    document.addEventListener("mousedown", handleClickOutside);
+  return () =>
+    document.removeEventListener("mousedown", handleClickOutside);
 
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-
-  }, []);
+}, []);
   return (
     <DashboardLayout
-      title="Revenue Analytics"
-      subtitle="Advanced PG performance insights"
+  title="Revenue Analytics"
+  subtitle="Advanced PG performance insights"
 
-      rightAction={
-        <div className="dashboard-export-wrapper">
+  rightAction={
+    <div className="dashboard-export-wrapper">
 
-          <button
-            className="dashboard-export-btn"
-            onClick={() => setShowExport(!showExport)}
-          >
-            <i className="bi bi-download"></i> Export
-          </button>
+      <button
+        className="dashboard-export-btn"
+        onClick={() => setShowExport(!showExport)}
+      >
+        <i className="bi bi-download"></i> Export
+      </button>
 
-          {showExport && (
-            <div className="dashboard-export-dropdown">
-              <button onClick={exportPDF}>Export as PDF</button>
-              <button onClick={exportWord}>Export as Word</button>
-              <button onClick={exportExcel}>Export as Excel</button>
-            </div>
-          )}
-
+      {showExport && (
+        <div className="dashboard-export-dropdown">
+          <button onClick={exportPDF}>Export as PDF</button>
+          <button onClick={exportWord}>Export as Word</button>
+          <button onClick={exportExcel}>Export as Excel</button>
         </div>
-      }
-    >
+      )}
 
-      <div className="owner-revenue-container" ref={exportRef}>
+    </div>
+  }
+>
+   
+    <div className="owner-revenue-container" ref={exportRef}>
         {loading && <div className="loader">Loading...</div>}
 
         {!loading && (
           <>
             {/* FILTER */}
-            <div className="top-bar">
+        <div className="top-bar">
 
-              <div className="filter-row">
-                {[/*"DAY", "WEEK",*/ "MONTH", "YEAR"].map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={filter === f ? "active" : ""}
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
+      <div className="filter-row">
+        {["DAY", "WEEK", "MONTH", "YEAR"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={filter === f ? "active" : ""}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
 
+    
 
+  {/* CALENDAR  */}
 
-              {/* CALENDAR  */}
+   <div className="calendar-wrapper">
 
-              <div className="calendar-wrapper">
+      <button
+      className="date-trigger-btn"
+      onClick={() => setShowCalendar(!showCalendar)}
+      >
+    {startDate && endDate
+      ? `${format(startDate,"dd MMM yyyy")} - ${format(endDate,"dd MMM yyyy")}`
+      : <><FaCalendarAlt /> Select Date Range</>}
+        </button>
 
-                <button
-                  className="date-trigger-btn"
-                  onClick={() => setShowCalendar(!showCalendar)}
-                >
-                  {startDate && endDate
-                    ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                    : <><FaCalendarAlt /> Select Date Range</>}
-                </button>
+          {showCalendar && (
+        <div ref={calendarRef} className="calendar-popup">
+          <div className="range-preview">
 
-                {showCalendar && (
-                  <div ref={calendarRef} className="calendar-popup">
-                    <div className="range-preview">
+        <div>
+          <label>From</label>
+          <div className="range-box">
+            {startDate ? format(startDate, "dd MMM yyyy") : "Select"}
+          </div>
+        </div>
 
-                      <div>
-                        <label>From</label>
-                        <div className="range-box">
-                          {startDate ? format(startDate, "dd MMM yyyy") : "Select"}
-                        </div>
-                      </div>
+        <div>
+          <label>To</label>
+          <div className="range-box">
+            {endDate ? format(endDate, "dd MMM yyyy") : "Select"}
+          </div>
+        </div>
 
-                      <div>
-                        <label>To</label>
-                        <div className="range-box">
-                          {endDate ? format(endDate, "dd MMM yyyy") : "Select"}
-                        </div>
-                      </div>
+      </div>
 
-                    </div>
+      <DayPicker
+        mode={filter === "DAY" ? "single" : "range"}
+        numberOfMonths={isMobile ? 1 : 1}
+        pagedNavigation
+        selected={{
+          from: startDate,
+          to: endDate
+        }}
+        onSelect={(range) => {
 
-                    <DayPicker
-                      mode={filter === "DAY" ? "single" : "range"}
-                      numberOfMonths={isMobile ? 1 : 1}
-                      pagedNavigation
-                      selected={{
-                        from: startDate,
-                        to: endDate
-                      }}
-                      onSelect={(range) => {
+          if (filter === "DAY") {
+            setStartDate(range);
+            setEndDate(range);
+          } else {
+            setStartDate(range?.from || null);
+            setEndDate(range?.to || null);
+          }
 
-                        if (filter === "DAY") {
-                          setStartDate(range);
-                          setEndDate(range);
-                        } else {
-                          setStartDate(range?.from || null);
-                          setEndDate(range?.to || null);
-                        }
+        }}
+      />
+        {/* Clear Filter Button */}
+        <div style={{ marginTop: "10px", textAlign: "right" }}>
+          <button
+              className="btn btn-sm btn-light"
+              onClick={() => {
+              setStartDate(null);
+              setEndDate(null);
+              setShowCalendar(false);
+              }}
+          >
+              Clear
+            </button>
+          </div>
 
-                      }}
-                    />
-                    {/* Clear Filter Button */}
-                    <div style={{ marginTop: "10px", textAlign: "right" }}>
-                      <button
-                        className="btn btn-sm btn-light"
-                        onClick={() => {
-                          setStartDate(null);
-                          setEndDate(null);
-                          setShowCalendar(false);
-                        }}
-                      >
-                        Clear
-                      </button>
-                    </div>
-
-                  </div>
-                )}
-
-              </div>
-
+          </div>
+            )}
 
             </div>
 
+
+        </div>
+
             {/* KPI GRID */}
             <div className="kpi-grid">
-
-              <KPI
-                title="Total Revenue"
-                value={`₹${animatedTotalRevenue.toLocaleString()}`}
-                icon="bi bi-cash-stack"
-                color="kpi-orange"
-              />
-
-              <KPI
-                title="Net Revenue"
-                value={`₹${animatedRevenue.toLocaleString()}`}
-                icon="bi bi-currency-rupee"
-                color="kpi-blue"
-              />
-              <KPI
-                title="Rent Collected"
-                value={`₹${animatedRent.toLocaleString()}`}
-                icon="bi bi-wallet2"
-                color="kpi-purple"
-              />
-              <KPI
-                title="Deposit Held"
-                value={`₹${animatedDeposit.toLocaleString()}`}
-                icon="bi bi-safe"
-                color="kpi-green"
-              />
-              <KPI
-                title="Active Residents"
-                value={totalActiveResidents}
-                icon="bi bi-person-check"
-                color="kpi-green"
-                onClick={() => navigate("/owner/residents")}
-              />
-              <KPI
-                title="Reserved Residents"
-                value={totalReservedResidents}
-                icon="bi bi-bookmark-check"
-                color="kpi-purple"
-                onClick={() => navigate("/owner/residents")}
-              />
+           <KPI
+              title="Net Revenue"
+              value={`₹${animatedRevenue.toLocaleString()}`}
+              icon="bi bi-currency-rupee"
+              color="kpi-blue"
+            />
+           <KPI
+            title="Rent Collected"
+            value={`₹${animatedRent.toLocaleString()}`}
+            icon="bi bi-wallet2"
+            color="kpi-purple"
+          />
+             <KPI
+              title="Deposit Held"
+              value={`₹${animatedDeposit.toLocaleString()}`}
+              icon="bi bi-safe"
+              color="kpi-green"
+            />
+            <KPI
+              title="Active Residents"
+              value={totalActiveResidents}
+              icon="bi bi-person-check"
+              color="kpi-green"
+              onClick={() => navigate("/owner/residents")}
+            />
+            <KPI
+              title="Reserved Residents"
+              value={totalReservedResidents}
+              icon="bi bi-bookmark-check"
+              color="kpi-purple"
+              onClick={() => navigate("/owner/residents")}
+            />
               <KPI
                 title="Avg Revenue / Resident"
                 value={`₹${animatedAvg.toLocaleString()}`}
                 icon="bi bi-graph-up-arrow"
                 color="kpi-blue"
               />
-              {/*
-              <KPI
-                title="Total Enquiries"
-                value={totalEnquiries}
-                icon="bi bi-chat-dots"
-                color="kpi-blue"
-                onClick={() => navigate("/owner/enquiries")}
-              />
-              */}
-
-              <KPI
-                title="Future Deposit Refund"
-                value={format(new Date(), "MMMM yyyy")}
-                icon="bi bi-calendar-check"
-                color="kpi-green"
-              />
-
-
+           <KPI
+            title="Total Enquiries"
+            value={totalEnquiries}
+            icon="bi bi-chat-dots"
+            color="kpi-blue"
+            onClick={() => navigate("/owner/enquiries")}
+          />
             </div>
-
 
             {/* CHARTS */}
             <div className="analytics-grid">
@@ -895,7 +866,7 @@ const OwnerRevenue = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                   <h3 style={{ margin: 0 }}>Revenue Trend</h3>
                   <div className="chart-toggle-wrapper">
-                    <button
+                    <button 
                       className={`chart-toggle-switch ${chartType}`}
                       onClick={() => setChartType(chartType === "area" ? "bar" : "area")}
                       aria-label="Toggle Chart Type"
@@ -908,107 +879,107 @@ const OwnerRevenue = () => {
                   </div>
                 </div>
 
-                {chartData.length === 0 ? (
+          {chartData.length === 0 ? (
 
-                  <div className="empty-chart">
-                    No revenue data for selected dates
-                  </div>
+          <div className="empty-chart">
+            No revenue data for selected dates
+          </div>
 
-                ) : (
+        ) : (
 
-                  <ResponsiveContainer width="100%" height={isMobile ? 220 : 320}>
-                    {chartType === "area" ? (
-                      <AreaChart
-                        data={chartData}
-                        margin={
-                          isMobile
-                            ? { top: 16, right: 30, left: 10, bottom: 0 }
-                            : { top: 20, right: 40, left: 20, bottom: 0 }
-                        }
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
+          <ResponsiveContainer width="100%" height={isMobile ? 220 : 320}>
+            {chartType === "area" ? (
+              <AreaChart
+                data={chartData}
+                margin={
+                  isMobile
+                    ? { top: 16, right: 30, left: 10, bottom: 0 }
+                    : { top: 20, right: 40, left: 20, bottom: 0 }
+                }
+              >
+                <CartesianGrid strokeDasharray="3 3" />
 
-                        <XAxis
-                          dataKey="date"
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
-                          tickLine={false}
-                          interval={isMobile ? "preserveStartEnd" : 0}
-                        />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: isMobile ? 10 : 13 }}
+                  tickLine={false}
+                  interval={isMobile ? "preserveStartEnd" : 0}
+                />
 
-                        <YAxis
-                          width={isMobile ? 48 : 60}
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
-                          tickFormatter={(v) =>
-                            isMobile
-                              ? v >= 1000
-                                ? `₹${(v / 1000).toFixed(0)}k`
-                                : `₹${v}`
-                              : `₹${v}`
-                          }
-                        />
+                <YAxis
+                  width={isMobile ? 48 : 60}
+                  tick={{ fontSize: isMobile ? 10 : 13 }}
+                  tickFormatter={(v) =>
+                    isMobile
+                      ? v >= 1000
+                        ? `₹${(v / 1000).toFixed(0)}k`
+                        : `₹${v}`
+                      : `₹${v}`
+                  }
+                />
 
-                        <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, "Revenue"]} />
-                        <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
+                <Tooltip formatter={(v)=>[`₹${v.toLocaleString()}`,"Revenue"]}/>
+                <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
 
-                        <Area
-                          type="monotone"
-                          dataKey="revenue"
-                          stroke="#6366f1"
-                          fill="#6366f1"
-                          fillOpacity={0.4}
-                        >
-                          {!isMobile && (
-                            <LabelList
-                              dataKey="revenue"
-                              position="top"
-                              formatter={(v) => `₹${v}`}
-                            />
-                          )}
-                        </Area>
-                      </AreaChart>
-                    ) : (
-                      <BarChart
-                        data={chartData}
-                        margin={
-                          isMobile
-                            ? { top: 16, right: 30, left: 10, bottom: 0 }
-                            : { top: 20, right: 40, left: 20, bottom: 0 }
-                        }
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                          dataKey="date"
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
-                          tickLine={false}
-                          interval={isMobile ? "preserveStartEnd" : 0}
-                        />
-                        <YAxis
-                          width={isMobile ? 48 : 60}
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
-                          tickFormatter={(v) =>
-                            isMobile
-                              ? v >= 1000
-                                ? `₹${(v / 1000).toFixed(0)}k`
-                                : `₹${v}`
-                              : `₹${v}`
-                          }
-                        />
-                        <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, "Revenue"]} />
-                        <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
-                        <Bar dataKey="revenue" fill="#6366f1" radius={[4, 4, 0, 0]}>
-                          {!isMobile && (
-                            <LabelList
-                              dataKey="revenue"
-                              position="top"
-                              formatter={(v) => `₹${v}`}
-                            />
-                          )}
-                        </Bar>
-                      </BarChart>
-                    )}
-                  </ResponsiveContainer>
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#6366f1"
+                  fill="#6366f1"
+                  fillOpacity={0.4}
+                >
+                  {!isMobile && (
+                    <LabelList
+                      dataKey="revenue"
+                      position="top"
+                      formatter={(v)=>`₹${v}`}
+                    />
+                  )}
+                </Area>
+              </AreaChart>
+            ) : (
+              <BarChart
+                data={chartData}
+                margin={
+                  isMobile
+                    ? { top: 16, right: 30, left: 10, bottom: 0 }
+                    : { top: 20, right: 40, left: 20, bottom: 0 }
+                }
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: isMobile ? 10 : 13 }}
+                  tickLine={false}
+                  interval={isMobile ? "preserveStartEnd" : 0}
+                />
+                <YAxis
+                  width={isMobile ? 48 : 60}
+                  tick={{ fontSize: isMobile ? 10 : 13 }}
+                  tickFormatter={(v) =>
+                    isMobile
+                      ? v >= 1000
+                        ? `₹${(v / 1000).toFixed(0)}k`
+                        : `₹${v}`
+                      : `₹${v}`
+                  }
+                />
+                <Tooltip formatter={(v)=>[`₹${v.toLocaleString()}`,"Revenue"]}/>
+                <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
+                <Bar dataKey="revenue" fill="#6366f1" radius={[4, 4, 0, 0]}>
+                  {!isMobile && (
+                    <LabelList
+                      dataKey="revenue"
+                      position="top"
+                      formatter={(v)=>`₹${v}`}
+                    />
+                  )}
+                </Bar>
+              </BarChart>
+            )}
+          </ResponsiveContainer>
 
-                )}
+            )}
               </div>
             </div>
           </>
