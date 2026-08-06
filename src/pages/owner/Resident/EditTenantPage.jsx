@@ -198,6 +198,19 @@ const EditTenantPage = ({ apiPrefix }) => {
   const selectedStateObj = useMemo(() => indianStates.find(s => s.name === form.permanentState), [indianStates, form.permanentState]);
   const indianCities = useMemo(() => selectedStateObj ? City.getCitiesOfState("IN", selectedStateObj.isoCode) : [], [selectedStateObj]);
 
+  // Auto-calculate future deposit refund
+  useEffect(() => {
+    const valNum = Number(form.deposit);
+    let refund = form.futureDepositRefund;
+    if (valNum === 2000) refund = "1000";
+    else if (valNum === 5000) refund = "2000";
+    else if (valNum === 10000) refund = "4000";
+
+    if (refund !== form.futureDepositRefund) {
+      setForm((prev) => ({ ...prev, futureDepositRefund: refund }));
+    }
+  }, [form.deposit]);
+
   const isDaily = form.stayType === "DAILY_BASIC";
   const total = useMemo(
     () =>
