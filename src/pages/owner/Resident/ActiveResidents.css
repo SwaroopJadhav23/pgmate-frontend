@@ -946,3 +946,189 @@
 .ar-sig-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; }
 .agreement-popup-sig-bg { background: #f8faff; padding: 8px; border-radius: 8px; }
 .ar-link-btn { text-decoration: none; font-size: 13px; padding: 6px 16px; }
+
+/* =============================================
+   POLICE VERIFICATION BUTTON — rdp-actions row
+============================================= */
+
+.rdp-btn-police {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: #ecfeff;
+  color: #0e7490;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background 0.15s, filter 0.15s;
+  min-height: 44px;
+}
+
+.rdp-btn-police:hover {
+  background: #cffafe;
+  filter: brightness(0.98);
+}
+
+.rdp-btn-police:active {
+  filter: brightness(0.94);
+}
+/* =============================================
+   POLICE VERIFICATION FORM
+============================================= */
+
+/* A4-sized paper look */
+.pv-modal {
+  width: 794px;
+  max-width: 95vw;
+ min-height: 750px;/* min-height: 1123px; */
+  background: #fff;
+  padding: 20px;
+  border-radius: 2px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.35);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.pv-printable {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pv-page {
+  border: 2px solid #000;
+  padding: 22px 30px 20px;
+  overflow: hidden;
+  background: #fff;
+}
+.pv-header-row { display: flex; justify-content: space-between; font-size: 12px; color: #111; margin-bottom: 10px; }
+.pv-form-no, .pv-admission-date { font-weight: 500; }
+
+.pv-header-main { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.pv-header-info { flex: 1; padding-right: 20px; }
+.pv-pg-name { color: #2b3fbf; font-weight: 700; font-size: 19px; margin: 0 0 4px; }
+.pv-pg-address, .pv-pg-phone { font-size: 11.5px; color: #111; margin: 1px 0; line-height: 1.3; }
+
+.pv-photo-box {
+  width: 70px; height: 80px; flex-shrink: 0;
+  border: 1px solid #000;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #9ca3af;
+}
+
+.pv-form-title {
+  text-align: center; color: #2b3fbf; font-weight: 700;
+  font-size: 15px; margin: 0 0 8px; padding: 6px 0;
+  border-top: 1.5px solid #000; border-bottom: 1.5px solid #000;
+}
+
+.pv-field-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.pv-row-2 { display: flex; gap: 20px; min-width: 0; }
+.pv-field-line { display: flex; align-items: baseline; gap: 6px; font-size: 12px; flex: 1; min-width: 0; }
+.pv-field-line--short { max-width: 150px; flex: none; }
+.pv-field-label { white-space: nowrap; font-weight: 600; color: #111; }
+.pv-field-input {
+  flex: 1; border: none; border-bottom: 1px solid #000;
+   padding: 1px 4px; font-size: 12px; background: transparent;
+   min-width: 0; width: 100%;
+}
+.pv-field-input:focus { outline: none; border-bottom-color: #5B5BD6; }
+.pv-field-input--area { resize: none; }
+
+.pv-declaration-title { text-align: center; font-weight: 700; font-size: 10px; text-decoration: underline; margin-top: 6px; margin-bottom: 4px; color: #111; }
+.pv-declaration { font-size: 8.5px; font-weight: 700; color: #111; margin-top: 0; line-height: 1.35; text-align: justify; }
+.pv-signature-line { font-size: 11px; margin-top: 10px; text-align: right; }
+/* ── Page 2: Rules & Regulations ── */
+.pv-page-2 { padding: 20px 24px 18px; }
+
+.pv-rules-title-wrap {
+  border-bottom: 1.5px solid #000;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+}
+.pv-rules-title {
+  text-align: center;
+  color: #2b3fbf;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+.pv-rules-list {
+  font-size: 8.5px;
+  line-height: 1.32;
+  color: #111;
+  padding-left: 16px;
+  margin: 0 0 8px;
+}
+.pv-rules-list li { margin-bottom: 3px; text-align: justify; }
+.pv-blue-bold { color: #2b3fbf; font-weight: 700; }
+.pv-rules-notice {
+  color: #2b3fbf;
+  font-weight: 700;
+  font-size: 8.5px;
+  line-height: 1.32;
+  margin: 6px 0;
+  text-align: justify;
+}
+.pv-rules-thanks {
+  color: #2b3fbf;
+  font-weight: 700;
+  font-size: 8.5px;
+  margin: 6px 0 14px;
+  text-align: center;
+}
+.pv-rules-sign-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 9px;
+  color: #2b3fbf;
+  font-weight: 600;
+  text-align: center;
+}
+.pv-sign-block { line-height: 1.8; }
+.pv-sig-input {
+  border: none;
+  border-bottom: 1px solid #000;
+  background: transparent;
+  font-size: 11px;
+  font-family: 'Brush Script MT', cursive;
+  padding: 1px 4px;
+  width: 200px;
+  text-align: center;
+}
+.pv-sig-input:focus { outline: none; border-bottom-color: #5B5BD6; }
+.pv-sig-input--rules { width: 180px; font-size: 12px; }
+
+.pv-field-input--error { border-bottom-color: #dc2626; }
+.pv-field-error { font-size: 9px; color: #dc2626; margin-left: 4px; white-space: nowrap; }
+/* Print only the form, hide everything else */
+@media print {
+  body * { visibility: hidden; }
+  .pv-printable, .pv-printable * { visibility: visible; }
+
+.agreement-view-popup-overlay,
+.agreement-view-popup,
+.pv-modal {
+  position: static !important;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  width: auto !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+  .pv-printable {
+    position: absolute; top: 0; left: 0; width: 100%;
+    padding: 20px;
+  }
+  .pv-page { page-break-after: always; }
+  .pv-page:last-child { page-break-after: auto; }
+  .pv-no-print, .pv-no-print-bg { display: none !important; }
+  @page { size: A4; margin: 15mm; }
+}
