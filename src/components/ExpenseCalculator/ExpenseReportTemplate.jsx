@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useRef, useEffect} from "react";
 import {Doughnut} from "react-chartjs-2";
 import {Chart as ChartJS, ArcElement, Tooltip, Legend} from "chart.js";
 import pgmateLogo from "../../assets/pgmate-withoutbg.png";
@@ -168,7 +168,29 @@ const ExpenseReportTemplate = ({data, id}) => {
   ];
 
   // ── SVG icons (inline so html-to-image renders correctly) ──
-      const TrendUpSVG = ({color = "#22c55e"}) => (
+  const HomeSVG = () => (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="#6f7af0"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 3L4 9v12h5v-7h6v7h5V9z" fill="#6f7af0" />
+    </svg>
+  );
+  const FooterHomeSVG = () => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="white"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 3L4 9v12h5v-7h6v7h5V9z" fill="white" />
+    </svg>
+  );
+  const TrendUpSVG = ({color = "#22c55e"}) => (
     <svg
       width="20"
       height="20"

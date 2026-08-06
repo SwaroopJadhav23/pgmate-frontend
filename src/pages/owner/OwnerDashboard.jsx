@@ -1499,7 +1499,16 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       ]
       : [{ value: 1, fill: "#e8e7fd" }];
 
-
+  const [ownerLangOpen, setOwnerLangOpen] = useState(false);
+  const ownerLangRef = useRef(null);
+  useEffect(() => {
+    const h = (e) => {
+      if (ownerLangRef.current && !ownerLangRef.current.contains(e.target))
+        setOwnerLangOpen(false);
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
   /* ─── Overview cards data ─────────────────────────────────── */
 

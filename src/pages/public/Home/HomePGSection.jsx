@@ -235,7 +235,11 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
-          const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const searchWrapRef = useRef(null);
   const dropdownHostRef = useRef(null);
@@ -377,11 +381,11 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
       const res = await api.get("/public/pgs/paged", {params});
       const content = res.data?.content || [];
       setPgs(content);
-
+      setTotalElements(content.length);
     } catch (err) {
       console.error(err);
       setPgs([]);
-
+      setTotalElements(0);
     } finally {
       setLoading(false);
     }
