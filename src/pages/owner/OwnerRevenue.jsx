@@ -810,7 +810,7 @@ const OwnerRevenue = () => {
                 color="kpi-orange"
               />
 
-             
+
               <KPI
                 title="Rent Collected"
                 value={`₹${animatedRent.toLocaleString()}`}
@@ -824,7 +824,7 @@ const OwnerRevenue = () => {
                 color="kpi-green"
               />
 
-               <KPI
+              <KPI
                 title="Future Deposit Refund"
                 value={`₹${animatedFutureRefund.toLocaleString()}`}
                 icon="bi bi-calendar-check"
@@ -845,7 +845,7 @@ const OwnerRevenue = () => {
                 color="kpi-purple"
                 onClick={() => navigate("/owner/residents")}
               />
-             
+
               {/*
               <KPI
                 title="Total Enquiries"
@@ -856,8 +856,8 @@ const OwnerRevenue = () => {
               />
               */}
 
-             
 
+              {/* 
                <KPI
                 title="Net Revenue"
                 value={`₹${animatedRevenue.toLocaleString()}`}
@@ -871,7 +871,7 @@ const OwnerRevenue = () => {
                 icon="bi bi-graph-up-arrow"
                 color="kpi-blue"
               />
-              
+              */}
 
             </div>
 
@@ -935,7 +935,7 @@ const OwnerRevenue = () => {
 
                 ) : (
 
-                  <ResponsiveContainer width="100%" height={isMobile ? 220 : 320}>
+                  <ResponsiveContainer width="100%" height={isMobile ? 260 : 380}>
                     {chartType === "area" ? (
                       <AreaChart
                         data={chartData}
@@ -949,9 +949,12 @@ const OwnerRevenue = () => {
 
                         <XAxis
                           dataKey="date"
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
+                          tick={{ fontSize: 9 }}
                           tickLine={false}
-                          interval={isMobile ? "preserveStartEnd" : 0}
+                          interval={0}
+                          angle={-90}
+                          textAnchor="end"
+                          height={70}
                         />
 
                         <YAxis
@@ -979,8 +982,18 @@ const OwnerRevenue = () => {
                           {!isMobile && (
                             <LabelList
                               dataKey="revenue"
-                              position="top"
-                              formatter={(v) => `₹${v}`}
+                              content={({ x, y, value, index }) => (
+                                <text
+                                  x={x}
+                                  y={y - (index % 2 === 0 ? 10 : 24)}
+                                  textAnchor="middle"
+                                  fontSize={10}
+                                  fill="#4338ca"
+                                  fontWeight={600}
+                                >
+                                  {`₹${value}`}
+                                </text>
+                              )}
                             />
                           )}
                         </Area>
@@ -990,16 +1003,19 @@ const OwnerRevenue = () => {
                         data={chartData}
                         margin={
                           isMobile
-                            ? { top: 16, right: 30, left: 10, bottom: 0 }
-                            : { top: 20, right: 40, left: 20, bottom: 0 }
+                            ? { top: 16, right: 30, left: 10, bottom: 40 }
+                            : { top: 20, right: 40, left: 20, bottom: 60 }
                         }
                       >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                           dataKey="date"
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
+                          tick={{ fontSize: 9 }}
                           tickLine={false}
-                          interval={isMobile ? "preserveStartEnd" : 0}
+                          interval={0}
+                          angle={-90}
+                          textAnchor="end"
+                          height={70}
                         />
                         <YAxis
                           width={isMobile ? 48 : 60}
@@ -1018,8 +1034,18 @@ const OwnerRevenue = () => {
                           {!isMobile && (
                             <LabelList
                               dataKey="revenue"
-                              position="top"
-                              formatter={(v) => `₹${v}`}
+                              content={({ x, y, width, value, index }) => (
+                                <text
+                                  x={x + width / 2}
+                                  y={y - (index % 2 === 0 ? 8 : 20)}
+                                  textAnchor="middle"
+                                  fontSize={10}
+                                  fill="#4338ca"
+                                  fontWeight={600}
+                                >
+                                  {`₹${value}`}
+                                </text>
+                              )}
                             />
                           )}
                         </Bar>
