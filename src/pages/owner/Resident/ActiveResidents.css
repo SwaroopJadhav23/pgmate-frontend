@@ -1,4 +1,4 @@
-/*AActive Resident.css*/
+/*Active Resident.css*/
 
 /* ===============================
    RESIDENT ACTION BUTTONS
@@ -1101,10 +1101,171 @@
   text-align: center;
 }
 .pv-sig-input:focus { outline: none; border-bottom-color: #5B5BD6; }
+/* AFTER */
 .pv-sig-input--rules { width: 180px; font-size: 12px; }
 
 .pv-field-input--error { border-bottom-color: #dc2626; }
 .pv-field-error { font-size: 9px; color: #dc2626; margin-left: 4px; white-space: nowrap; }
+
+/* =============================================
+   POLICE VERIFICATION FORM — RESPONSIVE
+============================================= */
+
+/* ── Tablet (601px – 1024px) ── */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .pv-modal {
+    width: 92vw;
+    max-width: 700px;
+    padding: 16px;
+    max-height: 90dvh;
+  }
+
+  .pv-page {
+    padding: 18px 22px 16px;
+  }
+
+  .pv-pg-name { font-size: 17px; }
+  .pv-pg-address, .pv-pg-phone { font-size: 10.5px; }
+  .pv-form-title { font-size: 14px; }
+
+  .pv-field-line { font-size: 11px; }
+  .pv-field-input { font-size: 11px; }
+
+  .pv-declaration { font-size: 8px; }
+  .pv-rules-list,
+  .pv-rules-notice,
+  .pv-rules-thanks { font-size: 8px; }
+}
+
+/* ── Mobile (≤600px) ── */
+@media (max-width: 600px) {
+  .pv-modal {
+    width: 100%;
+    max-width: 100vw;
+    min-height: auto;
+    max-height: 95dvh;
+    padding: 10px;
+    border-radius: 0;
+  }
+
+  .pv-printable {
+    gap: 16px;
+  }
+
+  .pv-page {
+    padding: 14px 14px 12px;
+  }
+
+  .pv-header-row {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+
+  .pv-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .pv-header-info {
+    padding-right: 0;
+  }
+
+  .pv-pg-name {
+    font-size: 16px;
+  }
+
+  .pv-pg-address,
+  .pv-pg-phone {
+    font-size: 10px;
+  }
+
+  .pv-photo-box {
+    width: 60px;
+    height: 68px;
+    align-self: flex-end;
+    font-size: 10px;
+  }
+
+  .pv-form-title {
+    font-size: 13px;
+    padding: 5px 0;
+    margin-bottom: 8px;
+  }
+
+  .pv-field-list {
+    gap: 10px;
+  }
+
+  .pv-row-2 {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pv-field-line--short {
+    max-width: 100%;
+  }
+
+  .pv-field-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    font-size: 11px;
+  }
+
+  .pv-field-label {
+    white-space: normal;
+  }
+
+  .pv-field-input {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .pv-declaration-title {
+    font-size: 9px;
+  }
+
+  .pv-declaration {
+    font-size: 7.5px;
+  }
+
+  .pv-signature-line {
+    text-align: left;
+  }
+
+  .pv-page-2 {
+    padding: 14px 14px 12px;
+  }
+
+  .pv-rules-title {
+    font-size: 12px;
+  }
+
+  .pv-rules-list {
+    font-size: 7.5px;
+    padding-left: 12px;
+  }
+
+  .pv-rules-notice,
+  .pv-rules-thanks {
+    font-size: 7.5px;
+  }
+
+  .pv-rules-sign-row {
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .ar-modal-actions {
+    flex-direction: column;
+  }
+}
+
 /* Print only the form, hide everything else */
 @media print {
   body * { visibility: hidden; }
