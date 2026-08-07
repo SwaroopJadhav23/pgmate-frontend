@@ -233,14 +233,14 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
           <table className="modern-table">
             <thead>
               <tr>
-                <th>S.No</th><th>Name</th><th>Phone</th><th>Rent</th><th>Check-in</th><th>Expected Checkout</th><th>Stay Type</th><th>Actions</th>
+                <th>S.No</th><th>Name</th><th>Phone</th><th>Rent</th><th>Check-in</th><th>Expected Checkout</th><th>Stay Type</th><th>Paid Status</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <TableSkeleton rows={6} cols={8} />
+                <TableSkeleton rows={6} cols={9} />
               ) : residents.length === 0 ? (
-                <tr><td colSpan="8" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
+                <tr><td colSpan="9" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
               ) : (
                 residents.map((r, idx) => {
                   // eslint-disable-next-line
@@ -265,6 +265,11 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                       <td data-label="Stay Type">
                         <span className={`payment-pill ${isDailyResident(r) ? "pill-online" : "pill-cash"}`}>
                           {isDailyResident(r) ? "Daily" : "Monthly"}
+                        </span>
+                      </td>
+                      <td data-label="Paid Status">
+                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-online"}`}>
+                          {r.hasPendingDues ? "Pending" : "Paid"}
                         </span>
                       </td>
                       <td data-label="Actions" className="d-flex gap-2 justify-content-center align-items-center" onClick={(e) => e.stopPropagation()}>
@@ -297,20 +302,25 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
           <table className="modern-table mob-table">
             <thead>
               <tr>
-                <th>Name</th><th>Rent</th><th>Actions</th>
+                <th>Name</th><th>Rent</th><th>Paid Status</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <TableSkeleton rows={6} cols={4} />
               ) : residents.length === 0 ? (
-                <tr><td colSpan="3" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
+                <tr><td colSpan="4" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
               ) : (
                 residents.map((r) => {
                   return (
                     <tr key={r.residentId} onClick={() => setDetailResident(r)} className="ar-cursor-pointer">
                       <td data-label="Name">{r.name}</td>
                       <td data-label="Rent">{chargeLabel(r)}</td>
+                      <td data-label="Paid Status">
+                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-online"}`} style={{ fontSize: "0.75rem" }}>
+                          {r.hasPendingDues ? "Pending" : "Paid"}
+                        </span>
+                      </td>
                       <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
                         <div className="mob-actions-wrap">
                           <div className="mob-actions-icons">
