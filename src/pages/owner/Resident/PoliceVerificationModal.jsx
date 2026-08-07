@@ -130,41 +130,40 @@ clone.querySelectorAll(".pv-header-main").forEach((el) => {
   el.style.marginBottom = "10px";
 });
 clone.querySelectorAll(".pv-pg-name").forEach((el) => {
-  el.style.fontSize = "24px";
-  el.style.marginBottom = "6px";
-});
-clone.querySelectorAll(".pv-pg-address, .pv-pg-phone").forEach((el) => {
-  el.style.fontSize = "13px";
-  el.style.margin = "3px 0";
-  el.style.lineHeight = "1.4";
-});
-    clone.querySelectorAll(".pv-photo-box").forEach((el) => {
-      el.style.width = "100px";
-      el.style.height = "115px";
-    });
-clone.querySelectorAll(".pv-form-title").forEach((el) => {
-  el.style.fontSize = "18px";
-  el.style.textAlign = "center";
-  el.style.margin = "6px 0 14px";
-  el.style.padding = "8px 0";
-});
-clone.querySelectorAll(".pv-field-list").forEach((el) => {
-  el.style.gap = "14px";
+  el.style.fontSize = "34px";
   el.style.marginBottom = "14px";
 });
+clone.querySelectorAll(".pv-pg-address, .pv-pg-phone").forEach((el) => {
+  el.style.fontSize = "15px";
+  el.style.margin = "8px 0";
+  el.style.lineHeight = "1.5";
+  el.style.fontWeight = "400";
+});
+    clone.querySelectorAll(".pv-photo-box").forEach((el) => {
+      el.style.width = "110px";
+      el.style.height = "140px";
+    });
+clone.querySelectorAll(".pv-form-title").forEach((el) => {
+  el.style.fontSize = "22px";
+  el.style.textAlign = "center";
+  el.style.margin = "12px 0 20px";
+  el.style.padding = "10px 0";
+});
+clone.querySelectorAll(".pv-field-list").forEach((el) => {
+  el.style.gap = "18px";
+  el.style.marginBottom = "18px";
+});
 clone.querySelectorAll(".pv-field-line").forEach((el) => {
-  el.style.fontSize = "13px";
+  el.style.fontSize = "15px";
   el.style.alignItems = "baseline";
 });
 clone.querySelectorAll(".pv-field-input").forEach((el) => {
-  el.style.fontSize = "13px";
+  el.style.fontSize = "15px";
   el.style.padding = "2px 6px";
 });
     clone.querySelectorAll(".pv-field-label").forEach((el) => {
-      el.style.textTransform = "uppercase";
       el.style.fontWeight = "700";
-      el.style.fontSize = "13px";
-      el.style.letterSpacing = "0.3px";
+      el.style.fontSize = "15px";
     });
 clone.querySelectorAll(".pv-declaration-title").forEach((el) => {
   el.style.fontSize = "14px";
@@ -292,21 +291,22 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
             <h5 className="pv-form-title">Police Verification Form</h5>
 
             <div className="pv-field-list">
-              <PVField label="1. Name of Tenant" value={form.tenantName} onChange={update("tenantName")} />
+              <PVField label="1. Name of tenant" value={form.tenantName} onChange={update("tenantName")} />
               <div className="pv-row-2">
                 <PVField label="2. Birth Date" type="date" value={form.birthDate} onChange={handleBirthDateChange} />
                 <PVField label="Age" value={form.age} onChange={update("age")} short />
               </div>
               <PVField label="3. Tenant phone no" type="tel" value={form.phone} onChange={handlePhoneChange("phone")} error={errors.phone} />
-              <PVField label="4. Tenant college / Company Name" value={form.college} onChange={update("college")} />
+              <PVField label="4. Tenant College / Company Name" value={form.college} onChange={update("college")} twoLines />
               <PVField label="5. Tenant Education" value={form.education} onChange={update("education")} />
               <PVField label="6. Tenant Aadhaar no" value={form.aadhaar} onChange={update("aadhaar")} />
               <PVField label="7. Tenant Email ID" type="email" value={form.email} onChange={handleEmailChange} error={errors.email} />
-              <PVField label="8. Permanent Address" value={form.permanentAddress} onChange={update("permanentAddress")} textarea />
+              <PVField label="8. Permanent Address" value={form.permanentAddress} onChange={update("permanentAddress")} twoLines />
+              
               <PVField label="9. Fathers Full Name" value={form.fathersName} onChange={update("fathersName")} />
               <PVField label="10. Fathers Phone No" type="tel" value={form.fathersPhone} onChange={handlePhoneChange("fathersPhone")} error={errors.fathersPhone} />
               <PVField label="11. Local Guardian Name" value={form.guardianName} onChange={update("guardianName")} />
-              <PVField label="12. Local Guardian Address" value={form.guardianAddress} onChange={update("guardianAddress")} />
+              <PVField label="12. Local Guardian Address" value={form.guardianAddress} onChange={update("guardianAddress")} twoLines />
               <PVField label="13. Local Guardian Phone no" type="tel" value={form.guardianPhone} onChange={handlePhoneChange("guardianPhone")} error={errors.guardianPhone} />
             </div>
 
@@ -441,17 +441,14 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
   );
 };
 
-const PVField = ({ label, value, onChange, type = "text", textarea = false, short = false, error = "" }) => (
-  <div className={`pv-field-line ${short ? "pv-field-line--short" : ""}`}>
-    <label className="pv-field-label">{label}:</label>
-    {textarea ? (
-      <textarea className="pv-field-input pv-field-input--area" rows={1} value={value} onChange={onChange} />
-    ) : (
-      <>
-        <input className={`pv-field-input ${error ? "pv-field-input--error" : ""}`} type={type} value={value} onChange={onChange} />
-        {error && <span className="pv-field-error">{error}</span>}
-      </>
-    )}
+const PVField = ({ label, value, onChange, type = "text", short = false, error = "", twoLines = false }) => (
+  <div className={`pv-field-container ${short ? "pv-field-container--short" : ""}`}>
+    <div className="pv-field-line">
+      <label className="pv-field-label">{label}:</label>
+      <input className={`pv-field-input ${error ? "pv-field-input--error" : ""}`} type={type} value={value} onChange={onChange} />
+      {error && <span className="pv-field-error">{error}</span>}
+    </div>
+    {twoLines && <div className="pv-field-line-extra"></div>}
   </div>
 );
 
