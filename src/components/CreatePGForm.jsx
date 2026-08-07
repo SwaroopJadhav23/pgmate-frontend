@@ -3,7 +3,7 @@ import "../CSS/CreatePGForm.css"; // Import the new CSS
 import api from "../api/axios";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
-import RulesClausesTable, { DEFAULT_RULES } from "./RulesClausesTable";
+import RulesClausesTable, { DEFAULT_RULES, resolveRuleDescription } from "./RulesClausesTable";
 import { AuthContext } from "../context/AuthContext";
 const AMENITIES_LIST = [
   "Parking", "Wifi", "Refrigerator", "Almirah", "Bed Sheet",
@@ -27,6 +27,24 @@ const HOUSE_RULES_LIST = [
   "Outside Food Allowed",
   "Management Rules Must Be Followed",
   "Respect Other Residents"
+];
+
+const GENERALIZED_RULES = [
+  "Residents must follow all the rules and regulations of the PG. The management reserves the right to modify the rules whenever necessary. Residents will be informed about any important changes, and continued stay in the PG implies acceptance of the updated rules.",
+  "Rent must be paid on or before the due date agreed with the PG management. Late payment charges, if applicable, will be as per the PG policy. Continuous delay in rent payment may result in further action as per the accommodation agreement.",
+  "Residents must maintain cleanliness in their rooms as well as in all common areas. Please use dustbins, dispose of waste properly, and help maintain a hygienic and healthy living environment.",
+  "Residents are responsible for their personal belongings. The PG management will not be responsible for any loss, theft, or damage to personal items. Residents are advised to keep their rooms locked when leaving.",
+  "Visitors and guests must follow the PG's guest policy. Unauthorized visitors or overnight stays are not permitted unless approved by the management. Residents are responsible for the conduct of their visitors.",
+  "Smoking, alcohol, drugs, gambling, and any illegal activities are strictly prohibited inside the PG premises. Any violation may lead to disciplinary action, cancellation of accommodation, or legal action as applicable.",
+  "Residents must respect fellow residents and staff. Loud music, unnecessary noise, abusive language, harassment, or any behavior causing inconvenience or disturbance to others is not allowed.",
+  "Use electrical appliances responsibly. Only appliances permitted by the PG management may be used. Unauthorized or high-power appliances that may pose a safety risk are not allowed without prior permission.",
+  "Any damage to PG property caused intentionally or due to negligence will be the responsibility of the resident. The resident may be required to bear the repair or replacement cost.",
+  "Residents must follow the entry and exit timings and other security guidelines prescribed by the PG management. Residents should cooperate with security checks whenever required.",
+  "Common facilities should be used responsibly. Please keep shared areas clean after use and report any maintenance or safety issues immediately to the PG management.",
+  "Residents must conserve electricity and water by switching off lights, fans, ACs, and taps when not in use. Misuse or wastage of utilities should be avoided.",
+  "Residents are expected to maintain proper behavior and respect the privacy, comfort, and rights of other residents. Any form of discrimination, violence, or misconduct will not be tolerated.",
+  "Before vacating the PG, all pending dues must be cleared, and the room should be returned in clean and good condition. The security deposit, if applicable, will be refunded as per the agreed policy after necessary adjustments.",
+  "Violation of any PG rule may result in a warning, fine, suspension of facilities, cancellation of accommodation, or legal action depending on the nature and seriousness of the violation."
 ];
 
 const CITY_OPTIONS = [
@@ -93,8 +111,12 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
     acTempMax: "",
     otherCustomFine: "",
     rulesCustomNote: "",
-    policeFormType: owner?.defaultPoliceFormType || "WITH_RULES"
+    policeFormType: owner?.defaultPoliceFormType || "WITH_RULES",
+    rulesPreference: "GENERAL"
   });
+
+  const [generalRulesList, setGeneralRulesList] = useState([...GENERALIZED_RULES]);
+
 
   const [imageList, setImageList] = useState([]);
   const [videoList, setVideoList] = useState([]);
@@ -113,7 +135,7 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
       if (formData.city === "Other" && !formData.customCity.trim()) { toast.error("Please specify the custom city"); return false; }
       if (!formData.locality.trim()) { toast.error("Locality is required"); return false; }
       if (!formData.address.trim()) { toast.error("Address is required"); return false; }
-      if (!formData.aboutDescription.trim()) { toast.error("Property Description is required"); return false; }
+
     }
     // Steps 2 and 3 have no strict required validations that block progress,
     // although we could add them if needed later.
@@ -236,14 +258,24 @@ const handleSubmit = async (e) => {
    const fd = new FormData();
 
    if (formData.city === "Other" && !formData.customCity.trim()) {
-  Swal.fire({
-  icon: "warning",
-  title: "City Required",
-  text: "Please enter your city",
-});
-  setLoading(false);
-  return;
-}
+     Swal.fire({
+       icon: "warning",
+       title: "City Required",
+       text: "Please enter your city",
+     });
+     setLoading(false);
+     return;
+   }
+
+   if (imageList.length === 0) {
+     Swal.fire({
+       icon: "warning",
+       title: "Images Required",
+       text: "Please upload at least one image of the PG.",
+     });
+     setLoading(false);
+     return;
+   }
 
 
 /* ===============================
@@ -286,8 +318,21 @@ Object.entries(formData).forEach(([k, v]) => {
   }
 });
 
-    // ---- rules & clauses table ----
-    fd.append("rulesClauses", JSON.stringify(rulesClauses));
+    // ---- rules & clauses table or general list ----
+    if (formData.rulesPreference === "GENERAL") {
+      fd.append("rulesClauses", JSON.stringify(generalRulesList.map((r, i) => ({
+        id: `gen-rule-${i}`,
+        title: `Rule ${i + 1}`,
+        description: r,
+        enabled: true
+      }))));
+    } else {
+      const resolvedRules = rulesClauses.map(r => ({
+        ...r,
+        description: resolveRuleDescription(r.description, formData)
+      }));
+      fd.append("rulesClauses", JSON.stringify(resolvedRules));
+    }
 
     // ---- append images directly ----
     imageList.forEach((img) => {
@@ -545,7 +590,8 @@ const removeCustomRule = (index) => {
                 </label>
               </div>
               <div className="police-form-info-banner">
-                ℹ️ This will be the default preference for all police verification reports. You can change this anytime from PG Settings.
+                <i className="bi bi-info-circle-fill" style={{ fontSize: '18px', color: '#3b82f6' }}></i> 
+                <span>This will be the default preference for all police verification reports. You can change this anytime from PG Settings.</span>
               </div>
             </div>
 
@@ -554,7 +600,108 @@ const removeCustomRule = (index) => {
               <>
                 <div className="create-pg-form-group create-pg-form-row-single">
                   <h3 className="create-pg-section-title" style={{ marginTop: "18px" }}>Rules &amp; Regulations</h3>
-                  <label className="create-pg-amenities-label">General Policy Settings</label>
+                  <label className="create-pg-amenities-label">Choose Rules Preference</label>
+
+                  <div className="police-form-option-grid" style={{ marginBottom: '20px' }}>
+                    <label className={`police-form-option ${formData.rulesPreference === "GENERAL" ? "selected" : ""}`}>
+                      <input
+                        type="radio"
+                        name="rulesPreference"
+                        value="GENERAL"
+                        checked={formData.rulesPreference === "GENERAL"}
+                        onChange={handleInputChange}
+                      />
+                      <span className="police-form-radio-dot" />
+                      <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <i className="bi bi-list-check" style={{ color: '#4f46e5' }}></i>
+                      </div>
+                      <span className="police-form-option-title">Use Generalised Rules</span>
+                      <span className="police-form-option-desc">Use a predefined set of rules. You can delete rules that don't apply.</span>
+                    </label>
+
+                    <label className={`police-form-option ${formData.rulesPreference === "CUSTOM" ? "selected" : ""}`}>
+                      <input
+                        type="radio"
+                        name="rulesPreference"
+                        value="CUSTOM"
+                        checked={formData.rulesPreference === "CUSTOM"}
+                        onChange={handleInputChange}
+                      />
+                      <span className="police-form-radio-dot" />
+                      <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <i className="bi bi-pencil-square" style={{ color: '#4f46e5' }}></i>
+                      </div>
+                      <span className="police-form-option-title">Create Custom Rules</span>
+                      <span className="police-form-option-desc">Manually define rent dates, late fees, and specific policies.</span>
+                    </label>
+                  </div>
+
+                  {formData.rulesPreference === "GENERAL" ? (
+                    <div className="general-rules-container">
+                      <label className="create-pg-amenities-label">General Rules List</label>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        {generalRulesList.map((rule, index) => (
+                          <li key={index} style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            marginBottom: '10px',
+                            gap: '12px'
+                          }}>
+                            <span style={{ fontSize: '14px', color: '#334155', lineHeight: '1.5' }}>
+                              {rule}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setGeneralRulesList(prev => prev.filter((_, i) => i !== index))}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#ef4444',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: '0.2s'
+                              }}
+                              title="Delete Rule"
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                      {generalRulesList.length === 0 && (
+                        <p style={{ fontSize: '14px', color: '#64748b', fontStyle: 'italic' }}>
+                          You have deleted all general rules.
+                        </p>
+                      )}
+                      <button 
+                        type="button" 
+                        onClick={() => setGeneralRulesList([...GENERALIZED_RULES])}
+                        style={{
+                          background: 'transparent',
+                          border: '1px solid #4f46e5',
+                          color: '#4f46e5',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          marginTop: '8px'
+                        }}
+                      >
+                        <i className="bi bi-arrow-counterclockwise" style={{ marginRight: '6px' }}></i>
+                        Restore Default Rules
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <label className="create-pg-amenities-label">Other Custom Policies (Fines)</label>
                   <div className="create-pg-form-row create-pg-form-row-3">
                     <div>
                       <label className="create-pg-form-label required">Rent Due Date</label>
@@ -675,8 +822,9 @@ const removeCustomRule = (index) => {
                       <input type="number" name="otherCustomFine" className="create-pg-form-input" placeholder="Enter amount" value={formData.otherCustomFine} onChange={handleInputChange} />
                     </div>
                   </div>
-
-                  <RulesClausesTable rules={rulesClauses} onChange={setRulesClauses} />
+                  <RulesClausesTable rules={rulesClauses} onChange={setRulesClauses} formData={formData} />
+                  </>
+                  )}
                 </div>
 
                 <hr className="create-pg-section-divider" />
@@ -748,7 +896,12 @@ const removeCustomRule = (index) => {
           <div className="create-pg-step-content">
             {/* Image Upload */}
             <div className="create-pg-form-group create-pg-form-row-single">
-              <label className="create-pg-form-label">Property Images</label>
+              <label className="create-pg-form-label">
+                Property Images
+                <span style={{ color: '#ef4444', fontSize: '13px', marginLeft: '10px', fontWeight: '500' }}>
+                  * Required: Please upload at least one image of the PG.
+                </span>
+              </label>
               <label className="create-pg-file-upload-label">
                 <span>📸 Click to upload images</span>
                 <input type="file" multiple accept="image/*" className="create-pg-file-input" onChange={handleImageUpload} />

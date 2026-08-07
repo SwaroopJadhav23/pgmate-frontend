@@ -131,7 +131,29 @@ export const DEFAULT_RULES = [
   },
 ];
 
-function SortableRuleRow({ rule, index, onToggle, onEdit, onDelete }) {
+export const resolveRuleDescription = (desc, formData) => {
+  if (!formData) return desc;
+  let txt = desc;
+  txt = txt.replace(/\{Rent Due Date\}/g, formData.rentDueDate || '___');
+  txt = txt.replace(/\{Late Fee Amount\}/g, formData.lateFeeAmount || '___');
+  txt = txt.replace(/\{Breakfast Time\}/g, formData.breakfastTime || '___');
+  txt = txt.replace(/\{Lunch Time\}/g, formData.lunchTime || '___');
+  txt = txt.replace(/\{Dinner Time\}/g, formData.dinnerTime || '___');
+  txt = txt.replace(/\{First Time Fine\}/g, formData.firstTimeFine || '___');
+  txt = txt.replace(/\{Repeated Fine\}/g, formData.repeatedFine || '___');
+  txt = txt.replace(/\{AC Temp Min\}/g, formData.acTempMin || '___');
+  txt = txt.replace(/\{AC Temp Max\}/g, formData.acTempMax || '___');
+  txt = txt.replace(/\{Addiction Fine\}/g, formData.addictionFine || '___');
+  txt = txt.replace(/\{Cleanliness Fine\}/g, formData.cleanlinessFine || '___');
+  txt = txt.replace(/\{Security Deposit Refund Days\}/g, formData.depositRefundDays || '___');
+  txt = txt.replace(/\{Damage Charges\}/g, formData.damageCharges || '___');
+  txt = txt.replace(/\{Curfew Time\}/g, formData.curfewTime || '___');
+  txt = txt.replace(/\{Washing Machine Charges\}/g, formData.washingMachineCharges || '___');
+  txt = txt.replace(/\{Visitor Stay Duration\}/g, formData.visitorPolicy || '___');
+  return txt;
+};
+
+function SortableRuleRow({ rule, index, onToggle, onEdit, onDelete, formData }) {
   const {
     attributes,
     listeners,
@@ -195,7 +217,7 @@ function SortableRuleRow({ rule, index, onToggle, onEdit, onDelete }) {
       ) : (
         <>
           <div className="rules-col-title">{rule.title}</div>
-          <div className="rules-col-desc">{rule.description}</div>
+          <div className="rules-col-desc">{resolveRuleDescription(rule.description, formData)}</div>
         </>
       )}
 
@@ -248,8 +270,9 @@ function SortableRuleRow({ rule, index, onToggle, onEdit, onDelete }) {
  * Props:
  *   rules     – array of { id, title, description, enabled }
  *   onChange  – (newRules) => void
+ *   formData  - form state for resolving placeholders
  */
-export default function RulesClausesTable({ rules, onChange }) {
+export default function RulesClausesTable({ rules, onChange, formData }) {
   const [newRuleText, setNewRuleText] = useState("");
 
   const sensors = useSensors(
@@ -335,6 +358,7 @@ export default function RulesClausesTable({ rules, onChange }) {
               onToggle={toggleRule}
               onEdit={editRule}
               onDelete={deleteRule}
+              formData={formData}
             />
           ))}
         </SortableContext>
