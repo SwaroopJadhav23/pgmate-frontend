@@ -730,3 +730,117 @@
   margin: 20px 0 !important;
   display: block !important;
 }
+
+/* ===============================
+   STEPPER UI
+================================ */
+.create-pg-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding: 0 10px;
+}
+
+.create-pg-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  text-align: center;
+}
+
+.create-pg-step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  border: 2px solid #e5e7eb;
+  z-index: 2;
+}
+
+.create-pg-step-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.create-pg-step.active .create-pg-step-circle {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.create-pg-step.active .create-pg-step-label {
+  color: #4f46e5;
+}
+
+.create-pg-step.completed .create-pg-step-circle {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.create-pg-step.completed .create-pg-step-label {
+  color: #10b981;
+}
+
+.create-pg-step-line {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e5e7eb;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.create-pg-step.completed .create-pg-step-line {
+  background: #10b981;
+}
+
+.create-pg-step-content {
+  animation: fadeInStep 0.4s ease forwards;
+}
+
+@keyframes fadeInStep {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===============================
+   STICKY FOOTER
+================================ */
+.create-pg-form-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px; /* Prevent huge jumps between steps */
+}
+
+.create-pg-form-actions-sticky {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  position: sticky;
+  bottom: -24px;
+  background: white;
+  z-index: 10;
+  padding-bottom: 24px;
+}

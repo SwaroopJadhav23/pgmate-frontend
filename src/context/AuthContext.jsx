@@ -11,6 +11,7 @@ const getProfileCompletion = (profile) => {
     profile.city,
     profile.photoUrl,
     profile.idProofUrl,
+    profile.defaultPoliceFormType,
   ];
   return (fields.filter(Boolean).length / fields.length) * 100;
 };
