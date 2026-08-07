@@ -1,24 +1,36 @@
 import React, { useState } from "react";
-import html2pdf from "html2pdf.js";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+
+const calculateAge = (dobString) => {
+  if (!dobString) return "";
+  const dob = new Date(dobString);
+  if (isNaN(dob)) return "";
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  return age >= 0 ? String(age) : "";
+};
 
 const PoliceVerificationModal = ({ resident, onClose }) => {
  const [form, setForm] = useState({
     tenantName: resident?.name || "",
-    birthDate: "",
-    age: "",
+    birthDate: resident?.dob || "",
+    age: calculateAge(resident?.dob),
     phone: resident?.phone || "",
-    college: "",
-    education: "",
-    aadhaar: "",
-    email: "",
-    permanentAddress: resident?.address || resident?.permanentAddress || "",
-    fathersName: "",
-    fathersPhone: "",
-    guardianName: resident?.emergencyContactName || "",
-    guardianAddress: "",
-    guardianPhone: resident?.emergencyContact || resident?.emergencyContactPhone || "",
+    college: resident?.collegeOrCompanyName || "",
+    education: resident?.education || "",
+    aadhaar: resident?.aadhaarNumber || "",
+    email: resident?.email || "",
+    permanentAddress: resident?.permanentAddress || "",
+    fathersName: resident?.guardianName || "",
+    fathersPhone: resident?.guardianPhone || "",
+    guardianName: resident?.localGuardianName || "",
+    guardianAddress: resident?.localGuardianAddress || "",
+    guardianPhone: resident?.localGuardianPhone || "",
     signature: "",
     tenantSignature: "",
     ownerSignature: "",
@@ -47,20 +59,7 @@ const PoliceVerificationModal = ({ resident, onClose }) => {
     }));
   };
 
-  const calculateAge = (dobString) => {
-    if (!dobString) return "";
-    const dob = new Date(dobString);
-    if (isNaN(dob)) return "";
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const monthDiff = today.getMonth() - dob.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-      age--;
-    }
-    return age >= 0 ? String(age) : "";
-  };
-
-  const handleBirthDateChange = (e) => {
+   const handleBirthDateChange = (e) => {
     const dobValue = e.target.value;
     setForm({ ...form, birthDate: dobValue, age: calculateAge(dobValue) });
   };
@@ -73,15 +72,20 @@ const handlePrint = async () => {
     // html2canvas can't reliably rasterize live form controls without
     // foreignObjectRendering, and foreignObjectRendering breaks width
     // when captured off-screen. This sidesteps both problems.
-    clone.querySelectorAll("input, textarea").forEach((el) => {
-      const replacement = document.createElement("div");
-      replacement.className = el.className;
-      replacement.textContent = el.value || "";
-      replacement.style.borderBottom = "1px solid #000";
-      replacement.style.minHeight = "1em";
-      replacement.style.whiteSpace = "pre-wrap";
-      el.replaceWith(replacement);
-    });
+// AFTER — smaller gap, still enough to clear descenders
+
+
+clone.querySelectorAll("input, textarea").forEach((el) => {
+  const replacement = document.createElement("div");
+  replacement.className = el.className;
+  replacement.textContent = el.value || "";
+  replacement.style.display = "inline-block";
+  replacement.style.borderBottom = "1px solid #000";
+  replacement.style.minHeight = "1em";
+  replacement.style.whiteSpace = "pre-wrap";
+  replacement.style.paddingBottom = "1px";
+  el.replaceWith(replacement);
+});
 
     // PDF-only styling — equal border spacing on all sides, clear header
     // alignment, consistent field/declaration/signature spacing. Screen
@@ -97,60 +101,67 @@ const handlePrint = async () => {
       page.style.position = "relative";
     });
 
-    clone.querySelectorAll(".pv-header-row").forEach((el) => {
-      el.style.fontSize = "14px";
-      el.style.marginBottom = "18px";
-    });
-    clone.querySelectorAll(".pv-header-main").forEach((el) => {
-      el.style.marginBottom = "16px";
-    });
-    clone.querySelectorAll(".pv-pg-name").forEach((el) => {
-      el.style.fontSize = "30px";
-      el.style.marginBottom = "10px";
-    });
-    clone.querySelectorAll(".pv-pg-address, .pv-pg-phone").forEach((el) => {
-      el.style.fontSize = "15px";
-      el.style.margin = "5px 0";
-      el.style.lineHeight = "1.5";
-    });
+   
+clone.querySelectorAll(".pv-header-row").forEach((el) => {
+  el.style.fontSize = "13px";
+  el.style.marginBottom = "10px";
+});
+clone.querySelectorAll(".pv-header-main").forEach((el) => {
+  el.style.marginBottom = "10px";
+});
+clone.querySelectorAll(".pv-pg-name").forEach((el) => {
+  el.style.fontSize = "24px";
+  el.style.marginBottom = "6px";
+});
+clone.querySelectorAll(".pv-pg-address, .pv-pg-phone").forEach((el) => {
+  el.style.fontSize = "13px";
+  el.style.margin = "3px 0";
+  el.style.lineHeight = "1.4";
+});
     clone.querySelectorAll(".pv-photo-box").forEach((el) => {
       el.style.width = "100px";
       el.style.height = "115px";
     });
-    clone.querySelectorAll(".pv-form-title").forEach((el) => {
-      el.style.fontSize = "20px";
-      el.style.textAlign = "center";
-      el.style.margin = "10px 0 28px";
-      el.style.padding = "14px 0";
+clone.querySelectorAll(".pv-form-title").forEach((el) => {
+  el.style.fontSize = "18px";
+  el.style.textAlign = "center";
+  el.style.margin = "6px 0 14px";
+  el.style.padding = "8px 0";
+});
+clone.querySelectorAll(".pv-field-list").forEach((el) => {
+  el.style.gap = "14px";
+  el.style.marginBottom = "14px";
+});
+clone.querySelectorAll(".pv-field-line").forEach((el) => {
+  el.style.fontSize = "13px";
+  el.style.alignItems = "baseline";
+});
+clone.querySelectorAll(".pv-field-input").forEach((el) => {
+  el.style.fontSize = "13px";
+  el.style.padding = "2px 6px";
+});
+    clone.querySelectorAll(".pv-field-label").forEach((el) => {
+      el.style.textTransform = "uppercase";
+      el.style.fontWeight = "700";
+      el.style.fontSize = "13px";
+      el.style.letterSpacing = "0.3px";
     });
-    clone.querySelectorAll(".pv-field-list").forEach((el) => {
-      el.style.gap = "26px";
-      el.style.marginBottom = "28px";
-    });
-    clone.querySelectorAll(".pv-field-line").forEach((el) => {
-      el.style.fontSize = "16px";
-      el.style.alignItems = "baseline";
-    });
-    clone.querySelectorAll(".pv-field-input").forEach((el) => {
-      el.style.fontSize = "16px";
-      el.style.padding = "3px 6px";
-    });
-    clone.querySelectorAll(".pv-declaration-title").forEach((el) => {
-      el.style.fontSize = "14px";
-      el.style.marginTop = "24px";
-      el.style.marginBottom = "10px";
-      el.style.textAlign = "center";
-    });
-    clone.querySelectorAll(".pv-declaration").forEach((el) => {
-      el.style.fontSize = "12.5px";
-      el.style.lineHeight = "1.7";
-    });
-    clone.querySelectorAll(".pv-signature-line").forEach((el) => {
-      el.style.fontSize = "15px";
-      el.style.marginTop = "30px";
-      el.style.marginBottom = "6px";
-      el.style.textAlign = "right";
-    });
+clone.querySelectorAll(".pv-declaration-title").forEach((el) => {
+  el.style.fontSize = "14px";
+  el.style.marginTop = "24px";
+  el.style.marginBottom = "10px";
+  el.style.textAlign = "center";
+});
+clone.querySelectorAll(".pv-declaration").forEach((el) => {
+  el.style.fontSize = "12.5px";
+  el.style.lineHeight = "1.7";
+});
+clone.querySelectorAll(".pv-signature-line").forEach((el) => {
+  el.style.fontSize = "15px";
+  el.style.marginTop = "30px";
+  el.style.marginBottom = "6px";
+  el.style.textAlign = "right";
+});
 
     // Page 2 (Rules & Regulations) — same bump in size/spacing as page 1.
     clone.querySelectorAll(".pv-rules-title").forEach((el) => {
@@ -163,11 +174,14 @@ const handlePrint = async () => {
     clone.querySelectorAll(".pv-rules-list").forEach((el) => {
       el.style.fontSize = "12.5px";
       el.style.lineHeight = "1.45";
-      el.style.paddingLeft = "20px";
+      el.style.paddingLeft = "0";
+      el.style.marginLeft = "24px";
       el.style.marginBottom = "10px";
     });
     clone.querySelectorAll(".pv-rules-list li").forEach((el) => {
       el.style.marginBottom = "10px";
+      el.style.paddingLeft = "6px";
+      el.style.textIndent = "0";
     });
     clone.querySelectorAll(".pv-rules-notice").forEach((el) => {
       el.style.fontSize = "13px";
@@ -202,11 +216,15 @@ const handlePrint = async () => {
     const pageWidthMm = 210;
     const pageHeightMm = 297;
 
+    const marginMm = 6; // equal outer margin so the border never touches the page edge
+    const imgWidthMm = pageWidthMm - marginMm * 2;
+    const imgHeightMm = pageHeightMm - marginMm * 2;
+
     for (let i = 0; i < pageEls.length; i++) {
       const canvas = await html2canvas(pageEls[i], { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
       const imgData = canvas.toDataURL("image/jpeg", 0.98);
       if (i > 0) pdf.addPage();
-      pdf.addImage(imgData, "JPEG", 0, 0, pageWidthMm, pageHeightMm);
+      pdf.addImage(imgData, "JPEG", marginMm, marginMm, imgWidthMm, imgHeightMm);
     }
 
     pdf.save(`Police_Verification_${form.tenantName || "Tenant"}.pdf`);
