@@ -126,6 +126,7 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
   const videoInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [lastStepChange, setLastStepChange] = useState(Date.now());
   const totalSteps = 4;
 
   const validateStep = (step) => {
@@ -144,12 +145,14 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
 
   const handleNextStep = () => {
     if (validateStep(currentStep)) {
+      setLastStepChange(Date.now());
       setCurrentStep(prev => Math.min(prev + 1, totalSteps));
       document.querySelector('.create-pg-form-body')?.scrollTo(0, 0);
     }
   };
 
   const handlePrevStep = () => {
+    setLastStepChange(Date.now());
     setCurrentStep(prev => Math.max(prev - 1, 1));
     document.querySelector('.create-pg-form-body')?.scrollTo(0, 0);
   };
@@ -170,6 +173,17 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
+    
+    // Check total limit
+    if (imageList.length + files.length > 5) {
+      Swal.fire({
+        icon: "warning",
+        title: "Limit Exceeded",
+        text: "You can only upload up to 5 images.",
+      });
+      return;
+    }
+
     files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -222,6 +236,11 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
 
     video.src = URL.createObjectURL(file);
   });
+  
+  // Clear input
+  if (videoInputRef.current) {
+    videoInputRef.current.value = "";
+  }
 };
 const removeVideo = (targetId) => {
   setVideoList((prev) => {
@@ -233,18 +252,27 @@ const removeVideo = (targetId) => {
 };
 
   const moveImage = (index, direction) => {
+    if (
+      (direction === -1 && index === 0) ||
+      (direction === 1 && index === imageList.length - 1)
+    ) {
+      return;
+    }
     const newList = [...imageList];
     const newIndex = index + direction;
-    if (newIndex >= 0 && newIndex < newList.length) {
-      [newList[index], newList[newIndex]] = [newList[newIndex], newList[index]];
-      setImageList(newList);
-    }
+    [newList[index], newList[newIndex]] = [newList[newIndex], newList[index]];
+    setImageList(newList);
   };
 
 
 
 const handleSubmit = async (e) => {
   e.preventDefault();
+
+  // Prevent accidental double-click submissions when arriving at step 4
+  if (Date.now() - lastStepChange < 500) {
+    return;
+  }
 
   // If user hits Enter on an input before the final step, just go to the next step
   if (currentStep < totalSteps) {
