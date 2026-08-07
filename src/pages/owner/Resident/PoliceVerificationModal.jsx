@@ -320,19 +320,22 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
             </div>
 
             <div className="pv-rules-list">
-              {pgData?.rulesPreference === "CUSTOM" && pgData?.rulesClauses ? (
+              {pgData?.rulesClauses ? (
                 (() => {
                   try {
                     const parsedRules = JSON.parse(pgData.rulesClauses);
-                    return parsedRules.map((rule, index) => (
-                      <div className="pv-rules-item" key={index}>
-                        <span className="pv-rules-num">{index + 1}.</span>
-                        <span className="pv-rules-text">{rule}</span>
-                      </div>
-                    ));
+                    return parsedRules.filter(r => r.enabled !== false).map((rule, index) => {
+                      const text = typeof rule === 'string' ? rule : (rule.description || rule.text || '');
+                      return (
+                        <div className="pv-rules-item" key={index}>
+                          <span className="pv-rules-num">{index + 1}.</span>
+                          <span className="pv-rules-text">{text}</span>
+                        </div>
+                      );
+                    });
                   } catch (e) {
-                    console.error("Failed to parse custom rules", e);
-                    return <p>Error loading custom rules.</p>;
+                    console.error("Failed to parse rules", e);
+                    return <p>Error loading rules.</p>;
                   }
                 })()
               ) : (
