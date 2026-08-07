@@ -28,24 +28,32 @@ const PoliceVerificationModal = ({ resident, apiPrefix, onClose }) => {
       }).catch(err => console.error("Failed to fetch PG data", err));
     }
   }, [resident, apiPrefix]);
- const [form, setForm] = useState({
-    tenantName: resident?.name || "",
-    birthDate: resident?.dob || "",
-    age: calculateAge(resident?.dob),
-    phone: resident?.phone || "",
-    college: resident?.collegeOrCompanyName || "",
-    education: resident?.education || "",
-    aadhaar: resident?.aadhaarNumber || "",
-    email: resident?.email || "",
-    permanentAddress: resident?.permanentAddress || "",
-    fathersName: resident?.guardianName || "",
-    fathersPhone: resident?.guardianPhone || "",
-    guardianName: resident?.localGuardianName || "",
-    guardianAddress: resident?.localGuardianAddress || "",
-    guardianPhone: resident?.localGuardianPhone || "",
-    signature: "",
-    tenantSignature: "",
-    ownerSignature: "",
+  const [form, setForm] = useState(() => {
+    const pgName = resident?.pgName || "PG";
+    const pgPrefix = pgName.replace(/[^a-zA-Z0-9]/g, "").substring(0, 3).toUpperCase() || "PG";
+    const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, "");
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+
+    return {
+      formNumber: `${pgPrefix}-${dateStr}-${randomNum}`,
+      tenantName: resident?.name || "",
+      birthDate: resident?.dob || "",
+      age: calculateAge(resident?.dob),
+      phone: resident?.phone || "",
+      college: resident?.collegeOrCompanyName || "",
+      education: resident?.education || "",
+      aadhaar: resident?.aadhaarNumber || "",
+      email: resident?.email || "",
+      permanentAddress: resident?.permanentAddress || "",
+      fathersName: resident?.guardianName || "",
+      fathersPhone: resident?.guardianPhone || "",
+      guardianName: resident?.localGuardianName || "",
+      guardianAddress: resident?.localGuardianAddress || "",
+      guardianPhone: resident?.localGuardianPhone || "",
+      signature: "",
+      tenantSignature: "",
+      ownerSignature: "",
+    };
   });
 
   const update = (key) => (e) => setForm({ ...form, [key]: e.target.value });
@@ -252,7 +260,7 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
           {/* ===================== PAGE 1 — Police Verification Form ===================== */}
           <div className="pv-page pv-page-1">
             <div className="pv-header-row">
-              <span className="pv-form-no">Form no: ____</span>
+              <span className="pv-form-no">Form no: {form.formNumber}</span>
               <span className="pv-admission-date">
                 Admission Date: {resident?.checkinDate ? new Date(resident.checkinDate).toLocaleDateString("en-GB") : "-"}
               </span>
@@ -260,11 +268,11 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
 
             <div className="pv-header-main">
               <div className="pv-header-info">
-                <h4 className="pv-pg-name">{resident?.pgName || "Name of the PG"}</h4>
+                <h4 className="pv-pg-name">{pgData?.name || resident?.pgName || "Name of the PG"}</h4>
                 <p className="pv-pg-address">
-                  <strong>Address:</strong> {[resident?.pgAddress, resident?.pgLocality, resident?.pgCity].filter(Boolean).join(", ") || "-"}
+                  <strong>Address:</strong> {[pgData?.address, pgData?.locality, pgData?.city].filter(Boolean).join(", ") || "-"}
                 </p>
-                {resident?.pgPhone && <p className="pv-pg-phone"><strong>Phone no:</strong> {resident.pgPhone}</p>}
+                {pgData?.ownerPhone && <p className="pv-pg-phone"><strong>Phone no:</strong> {pgData.ownerPhone}</p>}
               </div>
               
 <div className="pv-photo-box">
