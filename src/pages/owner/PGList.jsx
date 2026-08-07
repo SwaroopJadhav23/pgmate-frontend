@@ -8,7 +8,7 @@ import "../../CSS/pgList.css";
 import FloorManagerContent from "../manager/FloorManagerContent";
 import NextStepBanner from "../../components/NextStepBanner";
 import {useLocation} from "react-router-dom";
-import RulesClausesTable, {DEFAULT_RULES} from "../../components/RulesClausesTable";
+import RulesClausesTable, {DEFAULT_RULES, resolveRuleDescription} from "../../components/RulesClausesTable";
 import "../../CSS/CreatePGForm.css";
 import {PGListingSkeleton} from "../public/Skeleton";
 import Swal from "sweetalert2";
@@ -92,6 +92,23 @@ const HOUSE_RULES_LIST = [
   "Outside Food Allowed",
   "Management Rules Must Be Followed",
   "Respect Other Residents",
+];
+const GENERALIZED_RULES = [
+  "Residents must follow all the rules and regulations of the PG. The management reserves the right to modify the rules whenever necessary. Residents will be informed about any important changes, and continued stay in the PG implies acceptance of the updated rules.",
+  "Rent must be paid on or before the due date agreed with the PG management. Late payment charges, if applicable, will be as per the PG policy. Continuous delay in rent payment may result in further action as per the accommodation agreement.",
+  "Residents must maintain cleanliness in their rooms as well as in all common areas. Please use dustbins, dispose of waste properly, and help maintain a hygienic and healthy living environment.",
+  "Residents are responsible for their personal belongings. The PG management will not be responsible for any loss, theft, or damage to personal items. Residents are advised to keep their rooms locked when leaving.",
+  "Visitors and guests must follow the PG's guest policy. Unauthorized visitors or overnight stays are not permitted unless approved by the management. Residents are responsible for the conduct of their visitors.",
+  "Smoking, alcohol, drugs, gambling, and any illegal activities are strictly prohibited inside the PG premises. Any violation may lead to disciplinary action, cancellation of accommodation, or legal action as applicable.",
+  "Residents must respect fellow residents and staff. Loud music, unnecessary noise, abusive language, harassment, or any behavior causing inconvenience or disturbance to others is not allowed.",
+  "Use electrical appliances responsibly. Only appliances permitted by the PG management may be used. Unauthorized or high-power appliances that may pose a safety risk are not allowed without prior permission.",
+  "Any damage to PG property caused intentionally or due to negligence will be the responsibility of the resident. The resident may be required to bear the repair or replacement cost.",
+  "Residents must follow the entry and exit timings and other security guidelines prescribed by the PG management. Residents should cooperate with security checks whenever required.",
+  "Common facilities should be used responsibly. Please keep shared areas clean after use and report any maintenance or safety issues immediately to the PG management.",
+  "Residents must conserve electricity and water by switching off lights, fans, ACs, and taps when not in use. Misuse or wastage of utilities should be avoided.",
+  "Residents are expected to maintain proper behavior and respect the privacy, comfort, and rights of other residents. Any form of discrimination, violence, or misconduct will not be tolerated.",
+  "Before vacating the PG, all pending dues must be cleared, and the room should be returned in clean and good condition. The security deposit, if applicable, will be refunded as per the agreed policy after necessary adjustments.",
+  "Violation of any PG rule may result in a warning, fine, suspension of facilities, cancellation of accommodation, or legal action depending on the nature and seriousness of the violation."
 ];
 const CITY_OPTIONS = [
   "Hyderabad",
@@ -280,7 +297,10 @@ const PGList = ({role = "OWNER"}) => {
     acTempMax: "",
     otherCustomFine: "",
     rulesCustomNote: "",
+    rulesPreference: "GENERAL"
   });
+  const [generalRulesList, setGeneralRulesList] = useState([...GENERALIZED_RULES]);
+
   const [editRulesClauses, setEditRulesClauses] = useState(
     DEFAULT_RULES.map((r) => ({...r}))
   );
@@ -594,6 +614,7 @@ const PGList = ({role = "OWNER"}) => {
       acTempMax: pg.acTempMax ?? "",
       otherCustomFine: pg.otherCustomFine ?? "",
       rulesCustomNote: pg.rulesCustomNote ?? "",
+      rulesPreference: pg.rulesPreference ?? "GENERAL"
     });
     try {
       const savedRules = pg.rulesClauses ? JSON.parse(pg.rulesClauses) : null;
@@ -605,6 +626,22 @@ const PGList = ({role = "OWNER"}) => {
     } catch {
       setEditRulesClauses(DEFAULT_RULES.map((r) => ({...r})));
     }
+    
+    if (pg.rulesPreference === "GENERAL" && pg.rulesClauses) {
+        try {
+            const parsedRules = JSON.parse(pg.rulesClauses);
+            if (parsedRules.length > 0 && parsedRules[0].description) {
+                setGeneralRulesList(parsedRules.map(r => r.description));
+            } else {
+                setGeneralRulesList([...GENERALIZED_RULES]);
+            }
+        } catch {
+            setGeneralRulesList([...GENERALIZED_RULES]);
+        }
+    } else {
+        setGeneralRulesList([...GENERALIZED_RULES]);
+    }
+
     setLocalitySearch(pg.locality || "");
 
     setImageList(
@@ -1090,8 +1127,17 @@ const PGList = ({role = "OWNER"}) => {
 
       {/* EDIT MODAL */}
       {showEdit && editPg && (
-        <div className="modal-backdrop-custom">
-          <div className="modal-box">
+        <div 
+          className="modal-backdrop-custom"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowEdit(false);
+              setVideoList([]);
+              setImageList([]);
+            }
+          }}
+        >
+          <div className="modal-box" style={{ maxWidth: "900px", width: "95%" }}>
             <div className="edit-pg-modal-header">
               <h4>Edit PG</h4>
               <button
@@ -1306,43 +1352,159 @@ const PGList = ({role = "OWNER"}) => {
             </div>
             <div className="edit-pg-form-group edit-pg-form-row-single">
                   <label className="edit-pg-form-label">Include in Police Verification Form</label>
-                  <div className="police-form-option-grid police-form-readonly">
-                    <div
-                      className={`police-form-option ${editForm.policeFormType === "WITH_RULES" ? "selected" : "police-form-dimmed"}`}
+                  <div className="police-form-option-grid">
+                    <label
+                      className={`police-form-option ${editForm.policeFormType === "WITH_RULES" ? "selected" : ""}`}
                     >
-                      <span className="police-form-icon">🛡️📄</span>
-                      <span className="police-form-option-title">Police Form with Rules & Regulations</span>
+                      <input
+                        type="radio"
+                        name="policeFormType"
+                        value="WITH_RULES"
+                        checked={editForm.policeFormType === "WITH_RULES"}
+                        onChange={(e) => setEditForm({...editForm, policeFormType: e.target.value})}
+                      />
+                      <span className="police-form-radio-dot" />
+                      <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
+                        <i className="bi bi-file-earmark-text" style={{ color: '#6b7280' }}></i>
+                      </div>
+                      <span className="police-form-option-title">Police Form with Rules &amp; Regulations</span>
                       <span className="police-form-option-desc">
-                        Generate a 2-page document with police verification details and rules & regulations.
+                        Generate a 2-page document with police verification details and rules &amp; regulations.
                       </span>
-                      {editForm.policeFormType === "WITH_RULES" && (
-                        <span className="police-form-selected-tag">✓ Selected</span>
-                      )}
-                    </div>
+                    </label>
 
-                    <div
-                      className={`police-form-option ${editForm.policeFormType === "ONLY" ? "selected" : "police-form-dimmed"}`}
+                    <label
+                      className={`police-form-option ${editForm.policeFormType === "ONLY" ? "selected" : ""}`}
                     >
-                      <span className="police-form-icon">📄</span>
+                      <input
+                        type="radio"
+                        name="policeFormType"
+                        value="ONLY"
+                        checked={editForm.policeFormType === "ONLY"}
+                        onChange={(e) => setEditForm({...editForm, policeFormType: e.target.value})}
+                      />
+                      <span className="police-form-radio-dot" />
+                      <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
+                      </div>
                       <span className="police-form-option-title">Police Form Only</span>
                       <span className="police-form-option-desc">
                         Generate a 1-page document with only police verification details.
                       </span>
-                      {editForm.policeFormType === "ONLY" && (
-                        <span className="police-form-selected-tag">✓ Selected</span>
-                      )}
-                    </div>
+                    </label>
                   </div>
                   <p className="create-pg-section-subtitle" style={{marginTop: "6px"}}>
-                    Chosen during PG creation. Change it from Add New PG or PG Settings.
+                    Choose how you want the Police Verification document to be generated for your tenants.
                   </p>
 
                   <h3 className="create-pg-section-title" style={{marginTop: "16px"}}>
                     Rules & Regulations
                   </h3>
 
-                  <label className="edit-pg-amenities-label">General Policy Settings</label>
-                  <div className="create-pg-form-row create-pg-form-row-3">
+                  <label className="edit-pg-amenities-label">Choose Rules Preference</label>
+
+                  <div className="police-form-option-grid" style={{ marginBottom: '20px' }}>
+                    <label className={`police-form-option ${editForm.rulesPreference === "GENERAL" ? "selected" : ""}`}>
+                      <input
+                        type="radio"
+                        name="rulesPreference"
+                        value="GENERAL"
+                        checked={editForm.rulesPreference === "GENERAL"}
+                        onChange={(e) => setEditForm({...editForm, rulesPreference: e.target.value})}
+                      />
+                      <span className="police-form-radio-dot" />
+                      <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <i className="bi bi-list-check" style={{ color: '#4f46e5' }}></i>
+                      </div>
+                      <span className="police-form-option-title">Use Generalised Rules</span>
+                      <span className="police-form-option-desc">Use a predefined set of rules. You can delete rules that don't apply.</span>
+                    </label>
+
+                    <label className={`police-form-option ${editForm.rulesPreference === "CUSTOM" ? "selected" : ""}`}>
+                      <input
+                        type="radio"
+                        name="rulesPreference"
+                        value="CUSTOM"
+                        checked={editForm.rulesPreference === "CUSTOM"}
+                        onChange={(e) => setEditForm({...editForm, rulesPreference: e.target.value})}
+                      />
+                      <span className="police-form-radio-dot" />
+                      <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <i className="bi bi-pencil-square" style={{ color: '#4f46e5' }}></i>
+                      </div>
+                      <span className="police-form-option-title">Create Custom Rules</span>
+                      <span className="police-form-option-desc">Manually define rent dates, late fees, and specific policies.</span>
+                    </label>
+                  </div>
+
+                  {editForm.rulesPreference === "GENERAL" ? (
+                    <div className="general-rules-container">
+                      <label className="create-pg-amenities-label">General Rules List</label>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        {generalRulesList.map((rule, index) => (
+                          <li key={index} style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            marginBottom: '10px',
+                            gap: '12px'
+                          }}>
+                            <span style={{ fontSize: '14px', color: '#334155', lineHeight: '1.5' }}>
+                              {rule}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setGeneralRulesList(prev => prev.filter((_, i) => i !== index))}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#ef4444',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: '0.2s'
+                              }}
+                              title="Delete Rule"
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                      {generalRulesList.length === 0 && (
+                        <p style={{ fontSize: '14px', color: '#64748b', fontStyle: 'italic' }}>
+                          You have deleted all general rules.
+                        </p>
+                      )}
+                      <button 
+                        type="button" 
+                        onClick={() => setGeneralRulesList([...GENERALIZED_RULES])}
+                        style={{
+                          background: 'transparent',
+                          border: '1px solid #4f46e5',
+                          color: '#4f46e5',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          marginTop: '8px'
+                        }}
+                      >
+                        <i className="bi bi-arrow-counterclockwise" style={{ marginRight: '6px' }}></i>
+                        Restore Default Rules
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <label className="edit-pg-amenities-label">General Policy Settings</label>
+                      <div className="create-pg-form-row create-pg-form-row-3">
                     <div>
                       <label className="create-pg-form-label required">Rent Due Date</label>
                       <select
@@ -1575,7 +1737,7 @@ const PGList = ({role = "OWNER"}) => {
                     </div>
                   </div>
 
-                  <RulesClausesTable rules={editRulesClauses} onChange={setEditRulesClauses} />
+                  <RulesClausesTable rules={editRulesClauses} onChange={setEditRulesClauses} formData={editForm} />
 
                   <label className="create-pg-form-label" style={{marginTop: "10px", display: "block"}}>
                     Custom Note for Rules (Optional)
@@ -1586,6 +1748,8 @@ const PGList = ({role = "OWNER"}) => {
                     value={editForm.rulesCustomNote}
                     onChange={(e) => setEditForm({...editForm, rulesCustomNote: e.target.value})}
                   />
+                  </>
+                  )}
                 </div>
 
             <div className="edit-pg-form-group edit-pg-form-row-single">
@@ -1829,6 +1993,13 @@ const PGList = ({role = "OWNER"}) => {
                 }}
                 onClick={async () => {
                   setUpdateLoading(true);
+                  
+                  if (imageList.length === 0) {
+                    toast.error("Please upload at least one image of the PG.");
+                    setUpdateLoading(false);
+                    return;
+                  }
+                  
                   try {
                     if (
                       editForm.totalFloors === "" ||
@@ -1865,7 +2036,20 @@ const PGList = ({role = "OWNER"}) => {
                         if (k !== "customHouseRules") fd.append(k, v.join(","));
                       } else fd.append(k, v);
                     });
-                    fd.append("rulesClauses", JSON.stringify(editRulesClauses));
+                    if (editForm.rulesPreference === "GENERAL") {
+                      fd.append("rulesClauses", JSON.stringify(generalRulesList.map((r, i) => ({
+                        id: `gen-rule-${i}`,
+                        title: `Rule ${i + 1}`,
+                        description: r,
+                        enabled: true
+                      }))));
+                    } else {
+                      const resolvedRules = editRulesClauses.map(r => ({
+                        ...r,
+                        description: resolveRuleDescription(r.description, editForm)
+                      }));
+                      fd.append("rulesClauses", JSON.stringify(resolvedRules));
+                    }
                     imageList.forEach((img) => {
                       if (img.type === "existing")
                         fd.append("existingImageUrls", img.src);
