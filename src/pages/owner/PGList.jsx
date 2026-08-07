@@ -317,16 +317,15 @@ const PGList = ({role = "OWNER"}) => {
         const statsMap = Object.fromEntries(
           (statsRes.data || []).map((s) => [s.pgId, s]),
         );
-        setPgs(
-          pgRes.data.map((pg) => ({
-            ...pg,
-            totalRooms: statsMap[pg.id]?.totalRooms ?? null,
-            totalBeds: statsMap[pg.id]?.totalBeds ?? null,
-            occupiedBeds: statsMap[pg.id]?.occupiedBeds ?? null,
-            availableBeds: statsMap[pg.id]?.availableBeds ?? null,
-            occupancyPercent: statsMap[pg.id]?.occupancyPercent ?? null,
-          })),
-        );
+        const fetchedPgs = pgRes.data.map((pg) => ({
+          ...pg,
+          totalRooms: statsMap[pg.id]?.totalRooms ?? null,
+          totalBeds: statsMap[pg.id]?.totalBeds ?? null,
+          occupiedBeds: statsMap[pg.id]?.occupiedBeds ?? null,
+          availableBeds: statsMap[pg.id]?.availableBeds ?? null,
+          occupancyPercent: statsMap[pg.id]?.occupancyPercent ?? null,
+        }));
+        setPgs(fetchedPgs);
       }
     } catch (e) {
       console.error(e);

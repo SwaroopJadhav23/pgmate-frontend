@@ -7,6 +7,7 @@ import { getApkDownloadUrl } from "../../utils/apk";
 import { AuthContext } from "../../context/AuthContext";
 
 import "./ownerDashboardProfile.css";
+import "./PoliceFormUpdateModal.css";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import languageIcon from "../../assets/Language_icon.png";
 
@@ -38,6 +39,7 @@ const getOwnerProfileCompletion = (profile) => {
     profile.city,
     profile.photoUrl,
     profile.idProofUrl,
+    profile.defaultPoliceFormType,
   ];
 
   return (fields.filter(Boolean).length / fields.length) * 100;
@@ -52,6 +54,7 @@ const getOwnerProfileChecklist = (profile) => {
     { key: "city", label: "City", complete: Boolean(profile.city?.trim()) },
     { key: "photo", label: "Profile photo", complete: Boolean(profile.photoUrl) },
     { key: "idProof", label: "ID proof", complete: Boolean(profile.idProofUrl) },
+    { key: "policeForm", label: "Police Form Preference", complete: Boolean(profile.defaultPoliceFormType) },
   ];
 };
 
@@ -102,9 +105,18 @@ const OwnerDashboardProfile = () => {
       .then((res) => {
         const data = res.data || null;
         setProfile(data);
-        const incomplete = getOwnerProfileCompletion(data) < 100;
-        if ((location.state?.profileSetupRequired || incomplete) && incomplete) {
-          setShowCompletionPrompt(true);
+        // Check if they are missing ANY core field (name, email, city, photo, idProof).
+        // If they are only missing defaultPoliceFormType, we don't show THIS popup, 
+        // because the GlobalPoliceFormModal will show up instead and act as a feature update.
+        const missingCoreField = !data.name || !data.email || !data.city || !data.photoUrl || !data.idProofUrl;
+        
+        if (location.state?.profileSetupRequired || missingCoreField) {
+          // But wait, if they are routed here by ProtectedRoute just because of defaultPoliceFormType,
+          // profileSetupRequired will be true! So we need to explicitly ignore profileSetupRequired
+          // if they have all core fields.
+          if (missingCoreField) {
+            setShowCompletionPrompt(true);
+          }
         }
       })
       .catch(() => alert("Failed to load profile"))
@@ -141,6 +153,11 @@ const OwnerDashboardProfile = () => {
       return;
     }
 
+    if (!profile?.defaultPoliceFormType) {
+      await Swal.fire({ icon: "warning", title: "Preference Required", text: "Please select a Police Form preference to continue." });
+      return;
+    }
+
     const previousCompletion = getOwnerProfileCompletion(profile);
     const fd = new FormData();
     fd.append("name", trimmedName);
@@ -148,6 +165,7 @@ const OwnerDashboardProfile = () => {
     fd.append("city", trimmedCity);
     if (photo) fd.append("photo", photo);
     if (idProof) fd.append("idProof", idProof);
+    if (profile.defaultPoliceFormType) fd.append("defaultPoliceFormType", profile.defaultPoliceFormType);
 
     setSaveLoading(true);
     try {
@@ -352,6 +370,36 @@ const OwnerDashboardProfile = () => {
                 </label>
                 {profile.idProofUrl && <span className="view-link" onClick={() => setPreviewImage(profile.idProofUrl)}>View ID proof</span>}
                 {idProofInfo && <div className="file-chip"><i className="bi bi-file-earmark-text"></i>{idProofInfo.name} ({idProofInfo.size} KB)</div>}
+              </div>
+
+              <div className="pfield pfield--full">
+                <label>Default Police Verification Preference</label>
+                <div className="police-form-option-grid" style={{ marginTop: '8px' }}>
+                  <div
+                    className={`police-form-option ${profile.defaultPoliceFormType === "WITH_RULES" ? "selected" : ""}`}
+                    onClick={() => setProfile({ ...profile, defaultPoliceFormType: "WITH_RULES" })}
+                  >
+                    <div className="police-form-radio-dot" />
+                    <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                      <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
+                      <i className="bi bi-file-earmark-text" style={{ color: '#6b7280' }}></i>
+                    </div>
+                    <span className="police-form-option-title">Form with Rules</span>
+                    <p className="police-form-option-desc">Includes all the rules, regulations, and fines you configured.</p>
+                  </div>
+
+                  <div
+                    className={`police-form-option ${profile.defaultPoliceFormType === "ONLY" ? "selected" : ""}`}
+                    onClick={() => setProfile({ ...profile, defaultPoliceFormType: "ONLY" })}
+                  >
+                    <div className="police-form-radio-dot" />
+                    <div className="police-form-icon">
+                      <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
+                    </div>
+                    <span className="police-form-option-title">Form Only</span>
+                    <p className="police-form-option-desc">Standard police verification form without any additional rules.</p>
+                  </div>
+                </div>
               </div>
 
 

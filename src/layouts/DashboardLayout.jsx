@@ -2,6 +2,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import "./layout.css";
 import { useState, useEffect } from "react";
+import GlobalPoliceFormModal from "../components/GlobalPoliceFormModal";
 
 const DashboardLayout = ({
   title,
@@ -54,6 +55,7 @@ const DashboardLayout = ({
         </div>
 
       </div>
+      <GlobalPoliceFormModal />
     </div>
   );
 };

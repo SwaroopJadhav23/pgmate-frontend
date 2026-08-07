@@ -1,0 +1,169 @@
+.police-update-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.police-update-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPopIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.police-update-modal-header {
+  padding: 24px 32px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.police-update-modal-header h2 {
+  font-size: 1.5rem;
+  color: #111827;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.police-update-modal-header p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.police-update-modal-body {
+  padding: 24px 32px;
+}
+
+.police-update-label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.police-form-option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .police-form-option-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.police-form-option {
+  position: relative;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #fff;
+}
+
+.police-form-option:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.police-form-option.selected {
+  border-color: #4f46e5;
+  background: #eff6ff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+}
+
+.police-form-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.police-form-radio-dot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.police-form-option.selected .police-form-radio-dot {
+  border-color: #4f46e5;
+  background-color: #4f46e5;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+.police-form-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.police-form-option-title {
+  font-weight: 600;
+  color: #111827;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.police-form-option-desc {
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.police-update-modal-footer {
+  padding: 16px 32px 24px;
+  text-align: right;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.police-update-submit-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+}
+
+.police-update-submit-btn:hover:not(:disabled) {
+  background: #4338ca;
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+}
+
+.police-update-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
