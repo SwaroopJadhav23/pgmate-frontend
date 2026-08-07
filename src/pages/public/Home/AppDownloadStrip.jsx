@@ -70,14 +70,14 @@ const AppDownloadStrip = () => {
         <div className="adl-qr-wrap">
           <div className="adl-qr-box">
             <QRCode
-              value="https://pgmate.in/apk/pgmate.apk"
+              value="https://play.google.com/store/apps/details?id=com.fourise.pgmate"
               size={110}
               bgColor="#ffffff"
               fgColor="#1e1b4b"
               level="M"
             />
           </div>
-          <p className="adl-qr-label">Scan to download APK</p>
+          <p className="adl-qr-label">Scan to get PGMate on Play Store</p>
         </div>
       </section>
 

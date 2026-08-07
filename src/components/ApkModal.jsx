@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import "./ApkModal.css";
 import { getApkDownloadUrl } from "../utils/apk";
 
+// TODO: replace with real Play Store link once app is published
+const PLAYSTORE_URL = "market://details?id=com.fourise.pgmate";
+const PLAYSTORE_WEB_URL = "https://play.google.com/store/apps/details?id=com.fourise.pgmate";
+
 const DownloadIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +58,15 @@ const ApkDownloadModal = ({ show, setShow }) => {
   }, [show]);
 
   const handleDownload = () => {
-    window.location.href = getApkDownloadUrl();
+    if (isAndroid) {
+      const fallbackTimer = setTimeout(() => {
+        window.location.href = PLAYSTORE_WEB_URL;
+      }, 1500);
+      window.addEventListener("pagehide", () => clearTimeout(fallbackTimer), { once: true });
+      window.location.href = PLAYSTORE_URL;
+    } else {
+      window.open(PLAYSTORE_WEB_URL, "_blank");
+    }
     setShow(false);
   };
 
