@@ -1398,9 +1398,11 @@ const PGList = ({role = "OWNER"}) => {
                     Choose how you want the Police Verification document to be generated for your tenants.
                   </p>
 
-                  <h3 className="create-pg-section-title" style={{marginTop: "16px"}}>
-                    Rules & Regulations
-                  </h3>
+                  {editForm.policeFormType !== "ONLY" && (
+                    <>
+                      <h3 className="create-pg-section-title" style={{marginTop: "16px"}}>
+                        Rules & Regulations
+                      </h3>
 
                   <label className="edit-pg-amenities-label">Choose Rules Preference</label>
 
@@ -1748,6 +1750,8 @@ const PGList = ({role = "OWNER"}) => {
                     value={editForm.rulesCustomNote}
                     onChange={(e) => setEditForm({...editForm, rulesCustomNote: e.target.value})}
                   />
+                  </>
+                  )}
                   </>
                   )}
                 </div>
