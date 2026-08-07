@@ -20,10 +20,10 @@ const PoliceVerificationModal = ({ resident, apiPrefix, onClose }) => {
   const [pgData, setPgData] = useState(null);
 
   useEffect(() => {
-    if (resident?.pgId) {
+    if (resident?.pgId || resident?.pgName) {
       const endpoint = apiPrefix === "/manager/residents" ? "/manager/pg/my" : "/owner/pgs";
       api.get(endpoint).then((res) => {
-        const found = (res.data || []).find((p) => p.id === resident.pgId);
+        const found = (res.data || []).find((p) => p.id === resident.pgId || (resident.pgName && p.name === resident.pgName));
         if (found) setPgData(found);
       }).catch(err => console.error("Failed to fetch PG data", err));
     }
