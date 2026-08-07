@@ -123,11 +123,11 @@ clone.querySelectorAll("input, textarea").forEach((el) => {
 
    
 clone.querySelectorAll(".pv-header-row").forEach((el) => {
-  el.style.fontSize = "13px";
-  el.style.marginBottom = "10px";
+  el.style.fontSize = "16px";
+  el.style.marginBottom = "16px";
 });
 clone.querySelectorAll(".pv-header-main").forEach((el) => {
-  el.style.marginBottom = "10px";
+  el.style.marginBottom = "12px";
 });
 clone.querySelectorAll(".pv-pg-name").forEach((el) => {
   el.style.fontSize = "34px";
@@ -140,13 +140,13 @@ clone.querySelectorAll(".pv-pg-address, .pv-pg-phone").forEach((el) => {
   el.style.fontWeight = "400";
 });
     clone.querySelectorAll(".pv-photo-box").forEach((el) => {
-      el.style.width = "110px";
-      el.style.height = "140px";
+      el.style.width = "120px";
+      el.style.height = "160px";
     });
 clone.querySelectorAll(".pv-form-title").forEach((el) => {
   el.style.fontSize = "22px";
   el.style.textAlign = "center";
-  el.style.margin = "12px 0 20px";
+  el.style.margin = "12px -40px 20px";
   el.style.padding = "10px 0";
 });
 clone.querySelectorAll(".pv-field-list").forEach((el) => {
@@ -176,10 +176,11 @@ clone.querySelectorAll(".pv-declaration").forEach((el) => {
   el.style.lineHeight = "1.7";
 });
 clone.querySelectorAll(".pv-signature-line").forEach((el) => {
-  el.style.fontSize = "15px";
-  el.style.marginTop = "30px";
+  el.style.fontSize = "16px";
+  el.style.marginTop = "36px";
   el.style.marginBottom = "6px";
   el.style.textAlign = "right";
+  el.style.fontWeight = "700";
 });
 
     // Page 2 (Rules & Regulations) — same bump in size/spacing as page 1.
@@ -283,7 +284,7 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
       className="pv-photo-img"
     />
   ) : (
-    "Photo"
+    ""
   )}
 </div>
             </div>
