@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import api from "../../../api/axios";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -15,7 +18,18 @@ const calculateAge = (dobString) => {
   return age >= 0 ? String(age) : "";
 };
 
-const PoliceVerificationModal = ({ resident, onClose }) => {
+const PoliceVerificationModal = ({ resident, apiPrefix, onClose }) => {
+  const [pgData, setPgData] = useState(null);
+
+  useEffect(() => {
+    if (resident?.pgId) {
+      const endpoint = apiPrefix === "/manager/residents" ? "/manager/pg/my" : "/owner/pgs";
+      api.get(endpoint).then((res) => {
+        const found = (res.data || []).find((p) => p.id === resident.pgId);
+        if (found) setPgData(found);
+      }).catch(err => console.error("Failed to fetch PG data", err));
+    }
+  }, [resident, apiPrefix]);
  const [form, setForm] = useState({
     tenantName: resident?.name || "",
     birthDate: resident?.dob || "",
@@ -301,78 +315,97 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
           </div>
 
          {/* ===================== PAGE 2 — PG Rules and Regulations ===================== */}
+         {pgData?.policeFormType !== "ONLY" && pgData?.rulesPreference !== "NONE" && (
           <div className="pv-page pv-page-2">
             <div className="pv-rules-title-wrap">
               <h4 className="pv-rules-title">PG Rules and Regulations</h4>
             </div>
 
-           
-<div className="pv-rules-list">
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">1.</span>
-    <span className="pv-rules-text">Residents must follow all the rules and regulations of PG. Rules can be changed from time to time. A notice of at least <span className="pv-blue-bold">3 days</span> will be given for any changes in the rules. Violating the rules may result in legal action.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">2.</span>
-    <span className="pv-rules-text">Rent should be paid between 1st to 10th of every month. A late fee of ₹10 rupees per day will be charged after the 10th. If rent is not paid by the 20th, the room may be vacated without prior notice.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">3.</span>
-    <span className="pv-rules-text">Breakfast time: 1:00 AM to 1:15 PM. Lunch time: 1:15 PM to 3:00 PM. Dinner time: 7:15 PM to 9:00 PM. Please follow the timings strictly.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">4.</span>
-    <span className="pv-rules-text">Use of electrical appliances such as heater, water heater, iron, induction, mixer, electric kettle, etc. is strictly prohibited. A fine of ₹500 will be charged for first-time violation and ₹1000 for repeated violations. Use of AC / Cooler is allowed, but the temperature must be kept between 16°C to 24°C. A fine of ₹500 will be charged for not following this rule.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">5.</span>
-    <span className="pv-rules-text">Guests are not allowed. If any guest (for 30 minutes) is found inside the PG, the membership will be <span className="pv-blue-bold">cancelled</span> and the <span className="pv-blue-bold">security deposit will be forfeited</span>.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">6.</span>
-    <span className="pv-rules-text"><span className="pv-blue-bold">Commission agents (brokers) are not allowed.</span> If anyone is found involved in brokerage activities, their membership will be <span className="pv-blue-bold">cancelled</span> and 50% of the security deposit will be deducted.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">7.</span>
-    <span className="pv-rules-text">Any type of addiction such as smoking, tobacco, gutkha, alcohol, etc. is strictly prohibited inside the PG. Those found doing so will be fined ₹1000 and membership will be cancelled.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">8.</span>
-    <span className="pv-rules-text">Keep your room, common areas, washrooms, and the entire PG premises clean. Do not throw garbage here and there. If anyone is found doing so, a fine of ₹500 will be charged.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">9.</span>
-    <span className="pv-rules-text">You are responsible for your own belongings. PG is <span className="pv-blue-bold">not responsible</span> for any loss or theft. If any loss occurs, inform the administrator immediately.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">10.</span>
-    <span className="pv-rules-text">Security deposit will be refunded within 7 to 15 working days after checkout and after adjusting any pending dues. If any damage is found, an amount of up to ₹500 may be deducted from the deposit.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">11.</span>
-    <span className="pv-rules-text">Keep locks on your room door. PGs are <span className="pv-blue-bold">not responsible</span> for any loss or theft.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">12.</span>
-    <span className="pv-rules-text">Entry is allowed till 1:30 AM. After that, <span className="pv-blue-bold">coordinator's permission</span> is mandatory. PG has full rights to deny entry.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">13.</span>
-    <span className="pv-rules-text">Please keep your mobile on <span className="pv-blue-bold">silent mode</span> in the PG. Do not make noise while talking on the phone.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">14.</span>
-    <span className="pv-rules-text">Do not spit, litter or throw waste outside the room, in corridors, near staircase, or in the parking area. It is <span className="pv-blue-bold">strictly prohibited</span>.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">15.</span>
-    <span className="pv-rules-text">Keep the water tank, washbasin, taps, fans, lights, and all PG facilities clean and in good condition. For any damage, you may be fined up to ₹500.</span>
-  </div>
-  <div className="pv-rules-item">
-    <span className="pv-rules-num">16.</span>
-    <span className="pv-rules-text">Washing machine is available for use. For coordinator / owner's clothes, washing charge is ₹50 per wash.</span>
-  </div>
-</div>
+            <div className="pv-rules-list">
+              {pgData?.rulesPreference === "CUSTOM" && pgData?.rulesClauses ? (
+                (() => {
+                  try {
+                    const parsedRules = JSON.parse(pgData.rulesClauses);
+                    return parsedRules.map((rule, index) => (
+                      <div className="pv-rules-item" key={index}>
+                        <span className="pv-rules-num">{index + 1}.</span>
+                        <span className="pv-rules-text">{rule}</span>
+                      </div>
+                    ));
+                  } catch (e) {
+                    console.error("Failed to parse custom rules", e);
+                    return <p>Error loading custom rules.</p>;
+                  }
+                })()
+              ) : (
+                <>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">1.</span>
+                    <span className="pv-rules-text">Residents must follow all the rules and regulations of PG. Rules can be changed from time to time. A notice of at least <span className="pv-blue-bold">3 days</span> will be given for any changes in the rules. Violating the rules may result in legal action.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">2.</span>
+                    <span className="pv-rules-text">Rent should be paid between 1st to 10th of every month. A late fee of ₹10 rupees per day will be charged after the 10th. If rent is not paid by the 20th, the room may be vacated without prior notice.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">3.</span>
+                    <span className="pv-rules-text">Breakfast time: 1:00 AM to 1:15 PM. Lunch time: 1:15 PM to 3:00 PM. Dinner time: 7:15 PM to 9:00 PM. Please follow the timings strictly.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">4.</span>
+                    <span className="pv-rules-text">Use of electrical appliances such as heater, water heater, iron, induction, mixer, electric kettle, etc. is strictly prohibited. A fine of ₹500 will be charged for first-time violation and ₹1000 for repeated violations. Use of AC / Cooler is allowed, but the temperature must be kept between 16°C to 24°C. A fine of ₹500 will be charged for not following this rule.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">5.</span>
+                    <span className="pv-rules-text">Guests are not allowed. If any guest (for 30 minutes) is found inside the PG, the membership will be <span className="pv-blue-bold">cancelled</span> and the <span className="pv-blue-bold">security deposit will be forfeited</span>.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">6.</span>
+                    <span className="pv-rules-text"><span className="pv-blue-bold">Commission agents (brokers) are not allowed.</span> If anyone is found involved in brokerage activities, their membership will be <span className="pv-blue-bold">cancelled</span> and 50% of the security deposit will be deducted.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">7.</span>
+                    <span className="pv-rules-text">Any type of addiction such as smoking, tobacco, gutkha, alcohol, etc. is strictly prohibited inside the PG. Those found doing so will be fined ₹1000 and membership will be cancelled.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">8.</span>
+                    <span className="pv-rules-text">Keep your room, common areas, washrooms, and the entire PG premises clean. Do not throw garbage here and there. If anyone is found doing so, a fine of ₹500 will be charged.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">9.</span>
+                    <span className="pv-rules-text">You are responsible for your own belongings. PG is <span className="pv-blue-bold">not responsible</span> for any loss or theft. If any loss occurs, inform the administrator immediately.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">10.</span>
+                    <span className="pv-rules-text">Security deposit will be refunded within 7 to 15 working days after checkout and after adjusting any pending dues. If any damage is found, an amount of up to ₹500 may be deducted from the deposit.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">11.</span>
+                    <span className="pv-rules-text">Keep locks on your room door. PGs are <span className="pv-blue-bold">not responsible</span> for any loss or theft.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">12.</span>
+                    <span className="pv-rules-text">Entry is allowed till 1:30 AM. After that, <span className="pv-blue-bold">coordinator's permission</span> is mandatory. PG has full rights to deny entry.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">13.</span>
+                    <span className="pv-rules-text">Please keep your mobile on <span className="pv-blue-bold">silent mode</span> in the PG. Do not make noise while talking on the phone.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">14.</span>
+                    <span className="pv-rules-text">Do not spit, litter or throw waste outside the room, in corridors, near staircase, or in the parking area. It is <span className="pv-blue-bold">strictly prohibited</span>.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">15.</span>
+                    <span className="pv-rules-text">Keep the water tank, washbasin, taps, fans, lights, and all PG facilities clean and in good condition. For any damage, you may be fined up to ₹500.</span>
+                  </div>
+                  <div className="pv-rules-item">
+                    <span className="pv-rules-num">16.</span>
+                    <span className="pv-rules-text">Washing machine is available for use. For coordinator / owner's clothes, washing charge is ₹50 per wash.</span>
+                  </div>
+                </>
+              )}
+            </div>
 
             <p className="pv-rules-notice">
               If a resident violates any of the above rules, Gmate has the full right to take necessary action. This may include a warning, fine, cancellation of membership (membership cancellation), or legal action.
@@ -387,6 +420,7 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
               <span className="pv-sign-block">________________________<br />PG Owner Signature</span>
             </div>
           </div>
+         )}
         </div>
 
         <div className="ar-modal-actions pv-no-print">

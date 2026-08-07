@@ -642,7 +642,7 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
         <UploadSignatureModal resident={uploadSigResident} onClose={() => setUploadSigResident(null)} onSave={uploadSignatureForResident} saving={uploadingSig} />
       )}
       {policeResident && (
-        <PoliceVerificationModal resident={policeResident} onClose={() => setPoliceResident(null)} />
+        <PoliceVerificationModal resident={policeResident} apiPrefix={apiPrefix} onClose={() => setPoliceResident(null)} />
       )}
     </>
   );
