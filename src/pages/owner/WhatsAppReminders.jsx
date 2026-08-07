@@ -1,5 +1,5 @@
-import {FaGift} from "react-icons/fa";
-import {useState, useEffect, useCallback} from "react";
+import { FaGift } from "react-icons/fa";
+import { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import "./WhatsAppReminders.css";
@@ -29,10 +29,10 @@ const saveSentIds = (set) => {
 const buildMessage = (record) => {
   const dueDateFormatted = record.dueDate
     ? new Date(record.dueDate).toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
     : "soon";
 
   return `Hello ${record.residentName}, your rent for ${record.pgName} amounting to ₹${record.rentAmount?.toLocaleString("en-IN")} is pending. Please make the payment before ${dueDateFormatted} to avoid any inconvenience. Thank you - PGMate`;
@@ -75,7 +75,7 @@ const WhatsAppReminders = () => {
     setLoading(true);
     try {
       const [rentRes, residentsRes] = await Promise.all([
-        api.get("/owner/rent", {params: {status: "PENDING"}}),
+        api.get("/owner/rent", { params: { status: "PENDING" } }),
         api.get("/owner/residents"),
       ]);
 
@@ -159,15 +159,15 @@ const WhatsAppReminders = () => {
           </div>
         </div>
         <div className="war-stat-card">
-          <div className="war-stat-icon-wrap" style={{background: "#dcfce7"}}>
+          <div className="war-stat-icon-wrap" style={{ background: "#dcfce7" }}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
               strokeWidth="2"
               stroke="#16a34a"
             >
-              <path d="M21.5 12a9.5 9.5 0 1 1-3-7" />
-              <path d="M3.5 3v6h6" />
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
             </svg>
           </div>
           <div className="war-stat-info">
@@ -226,10 +226,10 @@ const WhatsAppReminders = () => {
             const alreadySent = sentIds.has(record.recordId);
             const dueDateFormatted = record.dueDate
               ? new Date(record.dueDate).toLocaleDateString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
               : "—";
 
             return (
