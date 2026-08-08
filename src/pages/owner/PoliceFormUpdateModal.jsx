@@ -52,9 +52,9 @@ const PoliceFormUpdateModal = ({ pgsNeedingUpdate, onSuccess }) => {
         <div className="police-update-modal-header">
           <h2>Update Police Verification Settings</h2>
           <p>
-            We've introduced Police Verification forms! Since you are an existing
-            owner, please select how you want the Police Verification document to
-            be generated for your existing properties.
+            We've introduced the <strong>Police Verification Form with PG Rules and Regulations</strong>! Since you are an existing owner, please select how you want the Police Verification document to be generated for your existing properties. 
+            <br /><br />
+            <em>Note: You can always change this setting later in the Add PG or Edit PG form pages.</em>
           </p>
         </div>
 
@@ -78,11 +78,11 @@ const PoliceFormUpdateModal = ({ pgsNeedingUpdate, onSuccess }) => {
               <span className="police-form-radio-dot" />
               <span className="police-form-icon">🛡️📄</span>
               <span className="police-form-option-title">
-                Police Form with Rules & Regulations
+                Police Form with PG Rules & Regulations
               </span>
               <span className="police-form-option-desc">
                 Generate a 2-page document with police verification details and
-                rules & regulations.
+                PG rules & regulations.
               </span>
             </label>
 

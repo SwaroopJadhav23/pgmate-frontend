@@ -384,7 +384,7 @@ const OwnerDashboardProfile = () => {
                       <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
                       <i className="bi bi-file-earmark-text" style={{ color: '#6b7280' }}></i>
                     </div>
-                    <span className="police-form-option-title">Form with Rules</span>
+                    <span className="police-form-option-title">Form with PG Rules</span>
                     <p className="police-form-option-desc">Includes all the rules, regulations, and fines you configured.</p>
                   </div>
 

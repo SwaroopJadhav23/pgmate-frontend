@@ -122,6 +122,9 @@
 .create-pg-form-row > div,
 .create-pg-form-row-3 > div {
   min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
 }
 .create-pg-form-input::placeholder,
 .create-pg-form-textarea::placeholder {

@@ -72,7 +72,7 @@ const ResidentsOverview = () => {
         "Expected Checkout": fmtDate(r.expectedCheckoutDate),
         "Onboarding Paid": r.onboardingPaymentAmount ?? 0,
         "Payment Mode": r.onboardingPaymentMode ?? "",
-        "Food Preference": r.foodPreference ?? "",
+        "Food Facility": r.foodFacility !== "Without Food" ? "With Food" : "Without Food",
         "Emergency Contact Name": r.emergencyContactName ?? "",
         "Emergency Contact": r.emergencyContact ?? "",
         "Emergency Relation": r.emergencyContactRelation ?? "",
@@ -82,7 +82,7 @@ const ResidentsOverview = () => {
         "S.No", "Name", "Phone", "Email", "PG Name", "Floor", "Room", "Bed",
         "Monthly Rent", "Deposit", "Total Dues", "Manual Dues", "Stay Type",
         "Check-in", "Expected Checkout",
-        "Onboarding Paid", "Payment Mode", "Food Preference",
+        "Onboarding Paid", "Payment Mode", "Food Facility",
         "Emergency Contact Name", "Emergency Contact", "Emergency Relation",
       ];
 

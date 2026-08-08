@@ -63,6 +63,7 @@ color:#64748b;
 font-weight:600;
 letter-spacing:.3px;
 text-transform:uppercase;
+white-space:nowrap;
 }
 .kpi-card h2{
 font-size:30px;

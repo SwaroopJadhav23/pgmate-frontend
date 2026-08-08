@@ -74,7 +74,7 @@ const OwnerRevenue = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
   const [rentRecords, setRentRecords] = useState([]);
-  const [chartType, setChartType] = useState("area");
+  const [chartType, setChartType] = useState("bar");
   const isMobile = window.innerWidth < 768;
 
 
@@ -801,7 +801,7 @@ const OwnerRevenue = () => {
             </div>
 
             {/* KPI GRID */}
-            <div className="kpi-grid">
+            <div className="owner-kpi-grid">
 
               <KPI
                 title="Total Revenue"
@@ -878,10 +878,10 @@ const OwnerRevenue = () => {
 
             {/* CHARTS */}
             <div className="analytics-grid">
-              <div className="chart-card small-card">
+              <div className="chart-card small-card" style={{ textAlign: 'center' }}>
                 <h3>Occupancy Rate</h3>
 
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', margin: '40px auto 0' }}>
                   <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
                     <PieChart>
                       <Pie
@@ -890,6 +890,8 @@ const OwnerRevenue = () => {
                           { name: "Vacant", value: 100 - occupancyRate, fill: "#e5e7eb" },
                         ].filter(d => d.value > 0)}
                         dataKey="value"
+                        cx="50%"
+                        cy="50%"
                         label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                         innerRadius={isMobile ? 50 : 60}
                         outerRadius={isMobile ? 75 : 90}
@@ -922,7 +924,7 @@ const OwnerRevenue = () => {
                       <span className="chart-toggle-thumb"></span>
                     </button>
                     <span className="chart-toggle-label">
-                      {chartType === "area" ? "Line Chart" : "Bar Chart"}
+                      {chartType === "area" ? "Bar Chart" : "Line Chart"}
                     </span>
                   </div>
                 </div>

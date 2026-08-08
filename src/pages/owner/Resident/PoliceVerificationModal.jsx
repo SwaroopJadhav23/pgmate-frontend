@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import api from "../../../api/axios";
+import toast from "react-hot-toast";
 
 const calculateAge = (dobString) => {
   if (!dobString) return "";
@@ -84,138 +85,95 @@ const PoliceVerificationModal = ({ resident, apiPrefix, onClose }) => {
     setForm({ ...form, birthDate: dobValue, age: calculateAge(dobValue) });
   };
 
+  const handleSave = async () => {
+    try {
+      const fd = new FormData();
+      let hasChanges = false;
+      const r = resident || {};
+      
+      const checkAndAppend = (key, val, orig) => {
+        if (val !== (orig || "")) {
+          fd.append(key, val);
+          hasChanges = true;
+        }
+      };
+
+      checkAndAppend("name", form.tenantName, r.name);
+      
+      if (form.birthDate && form.birthDate !== r.dob) {
+        checkAndAppend("dob", form.birthDate, r.dob);
+      }
+      
+      checkAndAppend("phone", form.phone, r.phone);
+      checkAndAppend("collegeOrCompanyName", form.college, r.collegeOrCompanyName);
+      checkAndAppend("education", form.education, r.education);
+      checkAndAppend("aadhaarNumber", form.aadhaar, r.aadhaarNumber);
+      checkAndAppend("email", form.email, r.email);
+      checkAndAppend("permanentAddress", form.permanentAddress, r.permanentAddress);
+      checkAndAppend("guardianName", form.fathersName, r.guardianName);
+      checkAndAppend("guardianPhone", form.fathersPhone, r.guardianPhone);
+      checkAndAppend("localGuardianName", form.guardianName, r.localGuardianName);
+      checkAndAppend("localGuardianAddress", form.guardianAddress, r.localGuardianAddress);
+      checkAndAppend("localGuardianPhone", form.guardianPhone, r.localGuardianPhone);
+
+      if (hasChanges && (r.residentId || r.id)) {
+        const endpoint = apiPrefix || "/owner/residents";
+        await api.put(`${endpoint}/${r.residentId || r.id}`, fd);
+        toast.success("Resident details saved");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to save changes.");
+    }
+  };
+
 const handlePrint = async () => {
+    if (errors.phone || errors.email || errors.fathersPhone || errors.guardianPhone) {
+      toast.error("Please fix validation errors before printing.");
+      return;
+    }
+    await handleSave();
     const original = document.getElementById("police-verification-printable");
     const clone = original.cloneNode(true);
+    clone.classList.add("pdf-export-mode");
 
-    // Replace inputs/textareas with plain divs carrying the same value —
-    // html2canvas can't reliably rasterize live form controls without
-    // foreignObjectRendering, and foreignObjectRendering breaks width
-    // when captured off-screen. This sidesteps both problems.
-// AFTER — smaller gap, still enough to clear descenders
+    // Replace inputs/textareas with robust block divs to avoid baseline/text-cutoff issues
+    clone.querySelectorAll("input, textarea").forEach((el) => {
+      const replacement = document.createElement("div");
+      replacement.className = el.className;
+      
+      let textVal = el.value || "";
+      if (el.type === "date" && textVal) {
+        const [y, m, d] = textVal.split("-");
+        if (y && m && d) textVal = `${d}-${m}-${y}`;
+      }
+      replacement.textContent = textVal;
+      
+      // Use display block so that the bottom padding strictly bounds the text descenders
+      replacement.style.display = "block";
+      replacement.style.boxSizing = "border-box";
+      const isFilled = el.value && el.value.toString().trim().length > 0;
+      replacement.style.borderBottom = isFilled ? "none" : "1px solid #000";
+      replacement.style.minHeight = "1.2em";
+      replacement.style.height = "auto";
+      replacement.style.setProperty("height", "auto", "important");
+      replacement.style.lineHeight = el.nodeName.toLowerCase() === "textarea" ? "1.6" : "1.2";
+      replacement.style.paddingBottom = el.nodeName.toLowerCase() === "textarea" ? "8px" : "2px";
+      replacement.style.whiteSpace = "pre-wrap";
+      el.replaceWith(replacement);
+    });
 
-
-clone.querySelectorAll("input, textarea").forEach((el) => {
-  const replacement = document.createElement("div");
-  replacement.className = el.className;
-  replacement.textContent = el.value || "";
-  replacement.style.display = "inline-block";
-  replacement.style.borderBottom = "1px solid #000";
-  replacement.style.minHeight = "1em";
-  replacement.style.whiteSpace = "pre-wrap";
-  replacement.style.paddingBottom = "1px";
-  el.replaceWith(replacement);
-});
-
-    // PDF-only styling — equal border spacing on all sides, clear header
-    // alignment, consistent field/declaration/signature spacing. Screen
-    // (the two on-screen pages) is untouched by any of this.
     const pageEls = clone.querySelectorAll(".pv-page");
     pageEls.forEach((page) => {
-      page.style.border = "2px solid #000";
+      // Force exact A4 pixel dimensions (96 DPI)
       page.style.boxSizing = "border-box";
       page.style.width = "794px";
       page.style.height = "1123px";
-      page.style.padding = "40px";      // equal top/right/bottom/left gap from border
+      page.style.display = "flex";
+      page.style.flexDirection = "column";
       page.style.overflow = "hidden";
       page.style.position = "relative";
-    });
-
-   
-clone.querySelectorAll(".pv-header-row").forEach((el) => {
-  el.style.fontSize = "16px";
-  el.style.marginBottom = "16px";
-});
-clone.querySelectorAll(".pv-header-main").forEach((el) => {
-  el.style.marginBottom = "12px";
-});
-clone.querySelectorAll(".pv-pg-name").forEach((el) => {
-  el.style.fontSize = "34px";
-  el.style.marginBottom = "14px";
-});
-clone.querySelectorAll(".pv-pg-address, .pv-pg-phone").forEach((el) => {
-  el.style.fontSize = "15px";
-  el.style.margin = "8px 0";
-  el.style.lineHeight = "1.5";
-  el.style.fontWeight = "400";
-});
-    clone.querySelectorAll(".pv-photo-box").forEach((el) => {
-      el.style.width = "120px";
-      el.style.height = "160px";
-    });
-clone.querySelectorAll(".pv-form-title").forEach((el) => {
-  el.style.fontSize = "22px";
-  el.style.textAlign = "center";
-  el.style.margin = "12px -40px 20px";
-  el.style.padding = "10px 0";
-});
-clone.querySelectorAll(".pv-field-list").forEach((el) => {
-  el.style.gap = "18px";
-  el.style.marginBottom = "18px";
-});
-clone.querySelectorAll(".pv-field-line").forEach((el) => {
-  el.style.fontSize = "15px";
-  el.style.alignItems = "baseline";
-});
-clone.querySelectorAll(".pv-field-input").forEach((el) => {
-  el.style.fontSize = "15px";
-  el.style.padding = "2px 6px";
-});
-    clone.querySelectorAll(".pv-field-label").forEach((el) => {
-      el.style.fontWeight = "700";
-      el.style.fontSize = "15px";
-    });
-clone.querySelectorAll(".pv-declaration-title").forEach((el) => {
-  el.style.fontSize = "14px";
-  el.style.marginTop = "24px";
-  el.style.marginBottom = "10px";
-  el.style.textAlign = "center";
-});
-clone.querySelectorAll(".pv-declaration").forEach((el) => {
-  el.style.fontSize = "12.5px";
-  el.style.lineHeight = "1.7";
-});
-clone.querySelectorAll(".pv-signature-line").forEach((el) => {
-  el.style.fontSize = "16px";
-  el.style.marginTop = "36px";
-  el.style.marginBottom = "6px";
-  el.style.textAlign = "right";
-  el.style.fontWeight = "700";
-});
-
-    // Page 2 (Rules & Regulations) — same bump in size/spacing as page 1.
-    clone.querySelectorAll(".pv-rules-title").forEach((el) => {
-      el.style.fontSize = "22px";
-    });
-    clone.querySelectorAll(".pv-rules-title-wrap").forEach((el) => {
-      el.style.paddingBottom = "10px";
-      el.style.marginBottom = "18px";
-    });
-    clone.querySelectorAll(".pv-rules-list").forEach((el) => {
-      el.style.fontSize = "12.5px";
-      el.style.lineHeight = "1.45";
-      el.style.paddingLeft = "0";
-      el.style.marginLeft = "24px";
-      el.style.marginBottom = "10px";
-    });
-clone.querySelectorAll(".pv-rules-item").forEach((el) => {
-  el.style.marginBottom = "10px";
-});
-    clone.querySelectorAll(".pv-rules-notice").forEach((el) => {
-      el.style.fontSize = "13px";
-      el.style.lineHeight = "1.6";
-      el.style.margin = "12px 0";
-    });
-    clone.querySelectorAll(".pv-rules-thanks").forEach((el) => {
-      el.style.fontSize = "13px";
-      el.style.margin = "12px 0 26px";
-    });
-   clone.querySelectorAll(".pv-rules-sign-row").forEach((el) => {
-      el.style.fontSize = "13px";
-      el.style.marginTop = "8px";
-    });
-    clone.querySelectorAll(".pv-rules-thanks").forEach((el) => {
-      el.style.margin = "10px 0 16px";
+      page.style.backgroundColor = "#ffffff";
     });
 
     const wrapper = document.createElement("div");
@@ -228,21 +186,18 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
-    // Capture each page separately and add as its own PDF page —
-    // avoids html2pdf's unreliable auto-slicing (source of blank pages).
     const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-    const pageWidthMm = 210;
-    const pageHeightMm = 297;
-
-    const marginMm = 6; // equal outer margin so the border never touches the page edge
-    const imgWidthMm = pageWidthMm - marginMm * 2;
-    const imgHeightMm = pageHeightMm - marginMm * 2;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 5; // Safe print margin
+    const pdfWidth = pageWidth - margin * 2;
 
     for (let i = 0; i < pageEls.length; i++) {
       const canvas = await html2canvas(pageEls[i], { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
       const imgData = canvas.toDataURL("image/jpeg", 0.98);
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
       if (i > 0) pdf.addPage();
-      pdf.addImage(imgData, "JPEG", marginMm, marginMm, imgWidthMm, imgHeightMm);
+      pdf.addImage(imgData, "JPEG", margin, margin, pdfWidth, pdfHeight);
     }
 
     pdf.save(`Police_Verification_${form.tenantName || "Tenant"}.pdf`);
@@ -254,7 +209,7 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
         className="agreement-view-popup agreement-view-popup-lg pv-modal"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="agreement-popup-close pv-no-print" onClick={onClose}>×</button>
+        <button className="pv-popup-close pv-no-print" onClick={onClose}>×</button>
 
         <div className="pv-printable" id="police-verification-printable">
           {/* ===================== PAGE 1 — Police Verification Form ===================== */}
@@ -334,7 +289,7 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
                   try {
                     const parsedRules = JSON.parse(pgData.rulesClauses);
                     return parsedRules.filter(r => r.enabled !== false).map((rule, index) => {
-                      const text = typeof rule === 'string' ? rule : (rule.description || rule.text || '');
+                      const text = typeof rule === 'string' ? rule : (rule.text || rule.description || '');
                       return (
                         <div className="pv-rules-item" key={index}>
                           <span className="pv-rules-num">{index + 1}.</span>
@@ -418,7 +373,7 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
             </div>
 
             <p className="pv-rules-notice">
-              If a resident violates any of the above rules, Gmate has the full right to take necessary action. This may include a warning, fine, cancellation of membership (membership cancellation), or legal action.
+              If a resident violates any of the above rules, we have the full right to take necessary action. This may include a warning, fine, cancellation of membership (membership cancellation), or legal action.
             </p>
             <p className="pv-rules-notice">
               I have read all the above rules and agree to follow them. If I violate any rule, I accept the action taken by the administration.
@@ -434,23 +389,42 @@ clone.querySelectorAll(".pv-rules-item").forEach((el) => {
         </div>
 
         <div className="ar-modal-actions pv-no-print">
-          <button className="modal-btn primary ar-btn-text" onClick={handlePrint}>Download PDF</button>
           <button className="modal-btn cancel ar-btn-text" onClick={onClose}>Close</button>
+          <button className="modal-btn cancel ar-btn-text" onClick={handleSave}>Save Details</button>
+          <button className="modal-btn primary ar-btn-text" onClick={handlePrint}>Download PDF</button>
         </div>
       </div>
     </div>
   );
 };
 
-const PVField = ({ label, value, onChange, type = "text", short = false, error = "", twoLines = false }) => (
-  <div className={`pv-field-container ${short ? "pv-field-container--short" : ""}`}>
-    <div className="pv-field-line">
-      <label className="pv-field-label">{label}:</label>
-      <input className={`pv-field-input ${error ? "pv-field-input--error" : ""}`} type={type} value={value} onChange={onChange} />
-      {error && <span className="pv-field-error">{error}</span>}
+const PVField = ({ label, value, onChange, type = "text", short = false, error = "", twoLines = false }) => {
+  const isFilled = value && value.toString().trim().length > 0;
+  
+  return (
+    <div className={`pv-field-container ${short ? "pv-field-container--short" : ""}`}>
+      <div className="pv-field-line">
+        <label className="pv-field-label">{label}:</label>
+        {twoLines && isFilled ? (
+          <textarea 
+            className={`pv-field-input pv-field-input--area ${error ? "pv-field-input--error" : ""} pv-field-input--filled`} 
+            value={value} 
+            onChange={onChange}
+            rows={2}
+          />
+        ) : (
+          <input 
+            className={`pv-field-input ${error ? "pv-field-input--error" : ""} ${isFilled ? "pv-field-input--filled" : ""}`} 
+            type={type} 
+            value={value} 
+            onChange={onChange} 
+          />
+        )}
+        {error && <span className="pv-field-error">{error}</span>}
+      </div>
+      {twoLines && !isFilled && <div className="pv-field-line-extra"></div>}
     </div>
-    {twoLines && <div className="pv-field-line-extra"></div>}
-  </div>
-);
+  );
+};
 
 export default PoliceVerificationModal;

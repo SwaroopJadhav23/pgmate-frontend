@@ -518,15 +518,7 @@ const EditTenantPage = ({ apiPrefix }) => {
                 <option value="Without Food">Without Food</option>
               </Form.Select>
             </div>
-            
-            <div className="arm-field" data-mobile-full="true">
-              <label>Food Preference</label>
-              <Form.Select value={form.foodPreference} onChange={(e) => setForm({ ...form, foodPreference: e.target.value })}>
-                <option value="">Select</option>
-                <option value="VEG">Veg</option>
-                <option value="NON_VEG">Non-Veg</option>
-              </Form.Select>
-            </div>
+
 
             <h6 className="mt-4" style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Permanent Address</h6>
             <div className="arm-field full">

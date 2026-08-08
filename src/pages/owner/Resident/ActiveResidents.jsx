@@ -1,4 +1,4 @@
-import { FaLeaf, FaDrumstickBite, FaFileAlt } from "react-icons/fa";
+import { FaLeaf, FaDrumstickBite, FaFileAlt, FaUtensils, FaTimesCircle } from "react-icons/fa";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -175,7 +175,7 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
     ? residents.find(r => r.residentId === detailResident.residentId) ?? detailResident
     : null;
   const currentSettlementIsDaily = isDailyResident(settlementResident);
-  const residentStats = useMemo(() => ({ total: totalElements, monthly: residents.filter(r => r.stayType === "MONTHLY_BASIC").length, daily: residents.filter(r => r.stayType === "DAILY_BASIC").length, veg: residents.filter(r => r.foodPreference === "VEG").length, nonVeg: residents.filter(r => r.foodPreference === "NON_VEG").length }), [residents, totalElements]);
+  const residentStats = useMemo(() => ({ total: totalElements, monthly: residents.filter(r => r.stayType === "MONTHLY_BASIC").length, daily: residents.filter(r => r.stayType === "DAILY_BASIC").length, withFood: residents.filter(r => r.foodFacility !== "Without Food").length, withoutFood: residents.filter(r => r.foodFacility === "Without Food").length }), [residents, totalElements]);
   const goToDues = (r) => {
     navigate("/owner/rent", {
       state: {
@@ -207,9 +207,9 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
         <div className="res-stat-card res-stat--food">
           <div className="res-stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" className="res-stat-icon" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z" /></svg></div>
           <div className="res-stat-info">
-            <span className="res-stat-value">{residentStats.veg + residentStats.nonVeg}</span>
-            <span className="res-stat-label">Food Preference</span>
-            <span className="res-stat-sub"><span className="ar-veg-text">Veg {residentStats.veg}</span>&nbsp;·&nbsp;<span className="ar-nonveg-text">Non-Veg {residentStats.nonVeg}</span></span>
+            <span className="res-stat-value">{residentStats.withFood + residentStats.withoutFood}</span>
+            <span className="res-stat-label">Food Facility</span>
+            <span className="res-stat-sub"><span className="ar-veg-text">With Food {residentStats.withFood}</span>&nbsp;·&nbsp;<span className="ar-nonveg-text">Without Food {residentStats.withoutFood}</span></span>
           </div>
         </div>
       </div>
@@ -384,7 +384,13 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
         <div className="modal-backdrop-custom" onClick={() => setDetailResident(null)}>
           <div className="modal-box rdp-modal" onClick={(e) => e.stopPropagation()}>
             <div className="rdp-header">
-              <div className="rdp-avatar">{liveDetail.name ? liveDetail.name.charAt(0).toUpperCase() : "?"}</div>
+              <div className="rdp-avatar">
+                {liveDetail.profilePhotoUrl ? (
+                  <img src={liveDetail.profilePhotoUrl} alt="Profile" className="rdp-avatar-img" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  liveDetail.name ? liveDetail.name.charAt(0).toUpperCase() : "?"
+                )}
+              </div>
               <div className="rdp-header-text">
                 <h4>{liveDetail.name}</h4>
                 <span>{liveDetail.pgName} &nbsp;·&nbsp; Room {liveDetail.roomNumber}, Bed {liveDetail.bedNumber} &nbsp;·&nbsp; {isDailyResident(liveDetail) ? "Daily" : "Monthly"}</span>
@@ -407,8 +413,12 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                   </div>
                 </div>
                 <div className="rdpm-row">
-                  <span className="rdpm-label">Food preference</span>
-                  <span className="rdpm-value">{liveDetail.foodPreference === "VEG" ? <><FaLeaf /> Veg</> : liveDetail.foodPreference === "NON_VEG" ? <><FaDrumstickBite /> Non-Veg</> : "-"}</span>
+                  <span className="rdpm-label">Food Facility</span>
+                  <span className="rdpm-value">
+                    {liveDetail.foodFacility !== "Without Food" 
+                      ? <><FaUtensils className="text-warning" style={{marginRight: '4px'}} /> With Food</> 
+                      : <><FaTimesCircle className="text-secondary" style={{marginRight: '4px'}} /> Without Food</>}
+                  </span>
                 </div>
 
                 <div className="rdpm-divider" />
@@ -445,6 +455,12 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                       <span className="rdpm-label">Rent &middot; deposit</span>
                       <span className="rdpm-value">{formatMoney(liveDetail.monthlyRent)} &middot; {formatMoney(liveDetail.deposit)}</span>
                     </div>
+                    {liveDetail.futureDepositRefund != null && liveDetail.futureDepositRefund > 0 && (
+                      <div className="rdpm-row">
+                        <span className="rdpm-label">Future Refund</span>
+                        <span className="rdpm-value">{formatMoney(liveDetail.futureDepositRefund)}</span>
+                      </div>
+                    )}
                     <div className="rdpm-row">
                       <span className="rdpm-label">Onboarding</span>
                       <span className="rdpm-value">
@@ -505,8 +521,12 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                     <a href={`tel:${liveDetail.phone}`} aria-label="Call"><i className="bi bi-telephone-fill text-success"></i></a>
                     <a href={`https://wa.me/91${liveDetail.phone}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i className="bi bi-whatsapp text-success"></i></a>
                   </div>
-                  <span className="rdp-label">Food Preference</span>
-                  <span className="rdp-value">{liveDetail.foodPreference === "VEG" ? <><FaLeaf /> Veg</> : liveDetail.foodPreference === "NON_VEG" ? <><FaDrumstickBite /> Non-Veg</> : "-"}</span>
+                  <span className="rdp-label">Food Facility</span>
+                  <span className="rdp-value">
+                    {liveDetail.foodFacility !== "Without Food" 
+                      ? <><FaUtensils className="text-warning" style={{marginRight: '4px'}} /> With Food</> 
+                      : <><FaTimesCircle className="text-secondary" style={{marginRight: '4px'}} /> Without Food</>}
+                  </span>
                 </div>
 
                 <div className="rdp-col">
@@ -538,6 +558,12 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                       <span className="rdp-value">{formatMoney(liveDetail.monthlyRent)}</span>
                       <span className="rdp-label">Deposit</span>
                       <span className="rdp-value">{formatMoney(liveDetail.deposit)}</span>
+                      {liveDetail.futureDepositRefund != null && liveDetail.futureDepositRefund > 0 && (
+                        <>
+                          <span className="rdp-label">Future Refund</span>
+                          <span className="rdp-value">{formatMoney(liveDetail.futureDepositRefund)}</span>
+                        </>
+                      )}
                       <span className="rdp-label">Onboarding</span>
                       <span className="rdp-value">
                         {liveDetail.onboardingPaymentMode && <span className="rdp-pill">{liveDetail.onboardingPaymentMode}</span>} {formatMoney(liveDetail.onboardingPaymentAmount)}
@@ -579,10 +605,10 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
             )}
 
             <div className="rdp-actions">
-  <button className="rdp-btn-edit" onClick={() => { navigate(`/owner/residents/edit/${liveDetail.residentId}`, { state: { resident: liveDetail, apiPrefix } }); setDetailResident(null); }}>Edit</button>
- <button className="rdp-btn-police" onClick={() => { setPoliceResident(liveDetail); setDetailResident(null); }}>Police Verification</button>
-  <button className="rdp-btn-checkout" onClick={() => { openCheckout(liveDetail); setDetailResident(null); }}>{isDailyResident(liveDetail) ? "Complete" : "Checkout"}</button>
-</div>
+              <button className="rdp-btn-police" onClick={() => { setPoliceResident(liveDetail); }}>Police Verification Form</button>
+              <button className="rdp-btn-edit" onClick={() => { navigate(`/owner/residents/edit/${liveDetail.residentId}`, { state: { resident: liveDetail, apiPrefix } }); setDetailResident(null); }}>Edit</button>
+              <button className="rdp-btn-checkout" onClick={() => { openCheckout(liveDetail); setDetailResident(null); }}>{isDailyResident(liveDetail) ? "Complete" : "Checkout"}</button>
+            </div>
           </div>
         </div>
       )}

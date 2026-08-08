@@ -617,9 +617,13 @@ const PGList = ({role = "OWNER"}) => {
       rulesPreference: pg.rulesPreference ?? "GENERAL"
     });
     try {
+      // Only restore saved rulesClauses into the custom table when they were saved as CUSTOM.
+      // If the PG used GENERAL rules, always seed the custom table with fresh DEFAULT_RULES
+      // templates so that switching to CUSTOM gives proper placeholder text for resolution.
       const savedRules = pg.rulesClauses ? JSON.parse(pg.rulesClauses) : null;
+      const isCustomSaved = pg.rulesPreference === "CUSTOM";
       setEditRulesClauses(
-        savedRules && savedRules.length
+        isCustomSaved && savedRules && savedRules.length
           ? savedRules
           : DEFAULT_RULES.map((r) => ({...r}))
       );
@@ -1368,9 +1372,9 @@ const PGList = ({role = "OWNER"}) => {
                         <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
                         <i className="bi bi-file-earmark-text" style={{ color: '#6b7280' }}></i>
                       </div>
-                      <span className="police-form-option-title">Police Form with Rules &amp; Regulations</span>
+                      <span className="police-form-option-title">Police Form with PG Rules &amp; Regulations</span>
                       <span className="police-form-option-desc">
-                        Generate a 2-page document with police verification details and rules &amp; regulations.
+                        Generate a 2-page document with police verification details and PG rules &amp; regulations.
                       </span>
                     </label>
 
@@ -1401,7 +1405,7 @@ const PGList = ({role = "OWNER"}) => {
                   {editForm.policeFormType !== "ONLY" && (
                     <>
                       <h3 className="create-pg-section-title" style={{marginTop: "16px"}}>
-                        Rules & Regulations
+                        PG Rules &amp; Regulations
                       </h3>
 
                   <label className="edit-pg-amenities-label">Choose Rules Preference</label>
@@ -1413,7 +1417,9 @@ const PGList = ({role = "OWNER"}) => {
                         name="rulesPreference"
                         value="GENERAL"
                         checked={editForm.rulesPreference === "GENERAL"}
-                        onChange={(e) => setEditForm({...editForm, rulesPreference: e.target.value})}
+                        onChange={(e) => {
+                          setEditForm({...editForm, rulesPreference: e.target.value});
+                        }}
                       />
                       <span className="police-form-radio-dot" />
                       <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -1429,7 +1435,11 @@ const PGList = ({role = "OWNER"}) => {
                         name="rulesPreference"
                         value="CUSTOM"
                         checked={editForm.rulesPreference === "CUSTOM"}
-                        onChange={(e) => setEditForm({...editForm, rulesPreference: e.target.value})}
+                        onChange={(e) => {
+                          setEditForm({...editForm, rulesPreference: e.target.value});
+                          // Reset clauses to DEFAULT_RULES templates so custom values are properly embedded on save
+                          setEditRulesClauses(DEFAULT_RULES.map((r) => ({...r})));
+                        }}
                       />
                       <span className="police-form-radio-dot" />
                       <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
