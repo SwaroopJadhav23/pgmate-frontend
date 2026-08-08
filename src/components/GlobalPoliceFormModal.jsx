@@ -113,11 +113,11 @@ const GlobalPoliceFormModal = () => {
                 <i className="bi bi-file-earmark-text" style={{ color: '#6b7280' }}></i>
               </div>
               <span className="police-form-option-title">
-                Police Form with Rules & Regulations
+                Police Form with PG Rules & Regulations
               </span>
               <span className="police-form-option-desc">
                 Generate a 2-page document with police verification details and
-                rules & regulations.
+                PG rules & regulations.
               </span>
             </label>
 

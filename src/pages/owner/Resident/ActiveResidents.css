@@ -167,6 +167,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
+
   .res-stat-value {
     font-size: 1.3rem;
   }
@@ -273,8 +274,13 @@
 }
 
 @keyframes ar-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* =============================================
@@ -298,6 +304,7 @@
 ============================================= */
 
 @media (max-width: 768px) {
+
   /* Make backdrop cover full screen */
   .modal-backdrop-custom {
     position: fixed;
@@ -305,7 +312,8 @@
     z-index: 1050;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
-    align-items: flex-end; /* slide up from bottom on mobile */
+    align-items: flex-end;
+    /* slide up from bottom on mobile */
     justify-content: center;
     padding: 0;
   }
@@ -392,11 +400,13 @@
   /* Larger form controls on mobile for easier tapping */
   .ar-modal-scrollable-body .form-control,
   .ar-modal-scrollable-body .form-select {
-    font-size: 16px; /* prevents iOS auto-zoom */
+    font-size: 16px;
+    /* prevents iOS auto-zoom */
     padding: 10px 14px;
     border-radius: 10px;
     min-height: 46px;
   }
+
 
   .ar-modal-scrollable-body .form-label {
     font-size: 13px;
@@ -643,10 +653,6 @@
   align-items: flex-start;
   padding: 9px 14px;
   border-bottom: 0.5px solid #f3f4f6;
-}
-
-.tmc-section-row--dates {
-  /* same as section-row, no extra needed */
 }
 
 .tmc-detail-cell {
@@ -929,51 +935,121 @@
 }
 
 /* ── Inline CSS Extraction ── */
-.agreement-view-popup-lg { width: min(580px, 96vw); }
-.agreement-view-popup-md { width: min(560px, 95vw); }
-.ar-modal-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
-.ar-modal-subtitle-sm { font-size: 13px; color: #6b7280; margin-bottom: 10px; }
-.ar-modal-actions { margin-top: 14px; display: flex; gap: 10px; }
-.ar-btn-text { font-size: 13px; }
-.ar-veg-text { color: #16a34a; font-weight: 600; }
-.ar-nonveg-text { color: #dc2626; font-weight: 600; }
-.ar-text-center { text-align: center; }
-.ar-cursor-pointer { cursor: pointer; }
-.rdpm-row-col { flex-direction: column; align-items: flex-start; gap: 4px; }
-.ar-doc-iframe { border: none; }
-.ar-doc-img { max-width: 100%; max-height: 500px; }
-.ar-modal-content { margin-bottom: 14px; font-size: 13px; color: #374151; line-height: 1.7; }
-.ar-sig-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; }
-.agreement-popup-sig-bg { background: #f8faff; padding: 8px; border-radius: 8px; }
-.ar-link-btn { text-decoration: none; font-size: 13px; padding: 6px 16px; }
+.agreement-view-popup-lg {
+  width: min(580px, 96vw);
+}
+
+.agreement-view-popup-md {
+  width: min(560px, 95vw);
+}
+
+.ar-modal-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.ar-modal-subtitle-sm {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.ar-modal-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.ar-btn-text {
+  font-size: 13px;
+}
+
+.ar-veg-text {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.ar-nonveg-text {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.ar-text-center {
+  text-align: center;
+}
+
+.ar-cursor-pointer {
+  cursor: pointer;
+}
+
+.rdpm-row-col {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.ar-doc-iframe {
+  border: none;
+}
+
+.ar-doc-img {
+  max-width: 100%;
+  max-height: 500px;
+}
+
+.ar-modal-content {
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.7;
+}
+
+.ar-sig-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.agreement-popup-sig-bg {
+  background: #f8faff;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.ar-link-btn {
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 16px;
+}
 
 /* =============================================
    POLICE VERIFICATION BUTTON — rdp-actions row
 ============================================= */
 
 .rdp-btn-police {
-  flex: 1;
-  padding: 12px 0;
-  font-size: 13px;
+  flex: none;
+  padding: 9px 22px;
+  font-size: 13.5px;
   font-weight: 600;
-  border: none;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
   cursor: pointer;
-  background: #ecfeff;
-  color: #0e7490;
-  border-left: 1px solid rgba(0, 0, 0, 0.06);
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  background: #eff6ff;
+  color: #1d4ed8;
   transition: background 0.15s, filter 0.15s;
-  min-height: 44px;
 }
 
 .rdp-btn-police:hover {
-  background: #cffafe;
+  background: #dbeafe;
   filter: brightness(0.98);
 }
 
 .rdp-btn-police:active {
   filter: brightness(0.94);
 }
+
 /* =============================================
    POLICE VERIFICATION FORM
 ============================================= */
@@ -982,11 +1058,12 @@
 .pv-modal {
   width: 794px;
   max-width: 95vw;
- min-height: 750px;/* min-height: 1123px; */
+  min-height: 750px;
+  /* min-height: 1123px; */
   background: #fff;
   padding: 20px;
   border-radius: 2px;
-  box-shadow: 0 4px 30px rgba(0,0,0,0.35);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
   max-height: 92vh;
   overflow-y: auto;
 }
@@ -999,55 +1076,192 @@
 
 .pv-page {
   border: 2px solid #000;
-  padding: 22px 30px 20px;
+  padding: 10px 20px 10px;
   overflow: hidden;
   background: #fff;
 }
-.pv-header-row { display: flex; justify-content: space-between; font-size: 12px; color: #111; margin-bottom: 10px; }
-.pv-form-no, .pv-admission-date { font-weight: 500; }
 
-.pv-header-main { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.pv-header-info { flex: 1; padding-right: 20px; }
-.pv-pg-name { color: #2b3fbf; font-weight: 700; font-size: 19px; margin: 0 0 4px; }
-.pv-pg-address, .pv-pg-phone { font-size: 11.5px; color: #111; margin: 1px 0; line-height: 1.3; }
+.pv-header-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.pv-form-no,
+.pv-admission-date {
+  font-weight: 500;
+}
+
+.pv-header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.pv-header-info {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.pv-pg-name {
+  color: #2b3fbf;
+  font-weight: 800;
+  font-size: 22px;
+  margin: 0 0 2px;
+}
+
+.pv-pg-address,
+.pv-pg-phone {
+  font-size: 10px;
+  color: #111;
+  margin: 2px 0;
+  line-height: 1.4;
+}
 
 .pv-photo-box {
-  width: 70px; height: 80px; flex-shrink: 0;
-  border: 1px solid #000;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: #9ca3af;
+  width: 70px;
+  height: 90px;
+  flex-shrink: 0;
+  border: 1.5px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .pv-form-title {
-  text-align: center; color: #2b3fbf; font-weight: 700;
-  font-size: 15px; margin: 0 0 8px; padding: 6px 0;
-  border-top: 1.5px solid #000; border-bottom: 1.5px solid #000;
+  text-align: center;
+  color: #2b3fbf;
+  font-weight: 800;
+  font-size: 16px;
+  margin: 4px -20px 8px;
+  padding: 4px 0;
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
 }
 
-.pv-field-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-.pv-row-2 { display: flex; gap: 20px; min-width: 0; }
-.pv-field-line { display: flex; align-items: baseline; gap: 6px; font-size: 12px; flex: 1; min-width: 0; }
-.pv-field-line--short { max-width: 150px; flex: none; }
-.pv-field-label { white-space: nowrap; font-weight: 600; color: #111; }
+.pv-field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.pv-row-2 {
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pv-field-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.pv-field-container--short {
+  max-width: 250px;
+  flex: none;
+}
+
+.pv-field-line {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 10px;
+  width: 100%;
+}
+
+.pv-field-list>.pv-field-container .pv-field-label,
+.pv-row-2>.pv-field-container:not(.pv-field-container--short) .pv-field-label {
+  flex: 0 0 215px;
+}
+
+.pv-field-label {
+  white-space: nowrap;
+  font-weight: 700;
+  color: #000;
+  font-size: 10px;
+  text-transform: none !important;
+}
+
 .pv-field-input {
-  flex: 1; border: none; border-bottom: 1px solid #000;
-   padding: 1px 4px 5px; font-size: 12px; background: transparent;
-   min-width: 0; width: 100%;
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #000;
+  padding: 1px 4px 4px;
+  font-size: 10px;
+  background: transparent;
+  min-width: 0;
+  width: 100%;
+  color: #000;
 }
-.pv-field-input:focus { outline: none; border-bottom-color: #5B5BD6; }
-.pv-field-input--area { resize: none; }
 
-.pv-declaration-title { text-align: center; font-weight: 700; font-size: 10px; text-decoration: underline; margin-top: 6px; margin-bottom: 4px; color: #111; }
-.pv-declaration { font-size: 8.5px; font-weight: 700; color: #111; margin-top: 0; line-height: 1.35; text-align: justify; }
-.pv-signature-line { font-size: 11px; margin-top: 10px; text-align: right; }
+.pv-field-input--filled {
+  border-bottom: none !important;
+}
+
+.pv-field-input:focus {
+  outline: none;
+  border-bottom-color: #2b3fbf;
+}
+
+.pv-field-input--area {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.4;
+  padding-top: 0;
+  padding-bottom: 0;
+  height: auto;
+}
+
+.pv-field-line-extra {
+  width: 100%;
+  border-bottom: 1px solid #000;
+  height: 12px;
+}
+
+.pv-declaration-title {
+  text-align: center;
+  font-weight: 800;
+  font-size: 11px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  color: #000;
+}
+
+.pv-declaration {
+  font-size: 9px;
+  font-weight: 500;
+  color: #000;
+  margin-top: 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.pv-signature-line {
+  font-size: 10px;
+  margin-top: 4px;
+  text-align: right;
+  font-weight: 700;
+}
+
 /* ── Page 2: Rules & Regulations ── */
-.pv-page-2 { padding: 20px 24px 18px; }
+.pv-page-2 {
+  padding: 20px 24px 18px;
+}
 
 .pv-rules-title-wrap {
   border-bottom: 1.5px solid #000;
   padding-bottom: 5px;
   margin-bottom: 8px;
 }
+
 .pv-rules-title {
   text-align: center;
   color: #2b3fbf;
@@ -1057,6 +1271,7 @@
   text-transform: uppercase;
   margin: 0;
 }
+
 .pv-rules-list {
   font-size: 8.5px;
   line-height: 1.32;
@@ -1065,6 +1280,7 @@
   list-style: none;
   padding-left: 0;
 }
+
 .pv-rules-item {
   display: flex;
   align-items: baseline;
@@ -1072,39 +1288,193 @@
   margin-bottom: 3px;
   text-align: justify;
 }
+
 .pv-rules-num {
   flex-shrink: 0;
   font-weight: 700;
 }
+
 .pv-rules-text {
   flex: 1;
 }
-.pv-blue-bold { color: #2b3fbf; font-weight: 700; }
+
+.pv-blue-bold {
+  color: #2b3fbf;
+  font-weight: 700;
+}
+
 .pv-rules-notice {
   color: #2b3fbf;
   font-weight: 700;
   font-size: 8.5px;
-  line-height: 1.32;
-  margin: 6px 0;
   text-align: justify;
+  margin-bottom: 8px;
 }
+
 .pv-rules-thanks {
   color: #2b3fbf;
   font-weight: 700;
   font-size: 8.5px;
-  margin: 6px 0 14px;
   text-align: center;
+  margin-bottom: 12px;
 }
+
 .pv-rules-sign-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
-  font-size: 9px;
-  color: #2b3fbf;
-  font-weight: 600;
-  text-align: center;
+  margin-top: 16px;
 }
-.pv-sign-block { line-height: 1.8; }
+
+.pv-sign-block {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #2b3fbf;
+}
+
+/* ==================================================== */
+/* 🖨️ PDF EXPORT OVERRIDES (Only applied when printing) */
+/* ==================================================== */
+.pdf-export-mode .pv-header-row {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.pdf-export-mode .pv-pg-name {
+  font-size: 36px;
+  margin: 0 0 12px;
+}
+
+.pdf-export-mode .pv-pg-address,
+.pdf-export-mode .pv-pg-phone {
+  font-size: 14px;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.pdf-export-mode .pv-photo-box {
+  width: 120px;
+  height: 150px;
+  font-size: 14px;
+}
+
+.pdf-export-mode .pv-form-title {
+  font-size: 20px;
+  margin: 0 -20px 16px;
+  padding: 4px 0 16px;
+  line-height: 1.2;
+}
+
+.pdf-export-mode .pv-field-list {
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pdf-export-mode .pv-field-line {
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13.5px;
+  padding-bottom: 2px;
+}
+
+.pdf-export-mode .pv-field-list>.pv-field-container .pv-field-label,
+.pdf-export-mode .pv-row-2>.pv-field-container:not(.pv-field-container--short) .pv-field-label {
+  flex: 0 0 280px;
+  margin-top: 4px;
+}
+
+.pdf-export-mode .pv-field-container--short {
+  max-width: 80px;
+}
+
+.pdf-export-mode .pv-field-container--short .pv-field-line {
+  justify-content: flex-start;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.pdf-export-mode .pv-field-container--short .pv-field-label {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+.pdf-export-mode .pv-field-container--short .pv-field-input {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 20px;
+  padding: 0 4px;
+  margin-top: 0;
+}
+
+.pdf-export-mode .pv-field-label {
+  font-size: 14px;
+}
+
+.pdf-export-mode .pv-field-input {
+  font-size: 14px;
+  padding: 2px 8px 6px;
+}
+
+.pdf-export-mode .pv-declaration-title {
+  font-size: 16px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.pdf-export-mode .pv-declaration {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.pdf-export-mode .pv-signature-line {
+  font-size: 14px;
+  margin-top: 40px;
+  padding-bottom: 20px;
+  text-align: right;
+  margin-right: 40px;
+}
+
+.pdf-export-mode .pv-rules-title {
+  font-size: 20px;
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+}
+
+.pdf-export-mode .pv-rules-list {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.pdf-export-mode .pv-rules-item {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pdf-export-mode .pv-rules-notice:first-of-type {
+  margin-top: 24px;
+}
+
+.pdf-export-mode .pv-rules-notice {
+  font-size: 12px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.pdf-export-mode .pv-rules-thanks {
+  font-size: 12px;
+  margin-bottom: 24px;
+}
+
+.pdf-export-mode .pv-rules-sign-row {
+  margin-top: 60px;
+  padding-bottom: 20px;
+}
+
+.pdf-export-mode .pv-sign-block {
+  font-size: 12px;
+}
+
 .pv-sig-input {
   border: none;
   border-bottom: 1px solid #000;
@@ -1115,12 +1485,28 @@
   width: 200px;
   text-align: center;
 }
-.pv-sig-input:focus { outline: none; border-bottom-color: #5B5BD6; }
-/* AFTER */
-.pv-sig-input--rules { width: 180px; font-size: 12px; }
 
-.pv-field-input--error { border-bottom-color: #dc2626; }
-.pv-field-error { font-size: 9px; color: #dc2626; margin-left: 4px; white-space: nowrap; }
+.pv-sig-input:focus {
+  outline: none;
+  border-bottom-color: #5B5BD6;
+}
+
+/* AFTER */
+.pv-sig-input--rules {
+  width: 180px;
+  font-size: 12px;
+}
+
+.pv-field-input--error {
+  border-bottom-color: #dc2626;
+}
+
+.pv-field-error {
+  font-size: 9px;
+  color: #dc2626;
+  margin-left: 4px;
+  white-space: nowrap;
+}
 
 /* =============================================
    POLICE VERIFICATION FORM — RESPONSIVE
@@ -1139,17 +1525,36 @@
     padding: 18px 22px 16px;
   }
 
-  .pv-pg-name { font-size: 17px; }
-  .pv-pg-address, .pv-pg-phone { font-size: 10.5px; }
-  .pv-form-title { font-size: 14px; }
+  .pv-pg-name {
+    font-size: 17px;
+  }
 
-  .pv-field-line { font-size: 11px; }
-  .pv-field-input { font-size: 11px; }
+  .pv-pg-address,
+  .pv-pg-phone {
+    font-size: 10.5px;
+  }
 
-  .pv-declaration { font-size: 8px; }
+  .pv-form-title {
+    font-size: 14px;
+  }
+
+  .pv-field-line {
+    font-size: 11px;
+  }
+
+  .pv-field-input {
+    font-size: 11px;
+  }
+
+  .pv-declaration {
+    font-size: 8px;
+  }
+
   .pv-rules-list,
   .pv-rules-notice,
-  .pv-rules-thanks { font-size: 8px; }
+  .pv-rules-thanks {
+    font-size: 8px;
+  }
 }
 
 /* ── Mobile (≤600px) ── */
@@ -1283,34 +1688,86 @@
 
 /* Print only the form, hide everything else */
 @media print {
-  body * { visibility: hidden; }
-  .pv-printable, .pv-printable * { visibility: visible; }
+  body * {
+    visibility: hidden;
+  }
 
-.agreement-view-popup-overlay,
-.agreement-view-popup,
-.pv-modal {
-  position: static !important;
-  overflow: visible !important;
-  max-height: none !important;
-  height: auto !important;
-  min-height: 0 !important;
-  width: auto !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
+  .pv-printable,
+  .pv-printable * {
+    visibility: visible;
+  }
+
+  .agreement-view-popup-overlay,
+  .agreement-view-popup,
+  .pv-modal {
+    position: static !important;
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    width: auto !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
 
   .pv-printable {
-    position: absolute; top: 0; left: 0; width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     padding: 20px;
   }
-  .pv-page { page-break-after: always; }
-  .pv-page:last-child { page-break-after: auto; }
-  .pv-no-print, .pv-no-print-bg { display: none !important; }
-  @page { size: A4; margin: 15mm; }
+
+  .pv-page {
+    page-break-after: always;
+  }
+
+  .pv-page:last-child {
+    page-break-after: auto;
+  }
+
+  .pv-no-print,
+  .pv-no-print-bg {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
 }
+
 /* AFTER — add this new rule below .pv-photo-box */
 .pv-photo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* =============================================
+   POLICE VERIFICATION MODAL CLOSE BUTTON
+============================================= */
+.pv-popup-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: #fef2f2;
+  border: none;
+  font-size: 20px;
+  color: #ef4444;
+  cursor: pointer;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  z-index: 10;
+}
+
+.pv-popup-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }

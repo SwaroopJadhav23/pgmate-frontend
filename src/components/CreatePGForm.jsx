@@ -597,8 +597,8 @@ const removeCustomRule = (index) => {
                     <i className="bi bi-shield-check" style={{ color: '#4f46e5' }}></i>
                     <i className="bi bi-file-earmark-text" style={{ color: '#6b7280' }}></i>
                   </div>
-                  <span className="police-form-option-title">Police Form with Rules &amp; Regulations</span>
-                  <span className="police-form-option-desc">Generate a 2-page document with police verification details and rules &amp; regulations.</span>
+                  <span className="police-form-option-title">Police Form with PG Rules &amp; Regulations</span>
+                  <span className="police-form-option-desc">Generate a 2-page document with police verification details and PG rules &amp; regulations.</span>
                 </label>
 
                 <label className={`police-form-option ${formData.policeFormType === "ONLY" ? "selected" : ""}`}>
@@ -619,7 +619,7 @@ const removeCustomRule = (index) => {
               </div>
               <div className="police-form-info-banner">
                 <i className="bi bi-info-circle-fill" style={{ fontSize: '18px', color: '#3b82f6' }}></i> 
-                <span>This will be the default preference for all police verification reports. You can change this anytime from PG Settings.</span>
+                <span>This will be the default preference for all police verification reports. You can change this anytime from the Edit PG form page.</span>
               </div>
             </div>
 
@@ -627,7 +627,7 @@ const removeCustomRule = (index) => {
             {formData.policeFormType === "WITH_RULES" && (
               <>
                 <div className="create-pg-form-group create-pg-form-row-single">
-                  <h3 className="create-pg-section-title" style={{ marginTop: "18px" }}>Rules &amp; Regulations</h3>
+                  <h3 className="create-pg-section-title" style={{ marginTop: "18px" }}>PG Rules &amp; Regulations</h3>
                   <label className="create-pg-amenities-label">Choose Rules Preference</label>
 
                   <div className="police-form-option-grid" style={{ marginBottom: '20px' }}>
@@ -996,7 +996,7 @@ const removeCustomRule = (index) => {
           ) : (
             <button
               type="submit"
-              className={`create-pg-btn-submit ${loading ? "loading" : ""}`}
+              className="create-pg-btn-submit"
               disabled={loading}
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", opacity: loading ? 0.85 : 1 }}
             >
