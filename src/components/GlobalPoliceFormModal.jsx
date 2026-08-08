@@ -43,13 +43,9 @@ const GlobalPoliceFormModal = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const fd = new FormData();
-      fd.append("name", owner.name);
-      fd.append("email", owner.email);
-      fd.append("city", owner.city);
-      fd.append("defaultPoliceFormType", selectedType);
-
-      await api.put("/owner/profile", fd);
+      await api.patch("/owner/profile/police-form-type", {
+        defaultPoliceFormType: selectedType,
+      });
 
       Swal.fire({
         icon: "success",
