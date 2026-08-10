@@ -2201,21 +2201,29 @@
   .rdp-modal {
     width: 92% !important;
     max-width: 420px !important;
-    max-height: none !important;
-    height: fit-content !important;
+    max-height: 85dvh !important;
+    height: auto !important;
     min-height: 0 !important;
     border-radius: 16px !important;
     margin: 0 !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
     overflow: hidden !important;
   }
   .rdp-modal .rdp-body-mobile {
-    overflow: visible !important;
+    overflow-y: auto !important;
+    flex: 1;
   }
   .modal-backdrop-custom:has(.rdp-modal) {
-    align-items: flex-start !important;
+    align-items: center !important;
     justify-content: center !important;
-    padding-top: 80px !important;
+    padding-top: 0 !important;
+  }
+  
+  .rdp-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 14px 18px 18px;
   }
 }
 
