@@ -1,4 +1,4 @@
-import { FaLeaf, FaDrumstickBite, FaFileAlt, FaUtensils, FaTimesCircle } from "react-icons/fa";
+import { FaLeaf, FaDrumstickBite, FaFileAlt, FaUtensils, FaTimesCircle, FaFilter } from "react-icons/fa";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -95,6 +95,15 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [stayFilter, setStayFilter] = useState("ALL");
+  const [sortOption, setSortOption] = useState("newest");
+const [sortMenuOpen, setSortMenuOpen] = useState(false);
+
+const SORT_OPTIONS = [
+  { key: "newest", label: "Newest First" },
+  { key: "oldest", label: "Oldest First" },
+  { key: "az", label: "Name A–Z" },
+  { key: "za", label: "Name Z–A" },
+];
   const [detailResident, setDetailResident] = useState(null);
   const [showSettlement, setShowSettlement] = useState(false);
   const [settlementResident, setSettlementResident] = useState(null);
@@ -183,6 +192,17 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
     : null;
   const currentSettlementIsDaily = isDailyResident(settlementResident);
   const residentStats = useMemo(() => ({ total: totalElements, monthly: residents.filter(r => r.stayType === "MONTHLY_BASIC").length, daily: residents.filter(r => r.stayType === "DAILY_BASIC").length, withFood: residents.filter(r => r.foodFacility !== "Without Food").length, withoutFood: residents.filter(r => r.foodFacility === "Without Food").length }), [residents, totalElements]);
+
+const sortedResidents = useMemo(() => {
+  const arr = [...residents];
+  switch (sortOption) {
+    case "az": return arr.sort((a, b) => a.name.localeCompare(b.name));
+    case "za": return arr.sort((a, b) => b.name.localeCompare(a.name));
+    case "oldest": return arr.sort((a, b) => new Date(a.checkinDate) - new Date(b.checkinDate));
+    case "newest":
+    default: return arr.sort((a, b) => new Date(b.checkinDate) - new Date(a.checkinDate));
+  }
+}, [residents, sortOption]);
   const goToDues = (r) => {
     navigate("/owner/rent", {
       state: {
@@ -227,11 +247,40 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
         <input type="text" className="residents-search-input" placeholder="Search by name, phone or room..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
         {searchInput && <button className="search-clear-btn" onClick={() => setSearchInput("")}>Clear</button>}
       </div>
-      <div className="status-tabs mb-3">
-        {STAY_FILTERS.map((filter) => (
-          <button key={filter.key} className={`status-btn ${stayFilter === filter.key ? "active" : ""}`} onClick={() => setStayFilter(filter.key)}>{filter.label}</button>
-        ))}
-      </div>
+      <div className="status-tabs-row mb-3">
+  <div className="status-tabs">
+    {STAY_FILTERS.map((filter) => (
+      <button key={filter.key} className={`status-btn ${stayFilter === filter.key ? "active" : ""}`} onClick={() => setStayFilter(filter.key)}>{filter.label}</button>
+    ))}
+  </div>
+  <div className="ar-filter-wrap">
+    <button
+      className="ar-filter-btn"
+      onClick={() => setSortMenuOpen((v) => !v)}
+      aria-label="Sort filter"
+      type="button"
+    >
+      <FaFilter />
+    </button>
+    {sortMenuOpen && (
+      <>
+        <div className="ar-filter-backdrop" onClick={() => setSortMenuOpen(false)} />
+        <div className="ar-filter-menu">
+          {SORT_OPTIONS.map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              className={`ar-filter-option ${sortOption === opt.key ? "active" : ""}`}
+              onClick={() => { setSortOption(opt.key); setSortMenuOpen(false); }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </>
+    )}
+  </div>
+</div>
       <p className="search-result-count">Showing <strong>{residents.length}</strong> of {totalElements} residents</p>
 
       {/* DESKTOP TABLE */}
@@ -249,9 +298,9 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
               ) : residents.length === 0 ? (
                 <tr><td colSpan="10" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
               ) : (
-                residents.map((r, idx) => {
-                  // eslint-disable-next-line
-                  const mode = normalize(r?.onboardingPaymentMode || "");
+  sortedResidents.map((r, idx) => {
+    // eslint-disable-next-line
+    const mode = normalize(r?.onboardingPaymentMode || "");
                   // eslint-disable-next-line
                   const amount = r?.onboardingPaymentAmount || 0;
                   return (
@@ -348,11 +397,11 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                 <TableSkeleton rows={6} cols={6} />
               ) : residents.length === 0 ? (
                 <tr><td colSpan="6" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
-              ) : (
-                residents.map((r, idx) => {
-                  return (
-                    <tr key={r.residentId} onClick={() => setDetailResident(r)} className="ar-cursor-pointer">
-                      <td data-label="S.No">{idx + 1}</td>
+             ) : (
+  sortedResidents.map((r, idx) => {
+    return (
+      <tr key={r.residentId} onClick={() => setDetailResident(r)} className="ar-cursor-pointer">
+        <td data-label="S.No">{idx + 1}</td>
                       <td data-label="Name">{r.name}</td>
                       <td data-label="Rent">{chargeLabel(r)}</td>
                       <td data-label="Paid Status">
