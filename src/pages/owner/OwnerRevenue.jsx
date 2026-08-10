@@ -311,8 +311,10 @@ const OwnerRevenue = () => {
 
 
   /* ================= FUTURE DEPOSIT REFUND ================= */
-  const futureDepositRefund = residents.reduce((sum, r) => {
+   const futureDepositRefund = residents.reduce((sum, r) => {
     if (r.status !== "ACTIVE") return sum; // still living here, refund pending future
+    const date = getRevenueDate(r);
+    if (!isDateInFilter(date)) return sum;
     return sum + Number(r.futureDepositRefund || 0);
   }, 0);
 
