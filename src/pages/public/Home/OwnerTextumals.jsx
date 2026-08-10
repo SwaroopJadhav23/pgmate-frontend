@@ -88,7 +88,11 @@ const OwnerTestimonials = () => {
             <p>Mobile App for Owners</p>
 
             <div className="owner-promo-badges">
-              <a href="#" className="owner-promo-badge" aria-label="Get it on Google Play">
+              <a href="https://play.google.com/store/apps/details?id=com.fourise.pgmate"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="owner-promo-badge"
+                aria-label="Get it on Google Play">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3 2.5c-.3.3-.5.7-.5 1.2v16.6c0 .5.2.9.5 1.2l.1.1L13 12 3.1 2.4 3 2.5z" />
                   <path d="M16.5 15.5L13 12l3.5-3.5 4 2.3c1 .6 1 1.9 0 2.5l-4 2.2z" />
