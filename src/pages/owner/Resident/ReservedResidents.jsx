@@ -156,6 +156,7 @@ const ReservedResidents = ({
         const params = new URLSearchParams();
         params.append("page", nextPage);
         params.append("size", PAGE_SIZE);
+        params.append("sort", "createdAt,desc");
         if (search.trim()) params.append("search", search.trim());
         if (stayFilter !== "ALL") params.append("stayType", stayFilter);
         const res = await fetchData(`${apiPrefix}/reserved/paged?${params.toString()}`);

@@ -127,19 +127,36 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [lastStepChange, setLastStepChange] = useState(Date.now());
+  const [formErrors, setFormErrors] = useState({});
   const totalSteps = 4;
+
+  const handleScrollToError = () => {
+    setTimeout(() => {
+      const firstError = document.querySelector('.error-field');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+    }, 100);
+  };
 
   const validateStep = (step) => {
     if (step === 1) {
-      if (!formData.name.trim()) { toast.error("PG Name is required"); return false; }
-      if (!formData.city) { toast.error("City is required"); return false; }
-      if (formData.city === "Other" && !formData.customCity.trim()) { toast.error("Please specify the custom city"); return false; }
-      if (!formData.locality.trim()) { toast.error("Locality is required"); return false; }
-      if (!formData.address.trim()) { toast.error("Address is required"); return false; }
-
+      const newErrors = {};
+      if (!formData.name.trim()) newErrors.name = true;
+      if (!formData.city) newErrors.city = true;
+      if (formData.city === "Other" && !formData.customCity.trim()) newErrors.customCity = true;
+      if (!formData.locality.trim()) newErrors.locality = true;
+      if (!formData.address.trim()) newErrors.address = true;
+      
+      if (Object.keys(newErrors).length > 0) {
+        setFormErrors(newErrors);
+        handleScrollToError();
+        toast.error("Please fill in all the required fields marked in red");
+        return false;
+      }
     }
-    // Steps 2 and 3 have no strict required validations that block progress,
-    // although we could add them if needed later.
+    setFormErrors({});
     return true;
   };
 
@@ -160,6 +177,9 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleAmenityToggle = (amenity) => {
@@ -439,7 +459,7 @@ const removeCustomRule = (index) => {
         })}
       </div>
 
-      <form onSubmit={handleSubmit} className="create-pg-form-body">
+      <form onSubmit={handleSubmit} noValidate className="create-pg-form-body">
 
         {/* ======================== STEP 1: BASIC DETAILS ======================== */}
         {currentStep === 1 && (
@@ -450,7 +470,7 @@ const removeCustomRule = (index) => {
                 <input
                   type="text"
                   name="name"
-                  className="create-pg-form-input"
+                  className={`create-pg-form-input ${formErrors.name ? "error-field" : ""}`}
                   placeholder="Enter PG name"
                   value={formData.name}
                   onChange={handleInputChange}
@@ -461,9 +481,12 @@ const removeCustomRule = (index) => {
                 <label className="create-pg-form-label required">City</label>
                 <select
                   name="city"
-                  className="create-pg-form-select"
+                  className={`create-pg-form-select ${formErrors.city ? "error-field" : ""}`}
                   value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, city: e.target.value });
+                    setFormErrors(prev => ({ ...prev, city: false }));
+                  }}
                   required
                 >
                   <option value="">Select City</option>
@@ -474,10 +497,14 @@ const removeCustomRule = (index) => {
                 {formData.city === "Other" && (
                   <input
                     type="text"
+                    name="customCity"
                     placeholder="Enter your city"
-                    className="create-pg-form-input mt-2"
+                    className={`create-pg-form-input mt-2 ${formErrors.customCity ? "error-field" : ""}`}
                     value={formData.customCity}
-                    onChange={(e) => setFormData({ ...formData, customCity: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, customCity: e.target.value });
+                      setFormErrors(prev => ({ ...prev, customCity: false }));
+                    }}
                     required
                   />
                 )}
@@ -486,14 +513,15 @@ const removeCustomRule = (index) => {
 
             <div className="create-pg-form-row">
               <div className="create-pg-form-group">
-                <label className="create-pg-form-label">Locality</label>
+                <label className="create-pg-form-label required">Locality</label>
                 <input
                   type="text"
                   name="locality"
-                  className="create-pg-form-input"
+                  className={`create-pg-form-input ${formErrors.locality ? "error-field" : ""}`}
                   placeholder="e.g., Jubilee Hills"
                   value={formData.locality}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="create-pg-form-group">
@@ -515,7 +543,7 @@ const removeCustomRule = (index) => {
               <label className="create-pg-form-label required">Address</label>
               <textarea
                 name="address"
-                className="create-pg-form-textarea"
+                className={`create-pg-form-textarea ${formErrors.address ? "error-field" : ""}`}
                 placeholder="Enter full address"
                 value={formData.address}
                 onChange={handleInputChange}

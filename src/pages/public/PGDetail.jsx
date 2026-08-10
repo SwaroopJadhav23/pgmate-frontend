@@ -670,21 +670,35 @@ const PGDetail = () => {
 
       {/* ══ LOCATION STRIP ══ */}
       <div className="pg-location-strip">
-        <div className="pls-card">
+        <a
+          className="pls-card pls-clickable"
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${pg.name}, ${pg.locality}, ${pg.city}`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open in Google Maps"
+        >
           <div className="pls-icon"><MapPin size={18} strokeWidth={2} /></div>
           <div className="pls-text">
             <span className="pls-label">LOCATION</span>
             <span className="pls-value">{pg.locality}, {pg.city}</span>
           </div>
-        </div>
+          <span className="pls-map-hint"><i className="bi bi-box-arrow-up-right"></i></span>
+        </a>
         {pg.address && (
-          <div className="pls-card">
+          <a
+            className="pls-card pls-clickable"
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${pg.name}, ${pg.address}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open in Google Maps"
+          >
             <div className="pls-icon"><Home size={18} strokeWidth={2} /></div>
             <div className="pls-text">
               <span className="pls-label">FULL ADDRESS</span>
               <span className="pls-value">{pg.address}</span>
             </div>
-          </div>
+            <span className="pls-map-hint"><i className="bi bi-box-arrow-up-right"></i></span>
+          </a>
         )}
       </div>
 

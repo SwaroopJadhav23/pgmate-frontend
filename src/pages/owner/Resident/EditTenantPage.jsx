@@ -47,7 +47,7 @@ const EMPTY_FORM = {
   localGuardianAddress: "",
 };
 
-const PAYMENT_MODES = ["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "WALLET"];
+
 
 const formatMoney = (value) => `₹${Number(value ?? 0).toLocaleString("en-IN")}`;
 
@@ -80,6 +80,7 @@ const EditTenantPage = ({ apiPrefix }) => {
   const [resident, setResident] = useState(null);
   const [loadingResident, setLoadingResident] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
   // Files
@@ -148,7 +149,7 @@ const EditTenantPage = ({ apiPrefix }) => {
   // ── populate form ──
   useEffect(() => {
     if (!resident) return;
-    setForm({
+    const loaded = {
       name: resident.name || "",
       phone: resident.phone || "",
       email: resident.email || "",
@@ -183,7 +184,47 @@ const EditTenantPage = ({ apiPrefix }) => {
       localGuardianRelation: resident.localGuardianRelation || "",
       localGuardianPhone: resident.localGuardianPhone || "",
       localGuardianAddress: resident.localGuardianAddress || "",
-    });
+    };
+    setForm(loaded);
+
+    // Immediately highlight all empty required fields on load
+    const isDaily = (resident.stayType || "MONTHLY_BASIC") === "DAILY_BASIC";
+    const initErrors = {};
+    if (!loaded.name?.trim()) initErrors.name = true;
+    if (!loaded.phone || String(loaded.phone).trim().length !== 10) initErrors.phone = true;
+    if (!loaded.checkinDate) initErrors.checkinDate = true;
+    if (!loaded.onboardingPaymentMode) initErrors.onboardingPaymentMode = true;
+    if (isDaily) {
+      if (!loaded.dailyRent || Number(loaded.dailyRent) <= 0) initErrors.dailyRent = true;
+      if (!loaded.numberOfDays || Number(loaded.numberOfDays) <= 0) initErrors.numberOfDays = true;
+    } else {
+      if (!loaded.monthlyRent || Number(loaded.monthlyRent) <= 0) initErrors.monthlyRent = true;
+      if (loaded.deposit === "" || loaded.deposit === null || loaded.deposit === undefined) initErrors.deposit = true;
+    }
+    // Police verification fields
+    if (!loaded.dob) initErrors.dob = true;
+    if (!loaded.gender) initErrors.gender = true;
+    if (!loaded.aadhaarNumber || String(loaded.aadhaarNumber).trim().length < 12) initErrors.aadhaarNumber = true;
+    if (!loaded.permanentAddress?.trim()) initErrors.permanentAddress = true;
+    if (!loaded.permanentState) initErrors.permanentState = true;
+    if (!loaded.permanentCity) initErrors.permanentCity = true;
+    if (!loaded.permanentPincode || String(loaded.permanentPincode).trim().length < 6) initErrors.permanentPincode = true;
+    if (!loaded.guardianName?.trim()) initErrors.guardianName = true;
+    if (!loaded.guardianRelation) initErrors.guardianRelation = true;
+    if (!loaded.guardianPhone || String(loaded.guardianPhone).trim().length < 10) initErrors.guardianPhone = true;
+    if (!loaded.localGuardianName?.trim()) initErrors.localGuardianName = true;
+    if (!loaded.localGuardianPhone || String(loaded.localGuardianPhone).trim().length < 10) initErrors.localGuardianPhone = true;
+    // Additional required fields
+    if (!loaded.email || !loaded.email.trim()) initErrors.email = true;
+    if (!loaded.occupation) initErrors.occupation = true;
+    if (!loaded.education?.trim()) initErrors.education = true;
+    if (!loaded.collegeOrCompanyName?.trim()) initErrors.collegeOrCompanyName = true;
+    if (!loaded.foodFacility) initErrors.foodFacility = true;
+    if (!loaded.expectedCheckoutDate) initErrors.expectedCheckoutDate = true;
+    if (!loaded.localGuardianRelation) initErrors.localGuardianRelation = true;
+    if (!loaded.localGuardianAddress?.trim()) initErrors.localGuardianAddress = true;
+    setFormErrors(initErrors);
+
     setPaymentFile(null);
     setIdProofFile(null);
     setProfilePhoto(null);
@@ -209,7 +250,7 @@ const EditTenantPage = ({ apiPrefix }) => {
     if (refund !== form.futureDepositRefund) {
       setForm((prev) => ({ ...prev, futureDepositRefund: refund }));
     }
-  }, [form.deposit]);
+  }, [form.deposit, form.futureDepositRefund]);
 
   const isDaily = form.stayType === "DAILY_BASIC";
   const total = useMemo(
@@ -220,15 +261,77 @@ const EditTenantPage = ({ apiPrefix }) => {
     [isDaily, form.dailyRent, form.numberOfDays, form.monthlyRent, form.deposit]
   );
 
-  const submit = async () => {
-    const baseInvalid = !form.name.trim() || !form.phone || !form.checkinDate || !form.onboardingPaymentMode;
-    const monthlyInvalid = !isDaily && (!form.monthlyRent || form.deposit === "");
-    const dailyInvalid = isDaily && (!form.dailyRent || !form.numberOfDays);
+  const handleScrollToError = () => {
+    setTimeout(() => {
+      const firstErrorEl = document.querySelector('.error-field, .is-invalid');
+      if (firstErrorEl) {
+        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorEl.focus();
+      }
+    }, 100);
+  };
 
-    if (baseInvalid || monthlyInvalid || dailyInvalid) {
-      toast("Please fill all required fields (Name, Phone, Rent, Check-in, Payment Mode).", { icon: "⚠️" });
+  const REQUIRED_FIELDS = ['name', 'phone', 'checkinDate', 'onboardingPaymentMode', 'monthlyRent', 'deposit', 'dailyRent', 'numberOfDays'];
+
+  const handleInputChange = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    // Clear error when user types something valid
+    if (value !== "" && value !== null && value !== undefined) {
+      if (formErrors[field]) {
+        setFormErrors(prev => ({ ...prev, [field]: false }));
+      }
+    } else if (REQUIRED_FIELDS.includes(field)) {
+      // Immediately show error if a mandatory field is cleared
+      setFormErrors(prev => ({ ...prev, [field]: true }));
+    }
+  };
+
+  const submit = async () => {
+    const newErrors = {};
+
+    // Basic required fields
+    if (!form.name || !form.name.trim()) newErrors.name = true;
+    if (!form.phone || String(form.phone).trim().length !== 10) newErrors.phone = true;
+    if (!form.checkinDate) newErrors.checkinDate = true;
+    if (!form.onboardingPaymentMode) newErrors.onboardingPaymentMode = true;
+    if (isDaily) {
+      if (!form.dailyRent || Number(form.dailyRent) <= 0) newErrors.dailyRent = true;
+      if (!form.numberOfDays || Number(form.numberOfDays) <= 0) newErrors.numberOfDays = true;
+    } else {
+      if (!form.monthlyRent || Number(form.monthlyRent) <= 0) newErrors.monthlyRent = true;
+      if (form.deposit === "" || form.deposit === null || form.deposit === undefined) newErrors.deposit = true;
+    }
+
+    // Police verification required fields — block save if any are missing
+    if (!form.dob) newErrors.dob = true;
+    if (!form.gender) newErrors.gender = true;
+    if (!form.aadhaarNumber || String(form.aadhaarNumber).trim().length < 12) newErrors.aadhaarNumber = true;
+    if (!form.permanentAddress?.trim()) newErrors.permanentAddress = true;
+    if (!form.permanentState) newErrors.permanentState = true;
+    if (!form.permanentCity) newErrors.permanentCity = true;
+    if (!form.permanentPincode || String(form.permanentPincode).trim().length < 6) newErrors.permanentPincode = true;
+    if (!form.guardianName?.trim()) newErrors.guardianName = true;
+    if (!form.guardianRelation) newErrors.guardianRelation = true;
+    if (!form.guardianPhone || String(form.guardianPhone).trim().length < 10) newErrors.guardianPhone = true;
+    if (!form.localGuardianName?.trim()) newErrors.localGuardianName = true;
+    if (!form.localGuardianPhone || String(form.localGuardianPhone).trim().length < 10) newErrors.localGuardianPhone = true;
+    // Additional required fields
+    if (!form.email || !form.email.trim()) newErrors.email = true;
+    if (!form.occupation) newErrors.occupation = true;
+    if (!form.education?.trim()) newErrors.education = true;
+    if (!form.collegeOrCompanyName?.trim()) newErrors.collegeOrCompanyName = true;
+    if (!form.foodFacility) newErrors.foodFacility = true;
+    if (!form.expectedCheckoutDate) newErrors.expectedCheckoutDate = true;
+    if (!form.localGuardianRelation) newErrors.localGuardianRelation = true;
+    if (!form.localGuardianAddress?.trim()) newErrors.localGuardianAddress = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setFormErrors(newErrors);
+      handleScrollToError();
+      toast("Please fill all required fields marked in red.", { icon: "⚠️" });
       return;
     }
+    setFormErrors({});
     if (form.phone && form.phone.length !== 10) {
       toast("Phone must be exactly 10 digits.", { icon: "⚠️" });
       return;
@@ -340,34 +443,39 @@ const EditTenantPage = ({ apiPrefix }) => {
             <hr className="arm-section-divider" />
 
             <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Personal Details</h6>
-            <div className="arm-field" data-mobile-full="true">
-              <label>Name *</label>
+            <div className="pfield">
+              <label>Full Name <span className="req">*</span></label>
               <Form.Control
+                type="text"
+                placeholder="Enter full name"
+                isInvalid={formErrors.name}
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
+                onChange={(e) => handleInputChange('name', e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart())}
               />
             </div>
-            <div className="arm-field" data-mobile-full="true">
-              <label>Phone *</label>
+
+            <div className="pfield">
+              <label>Phone Number <span className="req">*</span></label>
               <Form.Control
                 type="tel"
-                inputMode="numeric"
-                maxLength={10}
+                placeholder="10 digit phone number"
+                isInvalid={formErrors.phone}
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })}
+                onChange={(e) => handleInputChange('phone', digitsOnly(e.target.value).slice(0, 10))}
               />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Email</label>
+              <label>Email <span className="req">*</span></label>
               <Form.Control
                 type="email"
+                isInvalid={formErrors.email}
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value.trim() })}
+                onChange={(e) => { setForm({ ...form, email: e.target.value.trim() }); if (e.target.value.trim()) setFormErrors(prev => ({ ...prev, email: false })); }}
               />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Gender</label>
-              <Form.Select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })}>
+              <label>Gender <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.gender} value={form.gender} onChange={(e) => { setForm({ ...form, gender: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, gender: false })); }}>
                 <option value="">Select</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -375,23 +483,24 @@ const EditTenantPage = ({ apiPrefix }) => {
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Date of Birth</label>
-              <Form.Control type="date" value={form.dob} max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} onChange={(e) => setForm({ ...form, dob: e.target.value })} />
+              <label>Date of Birth <span className="req">*</span></label>
+              <Form.Control type="date" isInvalid={formErrors.dob} value={form.dob} max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} onChange={(e) => { setForm({ ...form, dob: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, dob: false })); }} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Aadhaar Number</label>
+              <label>Aadhaar Number <span className="req">*</span></label>
               <Form.Control
                 type="tel"
                 inputMode="numeric"
                 maxLength={12}
+                isInvalid={formErrors.aadhaarNumber}
                 value={form.aadhaarNumber}
-                onChange={(e) => setForm({ ...form, aadhaarNumber: digitsOnly(e.target.value).slice(0, 12) })}
+                onChange={(e) => { const v = digitsOnly(e.target.value).slice(0, 12); setForm({ ...form, aadhaarNumber: v }); if (v.length === 12) setFormErrors(prev => ({ ...prev, aadhaarNumber: false })); }}
               />
             </div>
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Occupation</label>
-              <Form.Select value={form.occupation} onChange={(e) => setForm({ ...form, occupation: e.target.value })}>
+              <label>Occupation <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.occupation} value={form.occupation} onChange={(e) => { setForm({ ...form, occupation: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, occupation: false })); }}>
                 <option value="">Select</option>
                 <option value="Student">Student</option>
                 <option value="Working Professional">Working Professional</option>
@@ -399,12 +508,12 @@ const EditTenantPage = ({ apiPrefix }) => {
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Education</label>
-              <Form.Control value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart() })} />
+              <label>Education <span className="req">*</span></label>
+              <Form.Control isInvalid={formErrors.education} value={form.education} onChange={(e) => { const v = e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart(); setForm({ ...form, education: v }); if (v.trim()) setFormErrors(prev => ({ ...prev, education: false })); }} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>College / Company</label>
-              <Form.Control value={form.collegeOrCompanyName} onChange={(e) => setForm({ ...form, collegeOrCompanyName: e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart() })} />
+              <label>College / Company <span className="req">*</span></label>
+              <Form.Control isInvalid={formErrors.collegeOrCompanyName} value={form.collegeOrCompanyName} onChange={(e) => { const v = e.target.value.replace(/[^a-zA-Z\s,.-]/g, '').trimStart(); setForm({ ...form, collegeOrCompanyName: v }); if (v.trim()) setFormErrors(prev => ({ ...prev, collegeOrCompanyName: false })); }} />
             </div>
 
             <hr className="arm-section-divider" />
@@ -412,24 +521,24 @@ const EditTenantPage = ({ apiPrefix }) => {
             <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Rent Details</h6>
             {isDaily ? (
               <>
-                <div className="arm-field">
-                  <label>Daily Rent</label>
-                  <Form.Control type="number" value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
+                <div className="pfield">
+                  <label>Daily Rent <span className="req">*</span></label>
+                  <Form.Control type="number" placeholder="Daily Rent" isInvalid={formErrors.dailyRent} value={form.dailyRent} onChange={(e) => handleInputChange('dailyRent', e.target.value)} />
                 </div>
-                <div className="arm-field">
-                  <label>Number of Days</label>
-                  <Form.Control type="number" value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} onWheel={(e) => e.target.blur()} />
+                <div className="pfield">
+                  <label>Number of Days <span className="req">*</span></label>
+                  <Form.Control type="number" placeholder="No. of Days" isInvalid={formErrors.numberOfDays} value={form.numberOfDays} onChange={(e) => handleInputChange('numberOfDays', e.target.value)} />
                 </div>
               </>
             ) : (
               <>
-                <div className="arm-field">
-                  <label>Monthly Rent</label>
-                  <Form.Control type="number" value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
+                <div className="pfield">
+                  <label>Monthly Rent <span className="req">*</span></label>
+                  <Form.Control type="number" placeholder="Rent Amount" isInvalid={formErrors.monthlyRent} value={form.monthlyRent} onChange={(e) => handleInputChange('monthlyRent', e.target.value)} />
                 </div>
-                <div className="arm-field">
-                  <label>Deposit</label>
-                  <Form.Control type="number" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} onWheel={(e) => e.target.blur()} />
+                <div className="pfield">
+                  <label>Security Deposit <span className="req">*</span></label>
+                  <Form.Control type="number" placeholder="Deposit Amount" isInvalid={formErrors.deposit} value={form.deposit} onChange={(e) => handleInputChange('deposit', e.target.value)} />
                 </div>
                 <div className="arm-field">
                   <label>Future Deposit Refund</label>
@@ -438,36 +547,23 @@ const EditTenantPage = ({ apiPrefix }) => {
               </>
             )}
 
-            <div className="arm-field">
-              <label>Check-in Date *</label>
-              <Form.Control type="date" value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
+            <div className="pfield">
+              <label>Check-in Date <span className="req">*</span></label>
+              <Form.Control type="date" isInvalid={formErrors.checkinDate} value={form.checkinDate} onChange={(e) => handleInputChange('checkinDate', e.target.value)} />
             </div>
             <div className="arm-field">
-              <label>Expected Checkout</label>
-              <Form.Control type="date" value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
+              <label>Expected Checkout <span className="req">*</span></label>
+              <Form.Control type="date" isInvalid={formErrors.expectedCheckoutDate} value={form.expectedCheckoutDate} onChange={(e) => { setForm({ ...form, expectedCheckoutDate: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, expectedCheckoutDate: false })); }} />
             </div>
             <div className="arm-field full">
               <label>Total Payable</label>
               <Form.Control value={formatMoney(total)} disabled />
             </div>
-
-            <div className="arm-field full">
-              <label>Payment Mode *</label>
-              <Form.Select
-                value={form.onboardingPaymentMode}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setForm({ ...form, onboardingPaymentMode: value });
-                  if (value === "CASH") {
-                    setPaymentFile(null);
-                    setRemovePaymentProof(true);
-                  } else {
-                    setRemovePaymentProof(false);
-                  }
-                }}
-              >
-                <option value="">Select</option>
-                {PAYMENT_MODES.map((m) => (
+            <div className="pfield">
+              <label>Payment Mode <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.onboardingPaymentMode} value={form.onboardingPaymentMode} onChange={(e) => handleInputChange('onboardingPaymentMode', e.target.value)}>
+                <option value="">Select Mode</option>
+                {["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "WALLET"].map(m => (
                   <option key={m} value={m}>{m.replace("_", " ")}</option>
                 ))}
               </Form.Select>
@@ -511,8 +607,8 @@ const EditTenantPage = ({ apiPrefix }) => {
             <h6 style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Additional Details</h6>
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Food Facility</label>
-              <Form.Select value={form.foodFacility} onChange={(e) => setForm({ ...form, foodFacility: e.target.value })}>
+              <label>Food Facility <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.foodFacility} value={form.foodFacility} onChange={(e) => { setForm({ ...form, foodFacility: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, foodFacility: false })); }}>
                 <option value="">Select</option>
                 <option value="With Food">With Food</option>
                 <option value="Without Food">Without Food</option>
@@ -522,36 +618,36 @@ const EditTenantPage = ({ apiPrefix }) => {
 
             <h6 className="mt-4" style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Permanent Address</h6>
             <div className="arm-field full">
-              <label>Address Line</label>
-              <Form.Control value={form.permanentAddress} onChange={(e) => setForm({ ...form, permanentAddress: e.target.value })} />
+              <label>Address Line <span className="req">*</span></label>
+              <Form.Control isInvalid={formErrors.permanentAddress} value={form.permanentAddress} onChange={(e) => { setForm({ ...form, permanentAddress: e.target.value }); if (e.target.value.trim()) setFormErrors(prev => ({ ...prev, permanentAddress: false })); }} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>State</label>
-              <Form.Select value={form.permanentState} onChange={(e) => setForm({ ...form, permanentState: e.target.value, permanentCity: "" })}>
+              <label>State <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.permanentState} value={form.permanentState} onChange={(e) => { setForm({ ...form, permanentState: e.target.value, permanentCity: "" }); if (e.target.value) setFormErrors(prev => ({ ...prev, permanentState: false })); }}>
                 <option value="">Select State</option>
                 {indianStates.map((s) => <option key={s.isoCode} value={s.name}>{s.name}</option>)}
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>City</label>
-              <Form.Select value={form.permanentCity} onChange={(e) => setForm({ ...form, permanentCity: e.target.value })} disabled={!form.permanentState}>
+              <label>City <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.permanentCity} value={form.permanentCity} onChange={(e) => { setForm({ ...form, permanentCity: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, permanentCity: false })); }} disabled={!form.permanentState}>
                 <option value="">Select City</option>
                 {indianCities.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Pincode</label>
-              <Form.Control type="tel" inputMode="numeric" maxLength={6} value={form.permanentPincode} onChange={(e) => setForm({ ...form, permanentPincode: digitsOnly(e.target.value).slice(0, 6) })} />
+              <label>Pincode <span className="req">*</span></label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={6} isInvalid={formErrors.permanentPincode} value={form.permanentPincode} onChange={(e) => { const v = digitsOnly(e.target.value).slice(0, 6); setForm({ ...form, permanentPincode: v }); if (v.length === 6) setFormErrors(prev => ({ ...prev, permanentPincode: false })); }} />
             </div>
 
             <h6 className="mt-4" style={{ gridColumn: "1 / -1", marginBottom: 0 }}>Guardian Information</h6>
             <div className="arm-field" data-mobile-full="true">
-              <label>Father's / Guardian's Name *</label>
-              <Form.Control value={form.guardianName} onChange={(e) => setForm({ ...form, guardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })} />
+              <label>Father's / Guardian's Name <span className="req">*</span></label>
+              <Form.Control isInvalid={formErrors.guardianName} value={form.guardianName} onChange={(e) => { const v = e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart(); setForm({ ...form, guardianName: v }); if (v.trim()) setFormErrors(prev => ({ ...prev, guardianName: false })); }} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Relation</label>
-              <Form.Select value={form.guardianRelation} onChange={(e) => setForm({ ...form, guardianRelation: e.target.value })}>
+              <label>Relation <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.guardianRelation} value={form.guardianRelation} onChange={(e) => { setForm({ ...form, guardianRelation: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, guardianRelation: false })); }}>
                 <option value="">Select</option>
                 <option value="Father">Father</option>
                 <option value="Mother">Mother</option>
@@ -563,16 +659,16 @@ const EditTenantPage = ({ apiPrefix }) => {
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Father's / Guardian's Phone *</label>
-              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.guardianPhone} onChange={(e) => setForm({ ...form, guardianPhone: digitsOnly(e.target.value).slice(0, 10) })} />
+              <label>Father's / Guardian's Phone <span className="req">*</span></label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={10} isInvalid={formErrors.guardianPhone} value={form.guardianPhone} onChange={(e) => { const v = digitsOnly(e.target.value).slice(0, 10); setForm({ ...form, guardianPhone: v }); if (v.length === 10) setFormErrors(prev => ({ ...prev, guardianPhone: false })); }} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Local Guardian's Name</label>
-              <Form.Control value={form.localGuardianName} onChange={(e) => setForm({ ...form, localGuardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })} />
+              <label>Local Guardian's Name <span className="req">*</span></label>
+              <Form.Control isInvalid={formErrors.localGuardianName} value={form.localGuardianName} onChange={(e) => { const v = e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart(); setForm({ ...form, localGuardianName: v }); if (v.trim()) setFormErrors(prev => ({ ...prev, localGuardianName: false })); }} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Local Guardian's Relation</label>
-              <Form.Select value={form.localGuardianRelation} onChange={(e) => setForm({ ...form, localGuardianRelation: e.target.value })}>
+              <label>Local Guardian's Relation <span className="req">*</span></label>
+              <Form.Select isInvalid={formErrors.localGuardianRelation} value={form.localGuardianRelation} onChange={(e) => { setForm({ ...form, localGuardianRelation: e.target.value }); if (e.target.value) setFormErrors(prev => ({ ...prev, localGuardianRelation: false })); }}>
                 <option value="">Select</option>
                 <option value="Father">Father</option>
                 <option value="Mother">Mother</option>
@@ -584,12 +680,12 @@ const EditTenantPage = ({ apiPrefix }) => {
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Local Guardian's Phone</label>
-              <Form.Control type="tel" inputMode="numeric" maxLength={10} value={form.localGuardianPhone} onChange={(e) => setForm({ ...form, localGuardianPhone: digitsOnly(e.target.value).slice(0, 10) })} />
+              <label>Local Guardian's Phone <span className="req">*</span></label>
+              <Form.Control type="tel" inputMode="numeric" maxLength={10} isInvalid={formErrors.localGuardianPhone} value={form.localGuardianPhone} onChange={(e) => { const v = digitsOnly(e.target.value).slice(0, 10); setForm({ ...form, localGuardianPhone: v }); if (v.length === 10) setFormErrors(prev => ({ ...prev, localGuardianPhone: false })); }} />
             </div>
             <div className="arm-field full">
-              <label>Local Guardian's Address</label>
-              <Form.Control value={form.localGuardianAddress} onChange={(e) => setForm({ ...form, localGuardianAddress: e.target.value })} />
+              <label>Local Guardian's Address <span className="req">*</span></label>
+              <Form.Control isInvalid={formErrors.localGuardianAddress} value={form.localGuardianAddress} onChange={(e) => { setForm({ ...form, localGuardianAddress: e.target.value }); if (e.target.value.trim()) setFormErrors(prev => ({ ...prev, localGuardianAddress: false })); }} />
             </div>
           </div>
         </div>
