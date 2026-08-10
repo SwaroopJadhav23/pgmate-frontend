@@ -74,6 +74,7 @@ const OwnerDashboardProfile = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [showCompletionPrompt, setShowCompletionPrompt] = useState(false);
 
+  const [formErrors, setFormErrors] = useState({});
   const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
@@ -123,40 +124,50 @@ const OwnerDashboardProfile = () => {
       .finally(() => setLoading(false));
   }, [location.state]);
 
+  const handleScrollToError = () => {
+    setTimeout(() => {
+      const firstError = document.querySelector('.error-field');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+    }, 100);
+  };
+
   const save = async () => {
     const trimmedName = profile.name?.trim() || "";
     const trimmedEmail = profile.email?.trim() || "";
     const trimmedCity = profile.city?.trim() || "";
 
+    const newErrors = {};
+
     if (!trimmedName) {
-      await Swal.fire({ icon: "warning", title: "Name Required", text: "Please enter your full name." });
-      return;
+      newErrors.name = true;
     }
-
     if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
-      await Swal.fire({ icon: "warning", title: "Invalid Email", text: "Please enter a valid email address." });
-      return;
+      newErrors.email = true;
     }
-
     if (!trimmedCity) {
-      await Swal.fire({ icon: "warning", title: "City Required", text: "Please enter your city." });
-      return;
+      newErrors.city = true;
     }
-
     if (!photo && !profile?.photoUrl) {
-      await Swal.fire({ icon: "warning", title: "Profile Photo Required", text: "Please upload a profile photo to continue." });
-      return;
+      newErrors.photo = true;
     }
-
     if (!idProof && !profile?.idProofUrl) {
-      await Swal.fire({ icon: "warning", title: "ID Proof Required", text: "Please upload an ID proof document to continue." });
-      return;
+      newErrors.idProof = true;
+    }
+    if (!profile?.defaultPoliceFormType) {
+      newErrors.policeForm = true;
     }
 
-    if (!profile?.defaultPoliceFormType) {
-      await Swal.fire({ icon: "warning", title: "Preference Required", text: "Please select a Police Form preference to continue." });
+    if (Object.keys(newErrors).length > 0) {
+      setFormErrors(newErrors);
+      handleScrollToError();
+      await Swal.fire({ icon: "warning", title: "Missing Fields", text: "Please fill in all the required fields marked in red." });
       return;
     }
+    
+    setFormErrors({});
 
     const previousCompletion = getOwnerProfileCompletion(profile);
     const fd = new FormData();
@@ -296,8 +307,12 @@ const OwnerDashboardProfile = () => {
               <div className="pfield">
                 <label>Full Name</label>
                 <input
+                  className={formErrors.name ? "error-field" : ""}
                   value={profile.name || ""}
-                  onChange={(e) => setProfile({ ...profile, name: e.target.value.trimStart() })}
+                  onChange={(e) => {
+                    setProfile({ ...profile, name: e.target.value.trimStart() });
+                    setFormErrors(prev => ({ ...prev, name: false }));
+                  }}
                   placeholder="Enter your name"
                   autoComplete="name"
                 />
@@ -318,10 +333,14 @@ const OwnerDashboardProfile = () => {
               <div className="pfield">
                 <label>Email</label>
                 <input
+                  className={formErrors.email ? "error-field" : ""}
                   type="email"
                   autoComplete="email"
                   value={profile.email || ""}
-                  onChange={(e) => setProfile({ ...profile, email: e.target.value.trim() })}
+                  onChange={(e) => {
+                    setProfile({ ...profile, email: e.target.value.trim() });
+                    setFormErrors(prev => ({ ...prev, email: false }));
+                  }}
                   placeholder="Enter your email"
                 />
               </div>
@@ -329,8 +348,12 @@ const OwnerDashboardProfile = () => {
               <div className="pfield">
                 <label>City</label>
                 <input
+                  className={formErrors.city ? "error-field" : ""}
                   value={profile.city || ""}
-                  onChange={(e) => setProfile({ ...profile, city: e.target.value.trimStart() })}
+                  onChange={(e) => {
+                    setProfile({ ...profile, city: e.target.value.trimStart() });
+                    setFormErrors(prev => ({ ...prev, city: false }));
+                  }}
                   placeholder="Enter your city"
                   autoComplete="address-level2"
                 />
@@ -338,14 +361,17 @@ const OwnerDashboardProfile = () => {
 
               <div className="pfield pfield--full">
                 <label>Profile Photo</label>
-                <label className="upload-zone">
+                <label className={`upload-zone ${formErrors.photo ? "error-field" : ""}`}>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
                       const f = e.target.files[0];
                       setPhoto(f);
-                      if (f) setPhotoInfo({ name: f.name, size: (f.size / 1024).toFixed(1) });
+                      if (f) {
+                        setPhotoInfo({ name: f.name, size: (f.size / 1024).toFixed(1) });
+                        setFormErrors(prev => ({ ...prev, photo: false }));
+                      }
                     }}
                   />
                   <span><i className="bi bi-cloud-arrow-up-fill" style={{ fontSize: "18px" }}></i> Upload Profile Photo</span>
@@ -356,14 +382,17 @@ const OwnerDashboardProfile = () => {
 
               <div className="pfield pfield--full">
                 <label>ID Proof</label>
-                <label className="upload-zone">
+                <label className={`upload-zone ${formErrors.idProof ? "error-field" : ""}`}>
                   <input
                     type="file"
                     accept="image/*,.pdf"
                     onChange={(e) => {
                       const f = e.target.files[0];
                       setIdProof(f);
-                      if (f) setIdProofInfo({ name: f.name, size: (f.size / 1024).toFixed(1) });
+                      if (f) {
+                        setIdProofInfo({ name: f.name, size: (f.size / 1024).toFixed(1) });
+                        setFormErrors(prev => ({ ...prev, idProof: false }));
+                      }
                     }}
                   />
                   <span><i className="bi bi-file-earmark-arrow-up-fill" style={{ fontSize: "18px" }}></i> Upload ID Proof</span>
@@ -374,10 +403,13 @@ const OwnerDashboardProfile = () => {
 
               <div className="pfield pfield--full">
                 <label>Default Police Verification Preference</label>
-                <div className="police-form-option-grid" style={{ marginTop: '8px' }}>
+                <div className={`police-form-option-grid ${formErrors.policeForm ? "error-field" : ""}`} style={{ marginTop: '8px', padding: formErrors.policeForm ? '8px' : '0' }}>
                   <div
                     className={`police-form-option ${profile.defaultPoliceFormType === "WITH_RULES" ? "selected" : ""}`}
-                    onClick={() => setProfile({ ...profile, defaultPoliceFormType: "WITH_RULES" })}
+                    onClick={() => {
+                      setProfile({ ...profile, defaultPoliceFormType: "WITH_RULES" });
+                      setFormErrors(prev => ({ ...prev, policeForm: false }));
+                    }}
                   >
                     <div className="police-form-radio-dot" />
                     <div className="police-form-icon" style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -390,7 +422,10 @@ const OwnerDashboardProfile = () => {
 
                   <div
                     className={`police-form-option ${profile.defaultPoliceFormType === "ONLY" ? "selected" : ""}`}
-                    onClick={() => setProfile({ ...profile, defaultPoliceFormType: "ONLY" })}
+                    onClick={() => {
+                      setProfile({ ...profile, defaultPoliceFormType: "ONLY" });
+                      setFormErrors(prev => ({ ...prev, policeForm: false }));
+                    }}
                   >
                     <div className="police-form-radio-dot" />
                     <div className="police-form-icon">

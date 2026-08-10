@@ -111,7 +111,6 @@
 /* FIX SELECT DROPDOWN */
 
 .create-pg-form-select{
-  height: 44px !important;
   line-height: 1.2 !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -156,7 +155,7 @@
 }
 
 .create-pg-form-group:last-of-type {
-  margin-bottom: 12px !important;
+  margin-bottom: 5px !important;
 }
 
 .create-pg-form-row {

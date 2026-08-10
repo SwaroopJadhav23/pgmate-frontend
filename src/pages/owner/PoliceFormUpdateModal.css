@@ -18,6 +18,7 @@
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
+  max-height: 90vh;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -44,13 +45,16 @@
 
 .police-update-modal-header p {
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: .77rem;
   margin: 0;
   line-height: 1.5;
 }
 
 .police-update-modal-body {
   padding: 24px 32px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .police-update-label {
@@ -70,6 +74,10 @@
 @media (max-width: 600px) {
   .police-form-option-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .police-form-option {
+    padding: 16px 12px;
   }
 }
 
@@ -140,9 +148,42 @@
 
 .police-update-modal-footer {
   padding: 16px 32px 24px;
-  text-align: right;
   border-top: 1px solid #f0f0f0;
   background: #fafafa;
+  text-align: right;
+}
+
+.police-update-note {
+  font-size: 0.85rem;
+  color: #1e40af;
+  background-color: #dbeafe;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.police-update-note i {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .police-update-modal-footer {
+    text-align: center;
+    padding: 16px 20px 20px;
+  }
+  .police-update-modal-header {
+    padding: 20px 20px 16px;
+  }
+  .police-update-modal-body {
+    padding: 20px 20px;
+  }
+  .police-update-submit-btn {
+    width: 100%;
+  }
 }
 
 .police-update-submit-btn {

@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Error Field Validation */
+/* Error Field Validation */
+.error-field, .is-invalid {
+  border: 2px solid #ef4444 !important;
+  transition: border 0.3s;
+}
+.error-field:focus, .is-invalid:focus,
+input.error-field:focus, select.error-field:focus, textarea.error-field:focus,
+.edit-pg-form-input.error-field:focus,
+.create-pg-form-input.error-field:focus,
+.edit-pg-form-select.error-field:focus,
+.edit-pg-form-textarea.error-field:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+  background-color: #fef2f2 !important;
+}

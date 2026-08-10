@@ -72,6 +72,12 @@ const isDailyResident = (resident) => resident?.stayType === "DAILY_BASIC";
 const chargeLabel = (resident) => isDailyResident(resident) ? `${formatMoney(resident.dailyRent)}/day` : formatMoney(resident.monthlyRent);
 // eslint-disable-next-line
 const extraLabel = (resident) => isDailyResident(resident) ? `${resident.numberOfDays || 0} day(s)` : formatMoney(resident.deposit);
+// Police verification completeness: all key personal/guardian fields must be filled
+const isPoliceVerificationComplete = (r) => {
+  return !!(r?.name && r?.dob && r?.phone && r?.aadhaarNumber && r?.email &&
+    r?.permanentAddress && r?.guardianName && r?.guardianPhone &&
+    r?.localGuardianName && r?.localGuardianAddress && r?.localGuardianPhone);
+};
 
 
 const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
@@ -104,6 +110,7 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
       if (append) setLoadingMore(true); else setLoading(true);
       const params = new URLSearchParams();
       params.append("page", nextPage); params.append("size", PAGE_SIZE);
+      params.append("sort", "createdAt,desc");
       if (search.trim()) params.append("search", search.trim());
       if (stayFilter !== "ALL") params.append("stayType", stayFilter);
       const res = await api.get(`${apiPrefix}/paged?${params.toString()}`);
@@ -233,14 +240,14 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
           <table className="modern-table">
             <thead>
               <tr>
-                <th>S.No</th><th>Name</th><th>Phone</th><th>Rent</th><th>Check-in</th><th>Expected Checkout</th><th>Stay Type</th><th>Paid Status</th><th>Actions</th>
+                <th>S.No</th><th>Name</th><th>Phone</th><th>Rent</th><th>Check-in</th><th>Exp. Checkout</th><th>Stay Type</th><th>Paid</th><th>Police Verif.</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <TableSkeleton rows={6} cols={9} />
+                <TableSkeleton rows={6} cols={10} />
               ) : residents.length === 0 ? (
-                <tr><td colSpan="9" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
+                <tr><td colSpan="10" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
               ) : (
                 residents.map((r, idx) => {
                   // eslint-disable-next-line
@@ -261,16 +268,47 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
                       </td>
                       <td data-label="Charge">{chargeLabel(r)}</td>
                       <td data-label="Check-in">{formatDate(r.checkinDate)}</td>
-                      <td data-label="Expected Checkout">{formatDate(r.expectedCheckoutDate)}</td>
+                      <td data-label="Exp. Checkout">{formatDate(r.expectedCheckoutDate)}</td>
                       <td data-label="Stay Type">
-                        <span className={`payment-pill ${isDailyResident(r) ? "pill-online" : "pill-cash"}`}>
+                        <span className={`payment-pill ${isDailyResident(r) ? "pill-cash" : "pill-online"}`}>
                           {isDailyResident(r) ? "Daily" : "Monthly"}
                         </span>
                       </td>
-                      <td data-label="Paid Status">
-                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-online"}`}>
+                      <td data-label="Paid">
+                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-cash"}`}>
                           {r.hasPendingDues ? "Pending" : "Paid"}
                         </span>
+                      </td>
+                      <td data-label="Police Verif." onClick={(e) => e.stopPropagation()}>
+                        <div className="pv-status-cell">
+                          {isPoliceVerificationComplete(r) ? (
+                            <>
+                              <span className="pv-icon pv-icon--ok" title="Verification Complete">
+                                <i className="bi bi-check-lg"></i>
+                              </span>
+                              <button
+                                className="pv-action-btn pv-action-btn--view"
+                                title="View Police Form"
+                                onClick={(e) => { e.stopPropagation(); setPoliceResident(r); }}
+                              >
+                                <i className="bi bi-eye"></i>
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <span className="pv-icon pv-icon--warn" title="Verification Incomplete">
+                                <i className="bi bi-exclamation-triangle-fill"></i>
+                              </span>
+                              <button
+                                className="pv-action-btn pv-action-btn--edit"
+                                title="Complete Verification"
+                                onClick={(e) => { e.stopPropagation(); navigate(`/owner/residents/edit/${r.residentId}`, { state: { resident: r, apiPrefix } }); }}
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td data-label="Actions" className="d-flex gap-2 justify-content-center align-items-center" onClick={(e) => e.stopPropagation()}>
                         <a href={`tel:${r.phone}`} className="icon-btn" aria-label="Call">
@@ -302,24 +340,56 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
           <table className="modern-table mob-table">
             <thead>
               <tr>
-                <th>Name</th><th>Rent</th><th>Paid Status</th><th>Actions</th>
+                <th>S.No</th><th>Name</th><th>Rent</th><th>Paid Status</th><th>Police Verif.</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <TableSkeleton rows={6} cols={4} />
+                <TableSkeleton rows={6} cols={6} />
               ) : residents.length === 0 ? (
-                <tr><td colSpan="4" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
+                <tr><td colSpan="6" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
               ) : (
-                residents.map((r) => {
+                residents.map((r, idx) => {
                   return (
                     <tr key={r.residentId} onClick={() => setDetailResident(r)} className="ar-cursor-pointer">
+                      <td data-label="S.No">{idx + 1}</td>
                       <td data-label="Name">{r.name}</td>
                       <td data-label="Rent">{chargeLabel(r)}</td>
                       <td data-label="Paid Status">
-                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-online"}`} style={{ fontSize: "0.75rem" }}>
+                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-cash"}`} style={{ fontSize: "0.75rem" }}>
                           {r.hasPendingDues ? "Pending" : "Paid"}
                         </span>
+                      </td>
+                      <td data-label="Police Verif." onClick={(e) => e.stopPropagation()}>
+                        <div className="pv-status-cell">
+                          {isPoliceVerificationComplete(r) ? (
+                            <>
+                              <span className="pv-icon pv-icon--ok" title="Verification Complete">
+                                <i className="bi bi-check-lg"></i>
+                              </span>
+                              <button
+                                className="pv-action-btn pv-action-btn--view"
+                                title="View Police Form"
+                                onClick={(e) => { e.stopPropagation(); setPoliceResident(r); }}
+                              >
+                                <i className="bi bi-eye"></i>
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <span className="pv-icon pv-icon--warn" title="Verification Incomplete">
+                                <i className="bi bi-exclamation-triangle-fill"></i>
+                              </span>
+                              <button
+                                className="pv-action-btn pv-action-btn--edit"
+                                title="Complete Verification"
+                                onClick={(e) => { e.stopPropagation(); navigate(`/owner/residents/edit/${r.residentId}`, { state: { resident: r, apiPrefix } }); }}
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
                         <div className="mob-actions-wrap">

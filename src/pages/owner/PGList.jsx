@@ -258,6 +258,17 @@ const PGList = ({role = "OWNER"}) => {
   const [showLocalitySuggestions, setShowLocalitySuggestions] = useState(false);
   const localityInputRef = useRef(null);
   const [actionLoading, setActionLoading] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+
+  const handleScrollToError = () => {
+    setTimeout(() => {
+      const firstError = document.querySelector('.error-field');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+    }, 100);
+  };
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -1162,22 +1173,24 @@ const PGList = ({role = "OWNER"}) => {
                 <label className="edit-pg-form-label required">PG Name</label>
                 <input
                   type="text"
-                  className="edit-pg-form-input"
+                  className={`edit-pg-form-input ${formErrors.name ? "error-field" : ""}`}
                   value={editForm.name}
-                  onChange={(e) =>
-                    setEditForm({...editForm, name: e.target.value})
-                  }
+                  onChange={(e) => {
+                    setEditForm({...editForm, name: e.target.value});
+                    setFormErrors(prev => ({...prev, name: false}));
+                  }}
                   placeholder="Enter PG name"
                 />
               </div>
               <div className="edit-pg-form-group">
                 <label className="edit-pg-form-label required">City</label>
                 <select
-                  className="edit-pg-form-select"
+                  className={`edit-pg-form-select ${formErrors.city ? "error-field" : ""}`}
                   value={editForm.city}
-                  onChange={(e) =>
-                    setEditForm({...editForm, city: e.target.value})
-                  }
+                  onChange={(e) => {
+                    setEditForm({...editForm, city: e.target.value});
+                    setFormErrors(prev => ({...prev, city: false}));
+                  }}
                 >
                   <option value="">Select City</option>
                   {CITY_OPTIONS.map((city) => (
@@ -1190,23 +1203,24 @@ const PGList = ({role = "OWNER"}) => {
                   <input
                     type="text"
                     placeholder="Enter your city"
-                    className="edit-pg-form-input mt-2"
+                    className={`edit-pg-form-input mt-2 ${formErrors.customCity ? "error-field" : ""}`}
                     value={editForm.customCity}
-                    onChange={(e) =>
-                      setEditForm({...editForm, customCity: e.target.value})
-                    }
+                    onChange={(e) => {
+                      setEditForm({...editForm, customCity: e.target.value});
+                      setFormErrors(prev => ({...prev, customCity: false}));
+                    }}
                   />
                 )}
               </div>
             </div>
             <div className="edit-pg-form-row">
               <div className="edit-pg-form-group">
-                <label className="edit-pg-form-label">Locality</label>
+                <label className="edit-pg-form-label required">Locality</label>
                 <div style={{position: "relative"}}>
                   <input
                     ref={localityInputRef}
                     type="text"
-                    className="edit-pg-form-input"
+                    className={`edit-pg-form-input ${formErrors.locality ? "error-field" : ""}`}
                     placeholder="Type to search or enter a new locality"
                     value={localitySearch}
                     autoComplete="off"
@@ -1214,6 +1228,7 @@ const PGList = ({role = "OWNER"}) => {
                       const val = e.target.value;
                       setLocalitySearch(val);
                       setEditForm({...editForm, locality: val});
+                      setFormErrors(prev => ({...prev, locality: false}));
                       setShowLocalitySuggestions(true);
                     }}
                     onFocus={() => setShowLocalitySuggestions(true)}
@@ -1256,6 +1271,7 @@ const PGList = ({role = "OWNER"}) => {
                               onMouseDown={() => {
                                 setLocalitySearch(loc);
                                 setEditForm({...editForm, locality: loc});
+                                setFormErrors(prev => ({...prev, locality: false}));
                                 setShowLocalitySuggestions(false);
                               }}
                               style={{
@@ -1298,11 +1314,12 @@ const PGList = ({role = "OWNER"}) => {
             <div className="edit-pg-form-group edit-pg-form-row-single">
               <label className="edit-pg-form-label required">Address</label>
               <textarea
-                className="edit-pg-form-textarea"
+                className={`edit-pg-form-textarea ${formErrors.address ? "error-field" : ""}`}
                 value={editForm.address}
-                onChange={(e) =>
-                  setEditForm({...editForm, address: e.target.value})
-                }
+                onChange={(e) => {
+                  setEditForm({...editForm, address: e.target.value});
+                  setFormErrors(prev => ({...prev, address: false}));
+                }}
                 placeholder="Enter full address"
               />
             </div>
@@ -2007,6 +2024,23 @@ const PGList = ({role = "OWNER"}) => {
                 }}
                 onClick={async () => {
                   setUpdateLoading(true);
+                  
+                  const newErrors = {};
+                  if (!editForm.name.trim()) newErrors.name = true;
+                  if (!editForm.city) newErrors.city = true;
+                  if (editForm.city === "Other" && !editForm.customCity.trim()) newErrors.customCity = true;
+                  if (!editForm.locality.trim()) newErrors.locality = true;
+                  if (!editForm.address.trim()) newErrors.address = true;
+                  
+                  if (Object.keys(newErrors).length > 0) {
+                    setFormErrors(newErrors);
+                    handleScrollToError();
+                    toast.error("Please fill in all the required fields marked in red");
+                    setUpdateLoading(false);
+                    return;
+                  }
+                  
+                  setFormErrors({});
                   
                   if (imageList.length === 0) {
                     toast.error("Please upload at least one image of the PG.");

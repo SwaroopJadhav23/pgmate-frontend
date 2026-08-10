@@ -141,6 +141,11 @@ const GlobalPoliceFormModal = () => {
               </span>
             </label>
           </div>
+          
+          <div className="police-update-note" style={{ marginTop: "20px" }}>
+            <i className="bi bi-info-circle-fill"></i>
+            <span>You can change these preferences later from your profile settings.</span>
+          </div>
         </div>
 
         <div className="police-update-modal-footer">

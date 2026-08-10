@@ -75,6 +75,14 @@
 .modern-table td {
   vertical-align: middle;
   text-align: center;
+  font-size: 12px;
+  padding: 6px 8px !important;
+}
+
+.modern-table th {
+  font-size: 11px;
+  padding: 7px 8px !important;
+  white-space: nowrap;
 }
 
 .residents-table-scroll {
@@ -86,9 +94,72 @@
 
 .residents-table,
 .modern-table {
-  min-width: 1300px;
+  min-width: 1100px;
   white-space: nowrap;
+  font-size: 12px;
 }
+
+/* ─────────────────────────────────────────────────────
+   POLICE VERIFICATION COLUMN
+───────────────────────────────────────────────────── */
+.pv-status-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pv-icon {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.pv-icon--ok {
+  color: #16a34a;
+  font-size: 18px;
+  -webkit-text-stroke: 1px #16a34a; /* Makes the tick bolder */
+}
+
+.pv-icon--warn {
+  color: #dc2626;
+  font-size: 18px;
+}
+
+.pv-action-btn {
+  border: none;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.18s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.pv-action-btn--view {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.pv-action-btn--view:hover {
+  background: #bfdbfe;
+  transform: translateY(-1px);
+}
+
+.pv-action-btn--edit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.pv-action-btn--edit:hover {
+  background: #fde68a;
+  transform: translateY(-1px);
+}
+
 
 /* ─────────────────────────────────────────────────────
    PHONE / COPY
@@ -281,9 +352,9 @@
 }
 
 .payment-pill {
-  padding: 5px 12px;
+  padding: 3px 8px;
   border-radius: 50px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   display: inline-block;
 }

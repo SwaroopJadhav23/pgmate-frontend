@@ -85,6 +85,7 @@ const ResidentRecords = ({ apiPrefix }) => {
           params: {
             page: 0,
             size: PAGE_SIZE,
+            sort: "createdAt,desc",
             search: queryParams.search || undefined,
             settlement:
               queryParams.settlement && queryParams.settlement !== "ALL"
@@ -120,6 +121,7 @@ const ResidentRecords = ({ apiPrefix }) => {
         params: {
           page: nextPage,
           size: PAGE_SIZE,
+          sort: "createdAt,desc",
           search: queryParams.search || undefined,
           settlement:
             queryParams.settlement && queryParams.settlement !== "ALL"
