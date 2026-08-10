@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 import api from "../../../api/axios";
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import { TableSkeleton } from "../../public/Skeleton";
@@ -143,6 +145,26 @@ const ResidentRecords = ({ apiPrefix }) => {
       setTotalPages(res.data?.totalPages || totalPages);
     } finally {
       setLoadingMore(false);
+    }
+  };
+
+    const handleDeleteRecord = async (record) => {
+    const confirm = await Swal.fire({
+      title: "Delete Checkout Record?",
+      text: `This will permanently remove ${record.name}'s checkout record.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Delete",
+    });
+    if (!confirm.isConfirmed) return;
+    try {
+      await api.delete(`${apiPrefix}/records/${record.residentId}`);
+      setRecords((prev) => prev.filter((r) => r.residentId !== record.residentId));
+      toast.success("Checkout record deleted.");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to delete record.");
     }
   };
 
@@ -512,14 +534,15 @@ const ResidentRecords = ({ apiPrefix }) => {
               <th>Checkout</th>
               <th>Refund Mode</th>
               <th>Refund Proof</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <TableSkeleton rows={8} cols={10} />
+              <TableSkeleton rows={8} cols={11} />
             ) : records.length === 0 ? (
               <tr>
-                <td colSpan="10" className="rrc-table-empty">No records found</td>
+                <td colSpan="11" className="rrc-table-empty">No records found</td>
               </tr>
             ) : (
               records.map((r, index) => {
@@ -538,11 +561,24 @@ const ResidentRecords = ({ apiPrefix }) => {
                     <td>{chargeLabel(r)}</td>
                     <td>{formatDate(r.checkinDate)}</td>
                     <td>{formatDate(r.actualCheckoutDate)}</td>
-                    <td>{r.refundPaymentMode || "Not Recorded"}</td>
+                   <td>{r.refundPaymentMode || "Not Recorded"}</td>
                     <td onClick={(e) => e.stopPropagation()}>
                       {r.refundProofUrl ? (
                         <button className="btn btn-sm btn-outline-primary" onClick={() => setPreviewUrl(r.refundProofUrl)}>View</button>
                       ) : "-"}
+                    </td>
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleDeleteRecord(r)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" width="16" height="16">
+                          <path d="M3 6h18" stroke="currentColor" strokeLinecap="round" />
+                          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeLinecap="round" />
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M10 11v6M14 11v6" stroke="currentColor" strokeLinecap="round" />
+                        </svg>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -757,6 +793,18 @@ const ResidentRecords = ({ apiPrefix }) => {
                       View Proof
                     </button>
                   )}
+                  <button
+                    className="rrcm-proof-btn"
+                    style={{ color: "#dc2626", borderColor: "#fca5a5" }}
+                    onClick={() => handleDeleteRecord(r)}
+                  >
+                     <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" width="16" height="16">
+                          <path d="M3 6h18" stroke="currentColor" strokeLinecap="round" />
+                          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeLinecap="round" />
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M10 11v6M14 11v6" stroke="currentColor" strokeLinecap="round" />
+                        </svg>
+                  </button>
                 </div>
               </div>
             );
