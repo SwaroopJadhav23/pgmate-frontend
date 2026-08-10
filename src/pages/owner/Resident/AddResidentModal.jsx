@@ -136,13 +136,29 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
   useEffect(() => {
     if (form.roomId) {
-      api.get(`${bedEndpoint}?roomId=${form.roomId}`).then((res) =>
-        setBeds((res.data || []).filter((b) => b.status === "AVAILABLE"))
-      );
+      api.get(`${bedEndpoint}?roomId=${form.roomId}`).then((res) => {
+        const availableBeds = (res.data || []).filter((b) => b.status === "AVAILABLE");
+        if (availableBeds.length > 0) {
+          setBeds(availableBeds);
+        } else {
+          // Fallback: generate synthetic bed options from room's totalBeds
+          // This handles rooms whose sharing type was updated but beds weren't synced yet
+          const selectedRoom = rooms.find((r) => r.id === form.roomId);
+          const totalBeds = selectedRoom?.totalBeds || 0;
+          const syntheticBeds = Array.from({ length: totalBeds }, (_, i) => ({
+            id: `synthetic-bed-${i + 1}`,
+            bedNumber: i + 1,
+            status: "AVAILABLE",
+            roomId: form.roomId,
+            _synthetic: true,
+          }));
+          setBeds(syntheticBeds);
+        }
+      });
     } else {
       setBeds([]);
     }
-  }, [form.roomId, bedEndpoint]);
+  }, [form.roomId, bedEndpoint, rooms]);
 
   // ── auto-select when only one option ────────────────────────────
   useEffect(() => {
@@ -280,17 +296,39 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
   const submit = async () => {
     if (!validateStep(4)) return;
 
-    const fd = new FormData();
-    Object.entries(form).forEach(([k, v]) => { if (v !== "") fd.append(k, v); });
-    if (file) fd.append("onboardingPaymentProof", file);
-    if (profilePhoto) fd.append("profilePhoto", profilePhoto);
-    if (aadhaarCard) fd.append("aadhaarCard", aadhaarCard);
-    if (securityDepositReceipt) fd.append("securityDepositReceipt", securityDepositReceipt);
-    // eslint-disable-next-line
-    {/*fd.append("agreementSignature", dataUrlToFile(signatureDataUrl, "agreement_signature.png")); */ }
-
     setLoading(true);
     try {
+      let resolvedBedId = form.bedId;
+
+      // If user selected a synthetic bed (DB not yet synced), trigger a bed sync first
+      if (form.bedId?.startsWith("synthetic-bed-")) {
+        const bedNum = parseInt(form.bedId.split("-").pop(), 10);
+        // Call the room sync endpoint to force-create missing beds
+        try {
+          await api.post(`${bedEndpoint.replace("/beds", "/rooms")}/${form.roomId}/sync-beds`);
+        } catch (e) {
+          // sync endpoint may not exist — ignore and try to find the bed directly
+        }
+        // Re-fetch beds after sync
+        const freshRes = await api.get(`${bedEndpoint}?roomId=${form.roomId}`);
+        const freshBeds = (freshRes.data || []).filter((b) => b.status === "AVAILABLE");
+        const match = freshBeds.find((b) => b.bedNumber === bedNum);
+        if (match) {
+          resolvedBedId = match.id;
+        } else {
+          toast.error("Bed not found on server. Please edit the room again to re-sync beds.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      const fd = new FormData();
+      Object.entries({ ...form, bedId: resolvedBedId }).forEach(([k, v]) => { if (v !== "") fd.append(k, v); });
+      if (file) fd.append("onboardingPaymentProof", file);
+      if (profilePhoto) fd.append("profilePhoto", profilePhoto);
+      if (aadhaarCard) fd.append("aadhaarCard", aadhaarCard);
+      if (securityDepositReceipt) fd.append("securityDepositReceipt", securityDepositReceipt);
+
       await api.post(residentEndpoint, fd);
       toast.success("Resident Added successfully.");
       onSuccess?.();
