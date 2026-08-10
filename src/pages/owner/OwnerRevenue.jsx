@@ -28,12 +28,18 @@ import {
   startOfDay,
   startOfWeek,
   startOfMonth,
+  endOfMonth,
   isWithinInterval,
   parse,
   // subMonths, 
   format,
 } from "date-fns";
 import "./OwnerRevenue.css";
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 
 
 /* ================= COUNT UP HOOK ================= */
@@ -73,6 +79,16 @@ const OwnerRevenue = () => {
   const [endDate, setEndDate] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
+  const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const monthRef = useRef(null);
+  const yearRef = useRef(null);
+  const yearOptions = useMemo(() => {
+    const cy = new Date().getFullYear();
+    return Array.from({ length: 7 }, (_, i) => cy - 5 + i);
+  }, []);
   const [rentRecords, setRentRecords] = useState([]);
   const [chartType, setChartType] = useState("bar");
   const isMobile = window.innerWidth < 768;
@@ -138,16 +154,31 @@ const OwnerRevenue = () => {
     }
 
     if (filter === "MONTH") {
-      return startOfMonth(now);
+      return startOfMonth(new Date(selectedYear, selectedMonth, 1));
     }
 
     if (filter === "YEAR") {
-      return new Date(now.getFullYear(), 0, 1);
+      return new Date(selectedYear, 0, 1);
     }
 
     return startOfMonth(now);
 
-  }, [filter]);
+  }, [filter, selectedMonth, selectedYear]);
+
+  const toDateFilter = useMemo(() => {
+    const today = new Date();
+
+    if (filter === "MONTH") {
+      return endOfMonth(new Date(selectedYear, selectedMonth, 1));
+    }
+
+    if (filter === "YEAR") {
+      return new Date(selectedYear, 11, 31, 23, 59, 59);
+    }
+
+    return today;
+
+  }, [filter, selectedMonth, selectedYear]);
   //  MONTH COMPARISON TEMPORARILY DISABLED
   /*
   const previousMonthStart = useMemo(() => {
@@ -162,8 +193,6 @@ const OwnerRevenue = () => {
 
       if (!date) return false;
 
-      const today = new Date();
-
       if (startDate && endDate) {
         return isWithinInterval(date, {
           start: startDate,
@@ -173,11 +202,11 @@ const OwnerRevenue = () => {
 
       return isWithinInterval(date, {
         start: fromDate,
-        end: today
+        end: toDateFilter
       });
 
     },
-    [fromDate, startDate, endDate]
+    [fromDate, toDateFilter, startDate, endDate]
   );
 
   const getRevenueDate = (r) => {
@@ -668,6 +697,12 @@ const OwnerRevenue = () => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
         setShowCalendar(false);
       }
+      if (monthRef.current && !monthRef.current.contains(e.target)) {
+        setShowMonthDropdown(false);
+      }
+      if (yearRef.current && !yearRef.current.contains(e.target)) {
+        setShowYearDropdown(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -712,15 +747,73 @@ const OwnerRevenue = () => {
             <div className="top-bar">
 
               <div className="filter-row">
-                {[/*"DAY", "WEEK",*/ "MONTH", "YEAR"].map((f) => (
+                <div className="filter-dropdown-wrapper" ref={monthRef}>
                   <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={filter === f ? "active" : ""}
+                    onClick={() => {
+                      setFilter("MONTH");
+                      setShowMonthDropdown((p) => !p);
+                      setShowYearDropdown(false);
+                    }}
+                    className={filter === "MONTH" ? "active" : ""}
                   >
-                    {f}
+                    MONTH
                   </button>
-                ))}
+                  {showMonthDropdown && (
+                    <div className="filter-dropdown-menu">
+                      {MONTH_NAMES.map((m, i) => (
+                        <div
+                          key={m}
+                          className={
+                            filter === "MONTH" && i === selectedMonth
+                              ? "filter-dropdown-item active"
+                              : "filter-dropdown-item"
+                          }
+                          onClick={() => {
+                            setSelectedMonth(i);
+                            setFilter("MONTH");
+                            setShowMonthDropdown(false);
+                          }}
+                        >
+                          {m}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="filter-dropdown-wrapper" ref={yearRef}>
+                  <button
+                    onClick={() => {
+                      setFilter("YEAR");
+                      setShowYearDropdown((p) => !p);
+                      setShowMonthDropdown(false);
+                    }}
+                    className={filter === "YEAR" ? "active" : ""}
+                  >
+                    YEAR
+                  </button>
+                  {showYearDropdown && (
+                    <div className="filter-dropdown-menu">
+                      {yearOptions.map((y) => (
+                        <div
+                          key={y}
+                          className={
+                            filter === "YEAR" && y === selectedYear
+                              ? "filter-dropdown-item active"
+                              : "filter-dropdown-item"
+                          }
+                          onClick={() => {
+                            setSelectedYear(y);
+                            setFilter("YEAR");
+                            setShowYearDropdown(false);
+                          }}
+                        >
+                          {y}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
 
