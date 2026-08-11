@@ -83,7 +83,7 @@
 
 .rent-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 20px;
 }
@@ -92,6 +92,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
 
   padding: 16px 18px;
   border-radius: 14px;
@@ -125,6 +126,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 
 .rent-stat-value {
@@ -132,6 +134,7 @@
   font-weight: 700;
   line-height: 1.1;
   color: #1e293b;
+  overflow-wrap: break-word;
 }
 
 .rent-stat-label {
@@ -196,14 +199,14 @@
 
 @media (max-width: 1024px) {
   .rent-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 }
 
 @media (max-width: 768px) {
   .rent-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -219,7 +222,7 @@
 
 @media (max-width: 480px) {
   .rent-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
@@ -239,6 +242,44 @@
 
   .rent-stat-sub {
     display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .rent-stats-grid {
+    gap: 6px;
+  }
+
+  .rent-stat-card {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+
+  .rent-stat-icon-wrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rent-stat-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .rent-stat-value {
+    font-size: 1rem;
+  }
+
+  .rent-stat-label {
+    font-size: 0.68rem;
+  }
+
+  .dues-filter-tabs .status-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .residents-search-input {
+    font-size: 12.5px;
   }
 }
 /* =========================================
@@ -302,16 +343,16 @@
 
   /* col 1: name+pg */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(1),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(1) { width: 28%; padding-left: 8px !important; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(1) { width: 27%; padding-left: 8px !important; }
   /* col 2: room */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(2),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(2) { width: 13%; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(2) { width: 11%; }
   /* col 3: rent */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(3),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(3) { width: 19%; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(3) { width: 18%; }
   /* col 4: status */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(4),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(4) { width: 19%; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(4) { width: 22%; padding-right: 6px !important; }
   /* col 5: action */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(5),
   .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(5) { width: 12%; text-align: center; padding-right: 4px !important; }
@@ -361,6 +402,38 @@
   .mrt-table-scope tbody tr.mrt-card-row .mrt-rent-amount {
     white-space: nowrap;
     font-size: 12.5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .mrt-table-scope tbody tr.mrt-card-row > td {
+    font-size: 11px;
+    padding: 8px 3px !important;
+  }
+
+  .mrt-mrow-name-top {
+    font-size: 12px;
+  }
+
+  .mrt-mrow-sub {
+    font-size: 10px;
+  }
+
+  .mrt-table-scope tbody tr.mrt-card-row .status-pill {
+    font-size: 9px;
+  }
+
+  .mrt-table-scope tbody tr.mrt-card-row .mrt-rent-amount {
+    font-size: 11.5px;
+  }
+
+  .mrt-table-scope tbody tr.mrt-card-row .mrt-due-label {
+    font-size: 8px;
+  }
+
+  .mrt-table-scope thead tr.mrt-mobile-head-row th {
+    font-size: 8.5px;
+    padding: 6px 3px !important;
   }
 }
 
@@ -972,12 +1045,24 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  word-break: break-word;
+  min-width: 0;
+}
+
+.mrt-mrow-name-text {
+  display: inline-block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .mrt-mrow-sub {
   font-size: 11px;
   color: #9ca3af !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .mrt-mrow .mrt-due-label {
@@ -1234,7 +1319,21 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding-bottom: 2px;
+  padding: 2px 20px 6px 0;
+  scroll-padding-right: 20px;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .dues-filter-tabs {
+    padding-right: 28px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+  }
+
+  .dues-filter-tabs .status-btn:last-child {
+    margin-right: 12px;
+  }
 }
 
 .dues-filter-tabs::-webkit-scrollbar {

@@ -731,7 +731,7 @@ const MonthlyRentTable = ({ status, refreshKey, onReload }) => {
                           }
                         >
                           <div className="mrt-mrow-name-top">
-                            {residentName}
+                            <span className="mrt-mrow-name-text">{residentName}</span>
                             {tenantHasManualDues && (
                               <span
                                 className={`mrt-expand-arrow ${isExpanded ? "mrt-expand-arrow--open" : ""}`}
