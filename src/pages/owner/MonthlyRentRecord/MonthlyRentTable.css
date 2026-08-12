@@ -294,15 +294,14 @@
 @media (max-width: 768px) {
 
   .mrt-table-scope .mrt-table-wrap {
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
     overflow-y: visible !important;
   }
 
   .mrt-table-scope .modern-table,
   .mrt-table-scope .mrt-table {
     width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
+    min-width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
     border-radius: 0 !important;
@@ -343,19 +342,19 @@
 
   /* col 1: name+pg */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(1),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(1) { width: 27%; padding-left: 8px !important; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(1) { width: 26%; padding-left: 8px !important; text-align: left; }
   /* col 2: room */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(2),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(2) { width: 11%; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(2) { width: 14%; text-align: center; }
   /* col 3: rent */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(3),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(3) { width: 18%; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(3) { width: 22%; text-align: center; }
   /* col 4: status */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(4),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(4) { width: 22%; padding-right: 6px !important; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(4) { width: 25%; text-align: center; padding-right: 2px !important; }
   /* col 5: action */
   .mrt-table-scope tbody tr.mrt-card-row > td:nth-child(5),
-  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(5) { width: 12%; text-align: center; padding-right: 4px !important; }
+  .mrt-table-scope thead tr.mrt-mobile-head-row th:nth-child(5) { width: 13%; text-align: center; padding-right: 6px !important; }
 
   .mrt-table-scope thead tr.mrt-mobile-head-row th {
     padding: 8px 4px !important;
@@ -383,25 +382,29 @@
   /* status pill must not wrap/clip inside its narrower column */
   .mrt-table-scope tbody tr.mrt-card-row .status-pill {
     display: inline-block;
-    font-size: 10px;
-    padding: 0;
+    font-size: 8.5px;
+    padding: 0 !important;
     white-space: nowrap;
     font-weight: 700;
     border-radius: 0;
     background: transparent !important;
   }
 
+  .mrt-table-scope tbody tr.mrt-card-row .mrt-rent-cell {
+    align-items: center;
+  }
+
   .mrt-table-scope tbody tr.mrt-card-row .mrt-due-label {
     display: block;
     white-space: nowrap;
-    font-size: 8.5px;
+    font-size: 8px;
     margin-top: 2px;
     font-weight: 500;
   }
 
   .mrt-table-scope tbody tr.mrt-card-row .mrt-rent-amount {
     white-space: nowrap;
-    font-size: 12.5px;
+    font-size: 12px;
   }
 }
 
