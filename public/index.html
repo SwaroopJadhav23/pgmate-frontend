@@ -73,9 +73,12 @@
     <!-- Chat widget styles and script -->
    <!-- <link rel="stylesheet" href="%PUBLIC_URL%/chat-widget.css"> -->
     <script>
-      // backend bot URL (change if your bot runs elsewhere)
-      window._PGMATE_CHATBOT_URL = "http://localhost:8002";
-    </script>
+  // Chatbot URL - resolves based on environment. No hardcoded localhost in production.
+  window._PGMATE_CHATBOT_URL =
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:8002"
+      : ""; // update to your actual production chatbot URL, or leave "" if not live yet
+</script>
   <!-- <script src="%PUBLIC_URL%/chat-widget.js" defer></script> -->
    <script type="text/javascript">
 function googleTranslateElementInit() {
