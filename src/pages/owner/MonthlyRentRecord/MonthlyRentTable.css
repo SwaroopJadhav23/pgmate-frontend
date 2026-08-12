@@ -288,6 +288,7 @@
 ========================================= */
 
 /* Desktop: show rows, hide mobile row */
+.mrt-table-scope thead tr:not(.mrt-mobile-head-row) th { font-size: 15px; }
 .mrt-desktop-row { display: table-row; }
 .mrt-card-row    { display: none; }
 
