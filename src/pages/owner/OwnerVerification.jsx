@@ -49,7 +49,6 @@ const OwnerVerification = () => {
   useEffect(() => {
 
     api.get("/owner/subscription").then(async res => {
-      console.log("SUBSCRIPTION RESPONSE:", res.data);
       const plan = res.data.planType;
       setPlanType(plan);
       setPlanStartDate(res.data.startDate || null);
