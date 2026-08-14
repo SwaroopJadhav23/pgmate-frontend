@@ -1,6 +1,6 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import pgmateLogo from "../assets/PGMate.png";
+import { useContext, useEffect,  useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+
 import {
   User as UserIcon,
   ClipboardList,
@@ -24,6 +24,7 @@ const USER_NAV_ITEMS = [
 const UserLayout = ({ children, hideWelcome }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -99,11 +100,28 @@ const UserLayout = ({ children, hideWelcome }) => {
             ))}
           </nav>
 
-          <button className="user-sb-logout" onClick={handleLogout}>
+          <button className="user-sb-logout" onClick={() => setShowLogoutConfirm(true)}>
             <LogOut size={18} />
             <span>Logout</span>
           </button>
         </aside>
+
+        {showLogoutConfirm && (
+          <div className="user-logout-overlay" onClick={() => setShowLogoutConfirm(false)}>
+            <div className="user-logout-modal" onClick={(e) => e.stopPropagation()}>
+              <h3>Log out?</h3>
+              <p>Really want to logout?</p>
+              <div className="user-logout-modal-actions">
+                <button className="user-logout-cancel" onClick={() => setShowLogoutConfirm(false)}>
+                  Cancel
+                </button>
+                <button className="user-logout-confirm" onClick={handleLogout}>
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="user-shell-main">
           <button

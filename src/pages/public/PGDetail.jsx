@@ -383,10 +383,12 @@ const PGDetail = () => {
 
   const isDiscount = pg.offerType === "DISCOUNT";
 
+  const priceSource = filteredRooms.length > 0 ? filteredRooms : sharingGroups;
+
   const minPrice =
-    sharingGroups.length > 0
+    priceSource.length > 0
       ? Math.min(
-        ...sharingGroups.map((r) =>
+        ...priceSource.map((r) =>
           isDiscount && pg.offerPercent > 0
             ? r.monthlyRent - (r.monthlyRent * pg.offerPercent) / 100
             : r.monthlyRent,
@@ -618,19 +620,19 @@ const PGDetail = () => {
             </button>
           </div>
 
-         <div className="bc-disclaimer-group">
-  <div className="bc-disclaimer">
-    <span className="bc-disclaimer-icon">i</span>
-    <p>Prices are indicative — confirm final pricing with owner.</p>
-  </div>
+          <div className="bc-disclaimer-group">
+            <div className="bc-disclaimer">
+              <span className="bc-disclaimer-icon">i</span>
+              <p>Prices are indicative — confirm final pricing with owner.</p>
+            </div>
 
-  {!((pg.reservationEnabled || pg.dailyReservationEnabled) && pg.reservationAmount > 0) && (
-    <div className="bc-disclaimer bc-disclaimer-warning">
-      <span className="bc-disclaimer-icon warning">!</span>
-      <p>Reservation may be temporarily closed (bed full / paused by owner).</p>
-    </div>
-  )}
-</div>
+            {!((pg.reservationEnabled || pg.dailyReservationEnabled) && pg.reservationAmount > 0) && (
+              <div className="bc-disclaimer bc-disclaimer-warning">
+                <span className="bc-disclaimer-icon warning">!</span>
+                <p>Reservation may be temporarily closed (bed full / paused by owner).</p>
+              </div>
+            )}
+          </div>
         </aside>
       </div>
 
