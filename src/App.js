@@ -58,6 +58,7 @@ import AdminOffers from "./pages/admin/AdminOffers";
 import AdminVerificationPayments from "./pages/admin/AdminVerificationPayments";
 import OwnerSponsorship from "./pages/owner/OwnerSponsorshipPage";
 import OwnerRevenue from "./pages/owner/OwnerRevenue";
+import AddExpense from "./pages/owner/AddExpense";
 import AdminPlanDashboard from "./pages/admin/AdminPlanDashboard";
 import AdminRevenue from "./pages/admin/AdminRevenue";
 
@@ -253,6 +254,14 @@ function App() {
             element={
               <ProtectedRoute role="OWNER">
                 <OwnerRevenue />
+              </ProtectedRoute>
+            }
+          />{" "}
+          <Route
+            path="/owner/revenue/add-expense"
+            element={
+              <ProtectedRoute role="OWNER">
+                <AddExpense />
               </ProtectedRoute>
             }
           />{" "}

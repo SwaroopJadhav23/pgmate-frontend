@@ -1,0 +1,121 @@
+.donut-breakdown-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color, #f1f5f9);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.donut-breakdown-card h3 {
+  margin: 0 0 24px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.donut-breakdown-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #64748b);
+  font-size: 14px;
+}
+
+.donut-breakdown-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 40px;
+}
+
+.donut-chart-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-total-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 4px;
+}
+
+.donut-total-label {
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+}
+
+.donut-legend-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.donut-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.donut-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.donut-legend-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.donut-legend-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+}
+
+.donut-legend-stats {
+  font-size: 13px;
+  color: var(--text-muted, #64748b);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.donut-legend-percent {
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+@media (max-width: 768px) {
+  .donut-breakdown-content {
+    flex-direction: column;
+  }
+  .donut-legend-wrapper {
+    width: 100%;
+    margin-top: 20px;
+  }
+}

@@ -1,5 +1,5 @@
 import { FaCalendarAlt } from "react-icons/fa";
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import DashboardLayout from "../../layouts/DashboardLayout";
@@ -31,9 +31,9 @@ import {
   endOfMonth,
   isWithinInterval,
   parse,
-  // subMonths, 
   format,
 } from "date-fns";
+import DonutBreakdownChart from "../../components/owner/DonutBreakdownChart";
 import "./OwnerRevenue.css";
 
 const MONTH_NAMES = [
@@ -44,26 +44,39 @@ const MONTH_NAMES = [
 
 /* ================= COUNT UP HOOK ================= */
 
-const useCountUp = (value, duration = 800) => {
+const useCountUp = (target, duration = 1200) => {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    let start = 0;
-    const increment = value / (duration / 16);
+    const value = Number(target) || 0;
+    if (value <= 0) {
+      setDisplay(value);
+      return;
+    }
 
-    const counter = setInterval(() => {
-      start += increment;
+    let startTimestamp = null;
+    let animationFrame;
 
-      if (start >= value) {
-        setDisplay(value);
-        clearInterval(counter);
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      // Cubic ease-out for a smooth deceleration
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      setDisplay(Math.floor(easeProgress * value));
+
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(step);
       } else {
-        setDisplay(Math.floor(start));
+        setDisplay(value);
       }
-    }, 16);
+    };
 
-    return () => clearInterval(counter);
-  }, [value, duration]);
+    animationFrame = window.requestAnimationFrame(step);
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [target, duration]);
 
   return display;
 };
@@ -90,28 +103,53 @@ const OwnerRevenue = () => {
     return Array.from({ length: 7 }, (_, i) => cy - 5 + i);
   }, []);
   const [rentRecords, setRentRecords] = useState([]);
-  const [chartType, setChartType] = useState("bar");
+  const [chartMetric, setChartMetric] = useState("COLLECTED");
+  const [pgs, setPgs] = useState([]);
+  const [selectedPgId, setSelectedPgId] = useState("ALL");
   const isMobile = window.innerWidth < 768;
 
+  const [expenditures, setExpenditures] = useState([]);
+  const [viewMode, setViewMode] = useState("month");
+
+  // Expense History
+  const [expHistoryPgId, setExpHistoryPgId] = useState("ALL");
+  const [expHistoryStatus, setExpHistoryStatus] = useState("ALL");
+  const [expHistorySearch, setExpHistorySearch] = useState("");
+  const [markingPaidId, setMarkingPaidId] = useState(null);
+  const [markPaidForm, setMarkPaidForm] = useState({ paymentDate: new Date().toISOString().split('T')[0], paymentMethod: 'CASH' });
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  useEffect(() => {
+    api.get("/owner/pgs")
+      .then((res) => {
+        setPgs(res.data || []);
+      })
+      .catch((err) => console.error("Failed to load PGs", err));
+  }, []);
 
   useEffect(() => {
     loadData();
     loadStats();
-  }, []);
+  }, [selectedPgId, viewMode]);
 
 
 
   const loadData = async () => {
     try {
-      const [active, records, reserved, enq, rentRes] = await Promise.all([
-        api.get("/owner/residents"),
-        api.get("/owner/residents/records"),
-        api.get("/owner/residents/reserved"),
-        api.get("/enquiry/enquiries"),
-        api.get("/owner/rent?status=PAID")
+      setLoading(true);
+      const params = selectedPgId === "ALL" ? {} : { pgId: selectedPgId };
+      // Include viewMode to trigger re-fetch as requested
+      const [active, records, reserved, enq, rentRes, expRes] = await Promise.all([
+        api.get("/owner/residents", { params }),
+        api.get("/owner/residents/records", { params }),
+        api.get("/owner/residents/reserved", { params }),
+        api.get("/enquiry/enquiries", { params }),
+        api.get("/owner/rent?status=PAID", { params }),
+        api.get("/owner/expenses", { params, viewMode })
       ]);
 
       setRentRecords(Array.isArray(rentRes.data) ? rentRes.data : []);
+      setExpenditures(Array.isArray(expRes.data) ? expRes.data : []);
       const merged = [
         ...(Array.isArray(active.data) ? active.data : []),
         ...(Array.isArray(records.data) ? records.data : []),
@@ -133,12 +171,15 @@ const OwnerRevenue = () => {
 
   const loadStats = async () => {
     try {
-      const res = await api.get("/owner/dashboard/stats");
+      const params = selectedPgId === "ALL" ? { viewMode } : { pgId: selectedPgId, viewMode };
+      const res = await api.get("/owner/dashboard/stats", { params });
       setStats(res.data);
     } catch (err) {
       console.error("Stats error:", err);
     }
   };
+
+
 
   /* ================= DATE RANGE ================= */
   const fromDate = useMemo(() => {
@@ -340,9 +381,6 @@ const OwnerRevenue = () => {
     );
   }).length;
 
-  const totalReservedResidents = residents.filter((r) => {
-    return r.status === "RESERVED";
-  }).length;
   const totalEnquiries = enquiries.filter((e) => {
     if (!e.createdAt) return false;
 
@@ -365,83 +403,192 @@ const OwnerRevenue = () => {
   /* ================= CHART DATA ================= */
 
   const chartData = useMemo(() => {
+    const monthlyPotential = stats?.maxPotentialRevenue || 0;
+
+    if (filter === "YEAR") {
+      const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const monthlyMap = {};
+      allMonths.forEach(m => monthlyMap[m] = { revenue: 0, expense: 0 });
+
+      rentRecords.forEach((rec) => {
+        const date = toDate(rec.paidDate);
+        if (date && date.getFullYear() === selectedYear && rec.status === "PAID") {
+          const monthStr = format(date, "MMM");
+          if (monthlyMap[monthStr] !== undefined) {
+            monthlyMap[monthStr].revenue += Number(rec.rentAmount || 0);
+          }
+        }
+      });
+
+      residents.forEach((r) => {
+        const date = toDate(r.actualCheckoutDate);
+        if (date && date.getFullYear() === selectedYear) {
+          const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
+          if (damage > 0) {
+            const monthStr = format(date, "MMM");
+            if (monthlyMap[monthStr] !== undefined) {
+              monthlyMap[monthStr].revenue += damage;
+            }
+          }
+        }
+      });
+      
+      expenditures.forEach(exp => {
+        const date = new Date(exp.expenseDate || exp.date);
+        if (date && date.getFullYear() === selectedYear) {
+            const monthStr = format(date, "MMM");
+            if (monthlyMap[monthStr] !== undefined) {
+                monthlyMap[monthStr].expense += Number(exp.amount || 0);
+            }
+        }
+      });
+
+      return allMonths.map(m => ({ date: m, revenue: monthlyMap[m].revenue, expense: monthlyMap[m].expense, potential: monthlyPotential }));
+    }
+
+    if (filter === "MONTH") {
+      const weeks = Array.from({ length: 4 }, () => ({ revenue: 0, expense: 0 }));
+      const weekPotential = Math.round(monthlyPotential / 4);
+
+      rentRecords.forEach((rec) => {
+        const date = toDate(rec.paidDate);
+        if (date && date.getFullYear() === selectedYear && date.getMonth() === selectedMonth && rec.status === "PAID") {
+          const day = date.getDate();
+          const weekIdx = Math.min(Math.floor((day - 1) / 7), 3);
+          weeks[weekIdx].revenue += Number(rec.rentAmount || 0);
+        }
+      });
+
+      residents.forEach((r) => {
+        const date = toDate(r.actualCheckoutDate);
+        if (date && date.getFullYear() === selectedYear && date.getMonth() === selectedMonth) {
+          const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
+          if (damage > 0) {
+            const day = date.getDate();
+            const weekIdx = Math.min(Math.floor((day - 1) / 7), 3);
+            weeks[weekIdx].revenue += damage;
+          }
+        }
+      });
+      
+      expenditures.forEach(exp => {
+        const date = new Date(exp.expenseDate || exp.date);
+        if (date && date.getFullYear() === selectedYear && date.getMonth() === selectedMonth) {
+            const day = date.getDate();
+            const weekIdx = Math.min(Math.floor((day - 1) / 7), 3);
+            weeks[weekIdx].expense += Number(exp.amount || 0);
+        }
+      });
+
+      return weeks.map((w, i) => ({ date: `Week ${i + 1}`, revenue: w.revenue, expense: w.expense, potential: weekPotential }));
+    }
+
+    // Default for DAY, WEEK, CUSTOM
     const map = {};
 
-    // RENT FROM RECORDS
     rentRecords.forEach((rec) => {
       const date = toDate(rec.paidDate);
-      if (!isDateInFilter(date)) return;
-
+      if (!isDateInFilter(date) || rec.status !== "PAID") return;
       const key = format(date, "dd MMM");
-
-      if (!map[key]) {
-        map[key] = { date: key, revenue: 0 };
-      }
-
+      if (!map[key]) map[key] = { date: key, revenue: 0, expense: 0, potential: Math.round(monthlyPotential / 30) };
       map[key].revenue += Number(rec.rentAmount || 0);
     });
 
-    //  DAMAGE (deposit loss)
     residents.forEach((r) => {
       const date = toDate(r.actualCheckoutDate);
       if (!isDateInFilter(date)) return;
-
-      const damage =
-        Number(r.deposit || 0) - Number(r.refundAmount || 0);
-
+      const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
       if (damage > 0) {
         const key = format(date, "dd MMM");
-
-        if (!map[key]) {
-          map[key] = { date: key, revenue: 0 };
-        }
-
+        if (!map[key]) map[key] = { date: key, revenue: 0, expense: 0, potential: Math.round(monthlyPotential / 30) };
         map[key].revenue += damage;
       }
     });
+    
+    expenditures.forEach(exp => {
+      const date = new Date(exp.expenseDate || exp.date);
+      if (!isDateInFilter(date)) return;
+      const key = format(date, "dd MMM");
+      if (!map[key]) map[key] = { date: key, revenue: 0, expense: 0, potential: Math.round(monthlyPotential / 30) };
+      map[key].expense += Number(exp.amount || 0);
+    });
 
-    return Object.values(map).sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
-  }, [rentRecords, residents, isDateInFilter]);
+    return Object.values(map).sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [rentRecords, residents, expenditures, isDateInFilter, filter, selectedMonth, selectedYear, stats]);
   /* ================= ANIMATIONS ================= */
 
   const totalRevenue = totalRentCollected + totalDepositHeld;
+  const potentialRevenue = stats?.maxPotentialRevenue || 0;
+  const colRate = potentialRevenue > 0 ? Math.round((totalRentCollected / potentialRevenue) * 100) : 0;
 
-  const animatedRevenue = useCountUp(collectionsInRange);
-  const animatedDeposit = useCountUp(totalDepositHeld);
-  const animatedRent = useCountUp(totalRentCollected);
+  const totalExpensesAmount = useMemo(() => {
+    return expenditures
+      .filter(exp => isDateInFilter(new Date(exp.expenseDate || exp.date)))
+      .reduce((sum, exp) => sum + Number(exp.amount), 0);
+  }, [expenditures, isDateInFilter]);
+
   const animatedTotalRevenue = useCountUp(totalRevenue);
+  const animatedRentCollected = useCountUp(totalRentCollected);
+  const animatedDepositHeld = useCountUp(totalDepositHeld);
   const animatedAvg = useCountUp(avgRevenuePerResident);
 
   const animatedFutureRefund = useCountUp(futureDepositRefund);
+  const animatedPotential = useCountUp(potentialRevenue);
+  const animatedExpenses = useCountUp(totalExpensesAmount);
+  
+  const animatedPendingRent = useCountUp(stats?.revenuePending || 0);
+  const animatedOverdueRent = useCountUp(stats?.revenueOverdue || 0);
+  const animatedColRate = useCountUp(colRate);
 
+  const isAllPgsEh = expHistoryPgId === 'ALL';
+  const filteredExpensesForEh = useMemo(() => expenditures
+    .filter(exp => isAllPgsEh || exp.pgId === expHistoryPgId)
+    .filter(exp => expHistoryStatus === 'ALL' || (exp.paymentStatus || '').toUpperCase() === expHistoryStatus)
+    .filter(exp => {
+      if (!expHistorySearch) return true;
+      const q = expHistorySearch.toLowerCase();
+      return (
+        (exp.category || '').toLowerCase().includes(q) ||
+        (exp.title || '').toLowerCase().includes(q) ||
+        (exp.paidTo || '').toLowerCase().includes(q)
+      );
+    }), [expenditures, isAllPgsEh, expHistoryPgId, expHistoryStatus, expHistorySearch]);
 
+  const ehTotalTxs = filteredExpensesForEh.length;
+  const ehPendingAmt = useMemo(() => filteredExpensesForEh.filter(e => (e.paymentStatus||'').toUpperCase() === 'PENDING').reduce((s, e) => s + (e.amount||0), 0), [filteredExpensesForEh]);
+  const ehPaidAmt = useMemo(() => filteredExpensesForEh.filter(e => (e.paymentStatus||'').toUpperCase() !== 'PENDING').reduce((s, e) => s + (e.amount||0), 0), [filteredExpensesForEh]);
+  const ehTotalAmt = ehPendingAmt + ehPaidAmt;
 
+  const animatedEhTotalTxs = useCountUp(ehTotalTxs);
+  const animatedEhPendingAmt = useCountUp(ehPendingAmt);
+  const animatedEhPaidAmt = useCountUp(ehPaidAmt);
+  const animatedEhTotalAmt = useCountUp(ehTotalAmt);
+
+  const tenantsPaidCount = stats?.tenantsPaidCount || 0;
+  const tenantsRemainingToPayCount = stats?.tenantsRemainingToPayCount || 0;
 
   const [showExport, setShowExport] = useState(false);
   const exportRef = useRef(null);
-  /* ================= COMMON EXPORT DATA ================= */
   const getRevenueLabel = () => {
 
     if (startDate && endDate)
-      return `Revenue (${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")})`;
+      return `Revenue & Expenditure (${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")})`;
 
     if (filter === "DAY")
       return startDate
-        ? `Revenue of ${format(startDate, "dd MMM yyyy")}`
-        : "Revenue of Selected Day";
+        ? `Revenue & Expenditure of ${format(startDate, "dd MMM yyyy")}`
+        : "Revenue & Expenditure of Selected Day";
 
     if (filter === "WEEK")
-      return "Revenue of Current Week";
+      return "Revenue & Expenditure of Current Week";
 
     if (filter === "MONTH")
-      return "Revenue of Current Month";
+      return "Revenue & Expenditure of Current Month";
 
     if (filter === "YEAR")
-      return "Revenue of Current Year";
+      return "Revenue & Expenditure of Current Year";
 
-    return "Revenue Report";
+    return "Revenue & Expenditure Report";
   };
 
   /* ---------- CURRENCY FORMATTERS ---------- */
@@ -460,13 +607,8 @@ const OwnerRevenue = () => {
 
   const reportRows = [
     {
-      label: "Net Revenue",
-      value: collectionsInRange,
-      type: "currency",
-    },
-    {
-      label: "Total Revenue",
-      value: totalRevenue,
+      label: "Potential Revenue",
+      value: potentialRevenue,
       type: "currency",
     },
     {
@@ -474,28 +616,41 @@ const OwnerRevenue = () => {
       value: totalRentCollected,
       type: "currency",
     },
-    { label: "Future Deposit Refund", value: futureDepositRefund, type: "currency" },
     {
-      label: "Deposit Held",
+      label: "Security Deposits Held",
       value: totalDepositHeld,
       type: "currency",
+    },
+    {
+      label: "Total Income",
+      value: totalRevenue,
+      type: "currency",
+    },
+    {
+      label: "Pending Rent",
+      value: stats?.revenuePending || 0,
+      type: "currency",
+    },
+    {
+      label: "Overdue Rent",
+      value: stats?.revenueOverdue || 0,
+      type: "currency",
+    },
+    {
+      label: "Future Deposit Refund",
+      value: futureDepositRefund,
+      type: "currency",
+    },
+    {
+      label: "Collection Rate",
+      value: colRate,
+      type: "percentage",
     },
     {
       label: "Active Residents",
       value: totalActiveResidents,
       type: "number",
     },
-    {
-      label: "Reserved Residents",
-      value: totalReservedResidents,
-      type: "number",
-    },
-    /*
-    {
-      label: "Total Enquiries",
-      value: totalEnquiries,
-      type: "number",
-    },*/
     {
       label: "Avg Revenue / Resident",
       value: avgRevenuePerResident,
@@ -514,7 +669,7 @@ const OwnerRevenue = () => {
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(18);
-    pdf.text("Revenue Analytics Report", 20, 20);
+    pdf.text("Revenue & Expenditure Report", 20, 20);
 
     pdf.setFontSize(13);
     pdf.text(getRevenueLabel(), 20, 30);
@@ -557,7 +712,7 @@ const OwnerRevenue = () => {
       y += 9;
     });
 
-    pdf.save("RevenueAnalytics.pdf");
+    pdf.save("RevenueAndExpenditure.pdf");
     setShowExport(false);
   };
 
@@ -566,7 +721,7 @@ const OwnerRevenue = () => {
 
     /* ---------- BUILD DATA ---------- */
     const data = [
-      ["Revenue Analytics Report"],
+      ["Revenue & Expenditure Report"],
       [getRevenueLabel()],
       [],
       ["Metric", "Value"],
@@ -606,17 +761,36 @@ const OwnerRevenue = () => {
     XLSX.utils.book_append_sheet(
       wb,
       ws,
-      "Revenue Analytics"
+      "Revenue & Expenditure"
     );
 
     /* ---------- DOWNLOAD ---------- */
     XLSX.writeFile(
       wb,
-      "RevenueAnalytics.xlsx"
+      "RevenueExpenditure.xlsx"
     );
 
     setShowExport(false);
   };
+
+  /* ================= EXPENDITURE EXCEL ================= */
+  const exportExpenditureExcel = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (selectedPgId !== "ALL") params.append("pgId", selectedPgId);
+      if (startDate) params.append("startDate", format(startDate, "yyyy-MM-dd"));
+      if (endDate) params.append("endDate", format(endDate, "yyyy-MM-dd"));
+
+      const response = await api.get(`/owner/expenditures/export?${params.toString()}`, {
+        responseType: 'blob'
+      });
+      saveAs(response.data, "ExpenditureLedger.xlsx");
+      setShowExport(false);
+    } catch (err) {
+      console.error("Failed to export expenditures", err);
+    }
+  };
+
   /* ================= WORD ================= */
   const exportWord = () => {
     const rowsHTML = reportRows.map((row) => {
@@ -671,7 +845,7 @@ const OwnerRevenue = () => {
 
   <body>
 
-    <h2>Revenue Analytics Report</h2>
+    <h2>Revenue & Expenditure Report</h2>
     <h4>${getRevenueLabel()}</h4>
 
     <table>
@@ -715,8 +889,8 @@ const OwnerRevenue = () => {
   }, []);
   return (
     <DashboardLayout
-      title="Revenue Analytics"
-      subtitle="Advanced PG performance insights"
+      title="Revenue & Expenditure"
+      subtitle="Your complete financial ledger"
 
       rightAction={
         <div className="dashboard-export-wrapper">
@@ -725,14 +899,19 @@ const OwnerRevenue = () => {
             className="dashboard-export-btn"
             onClick={() => setShowExport(!showExport)}
           >
-            <i className="bi bi-download"></i> Export
+            <div className="export-icon-box">
+              <i className="bi bi-download"></i>
+            </div>
+            <span>Export</span>
+            <i className="bi bi-chevron-right export-chevron"></i>
           </button>
 
           {showExport && (
             <div className="dashboard-export-dropdown">
               <button onClick={exportPDF}>Export as PDF</button>
               <button onClick={exportWord}>Export as Word</button>
-              <button onClick={exportExcel}>Export as Excel</button>
+              <button onClick={exportExcel}>Export Revenue Excel</button>
+              <button onClick={exportExpenditureExcel} style={{ color: '#ef4444', fontWeight: '600' }}>Export Expenditure</button>
             </div>
           )}
 
@@ -741,15 +920,76 @@ const OwnerRevenue = () => {
     >
 
       <div className="owner-revenue-container" ref={exportRef}>
-        {loading && <div className="loader">Loading...</div>}
+        
+
+        {loading && (
+          <div className="owner-revenue-container skeleton-container">
+            <div className="skeleton-top-bar">
+              <div className="filter-row" style={{ display: 'flex', gap: '16px' }}>
+                <div className="skeleton-box skeleton-filter"></div>
+                <div className="skeleton-box skeleton-filter"></div>
+              </div>
+              <div className="skeleton-box skeleton-btn"></div>
+            </div>
+            
+            <div className="skeleton-kpi-grid">
+              <div className="skeleton-box skeleton-kpi-card"></div>
+              <div className="skeleton-box skeleton-kpi-card"></div>
+              <div className="skeleton-box skeleton-kpi-card"></div>
+              <div className="skeleton-box skeleton-kpi-card"></div>
+            </div>
+            
+            <div className="skeleton-analytics-grid">
+              <div className="skeleton-box skeleton-chart-small"></div>
+              <div className="skeleton-box skeleton-chart-large"></div>
+            </div>
+
+            <div className="skeleton-expense-history">
+              <div className="skeleton-eh-top">
+                 <div className="skeleton-box skeleton-eh-title"></div>
+                 <div className="skeleton-eh-filters">
+                   <div className="skeleton-box skeleton-filter" style={{ flex: 1 }}></div>
+                   <div className="skeleton-box skeleton-filter" style={{ flex: 1 }}></div>
+                   <div className="skeleton-box skeleton-filter" style={{ flex: 2 }}></div>
+                 </div>
+              </div>
+              
+              <div className="skeleton-kpi-grid">
+                <div className="skeleton-box skeleton-kpi-card"></div>
+                <div className="skeleton-box skeleton-kpi-card"></div>
+                <div className="skeleton-box skeleton-kpi-card"></div>
+                <div className="skeleton-box skeleton-kpi-card"></div>
+              </div>
+
+              <div className="skeleton-eh-table">
+                 <div className="skeleton-box skeleton-eh-row"></div>
+                 <div className="skeleton-box skeleton-eh-row"></div>
+                 <div className="skeleton-box skeleton-eh-row"></div>
+                 <div className="skeleton-box skeleton-eh-row"></div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {!loading && (
           <>
             {/* FILTER */}
             <div className="top-bar">
 
-              <div className="filter-row">
-                <div className="filter-dropdown-wrapper" ref={monthRef}>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                {pgs.length > 0 && (
+                  <select
+                    className="rev-pg-filter"
+                    value={selectedPgId}
+                    onChange={e => setSelectedPgId(e.target.value)}
+                  >
+                    <option value="ALL">All PGs</option>
+                    {pgs.map(pg => <option key={pg.id} value={pg.id}>{pg.name}</option>)}
+                  </select>
+                )}
+
+                <div className="filter-row">
+                  <div className="filter-dropdown-wrapper" ref={monthRef}>
                   <button
                     onClick={() => {
                       setFilter("MONTH");
@@ -891,83 +1131,81 @@ const OwnerRevenue = () => {
                 )}
 
               </div>
+              </div>
+              
+              <div style={{ flex: 1 }}></div>
 
+              <button 
+                className="btn-add-expense" 
+                onClick={() => navigate('/owner/revenue/add-expense')}
+              >
+                + Add Expense
+              </button>
 
             </div>
 
             {/* KPI GRID */}
             <div className="owner-kpi-grid">
-
               <KPI
                 title="Total Revenue"
                 value={`₹${animatedTotalRevenue.toLocaleString()}`}
-                icon="bi bi-cash-stack"
-                color="kpi-orange"
+                icon="bi bi-wallet2"
+                color="kpi-green"
               />
-
-
               <KPI
                 title="Rent Collected"
-                value={`₹${animatedRent.toLocaleString()}`}
+                value={`₹${animatedRentCollected.toLocaleString()}`}
                 icon="bi bi-wallet2"
                 color="kpi-purple"
               />
               <KPI
                 title="Deposit Held"
-                value={`₹${animatedDeposit.toLocaleString()}`}
+                value={`₹${animatedDepositHeld.toLocaleString()}`}
                 icon="bi bi-safe"
                 color="kpi-green"
               />
-
               <KPI
                 title="Future Deposit Refund"
                 value={`₹${animatedFutureRefund.toLocaleString()}`}
                 icon="bi bi-calendar-check"
                 color="kpi-red"
               />
-
               <KPI
-                title="Active Residents"
-                value={totalActiveResidents}
-                icon="bi bi-person-check"
-                color="kpi-green"
-                onClick={() => navigate("/owner/residents")}
-              />
-              <KPI
-                title="Reserved Residents"
-                value={totalReservedResidents}
-                icon="bi bi-bookmark-check"
+                title="Potential Revenue"
+                value={`₹${animatedPotential.toLocaleString()}`}
+                icon="bi bi-house-door"
                 color="kpi-purple"
-                onClick={() => navigate("/owner/residents")}
+                trend={{ direction: 'up', value: '8.3%' }}
               />
-
-              {/*
               <KPI
-                title="Total Enquiries"
-                value={totalEnquiries}
-                icon="bi bi-chat-dots"
-                color="kpi-blue"
-                onClick={() => navigate("/owner/enquiries")}
-              />
-              */}
-
-
-              {/* 
-               <KPI
-                title="Net Revenue"
-                value={`₹${animatedRevenue.toLocaleString()}`}
-                icon="bi bi-currency-rupee"
-                color="kpi-blue"
+                title="Total Expenses"
+                value={`₹${animatedExpenses.toLocaleString()}`}
+                icon="bi bi-graph-down"
+                color="kpi-red"
+                trend={{ direction: 'up', value: '5.8%' }}
               />
 
-               <KPI
-                title="Avg Revenue / Resident"
-                value={`₹${animatedAvg.toLocaleString()}`}
-                icon="bi bi-graph-up-arrow"
+              <KPI
+                title="Pending Rent"
+                value={`₹${animatedPendingRent.toLocaleString()}`}
+                icon="bi bi-hourglass"
                 color="kpi-blue"
+                trend={{ direction: 'down', value: '100%' }}
               />
-              */}
-
+              <KPI
+                title="Overdue Rent"
+                value={`₹${animatedOverdueRent.toLocaleString()}`}
+                icon="bi bi-exclamation-triangle"
+                color="kpi-red"
+                trend={{ direction: 'up', value: '14.7%' }}
+              />
+              <KPI
+                title="Collection Rate"
+                value={`${animatedColRate}%`}
+                icon="bi bi-percent"
+                color="kpi-blue"
+                trend={{ direction: 'up', value: '15.3%' }}
+              />
             </div>
 
 
@@ -976,8 +1214,8 @@ const OwnerRevenue = () => {
               <div className="chart-card small-card" style={{ textAlign: 'center' }}>
                 <h3>Occupancy Rate</h3>
 
-                <div style={{ position: 'relative', margin: '40px auto 0' }}>
-                  <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
+                <div style={{ position: 'relative', margin: '30px auto 0' }}>
+                  <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
                         data={[
@@ -988,8 +1226,8 @@ const OwnerRevenue = () => {
                         cx="50%"
                         cy="50%"
                         label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                        innerRadius={isMobile ? 50 : 60}
-                        outerRadius={isMobile ? 75 : 90}
+                        innerRadius={isMobile ? 45 : 55}
+                        outerRadius={isMobile ? 65 : 75}
                       >
                         {[
                           { name: "Occupied", value: occupancyRate, fill: "#6366f1" },
@@ -1009,17 +1247,19 @@ const OwnerRevenue = () => {
 
               <div className="chart-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <h3 style={{ margin: 0 }}>Revenue Trend</h3>
+                  <h3 style={{ margin: 0 }}>
+                    {chartMetric === "COLLECTED" ? "Collected vs Potential" : "Revenue vs Expense"}
+                  </h3>
                   <div className="chart-toggle-wrapper">
                     <button
-                      className={`chart-toggle-switch ${chartType}`}
-                      onClick={() => setChartType(chartType === "area" ? "bar" : "area")}
-                      aria-label="Toggle Chart Type"
+                      className={`chart-toggle-switch ${chartMetric === "REVENUE_EXPENSE" ? "area" : ""}`}
+                      onClick={() => setChartMetric(chartMetric === "COLLECTED" ? "REVENUE_EXPENSE" : "COLLECTED")}
+                      aria-label="Toggle Chart Metric"
                     >
                       <span className="chart-toggle-thumb"></span>
                     </button>
                     <span className="chart-toggle-label">
-                      {chartType === "area" ? "Bar Chart" : "Line Chart"}
+                      {chartMetric === "COLLECTED" ? "View Expenses" : "View Potential"}
                     </span>
                   </div>
                 </div>
@@ -1032,9 +1272,8 @@ const OwnerRevenue = () => {
 
                 ) : (
 
-                  <ResponsiveContainer width="100%" height={isMobile ? 260 : 380}>
-                    {chartType === "area" ? (
-                      <AreaChart
+                  <ResponsiveContainer width="100%" height={isMobile ? 260 : 300}>
+                      <BarChart
                         data={chartData}
                         margin={
                           isMobile
@@ -1043,68 +1282,6 @@ const OwnerRevenue = () => {
                         }
                       >
                         <CartesianGrid strokeDasharray="3 3" />
-
-                        <XAxis
-                          dataKey="date"
-                          tick={{ fontSize: 9 }}
-                          tickLine={false}
-                          interval={0}
-                          angle={-90}
-                          textAnchor="end"
-                          height={70}
-                        />
-
-                        <YAxis
-                          width={isMobile ? 48 : 60}
-                          tick={{ fontSize: isMobile ? 10 : 13 }}
-                          tickFormatter={(v) =>
-                            isMobile
-                              ? v >= 1000
-                                ? `₹${(v / 1000).toFixed(0)}k`
-                                : `₹${v}`
-                              : `₹${v}`
-                          }
-                        />
-
-                        <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, "Revenue"]} />
-                        <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
-
-                        <Area
-                          type="monotone"
-                          dataKey="revenue"
-                          stroke="#6366f1"
-                          fill="#6366f1"
-                          fillOpacity={0.4}
-                        >
-                          {!isMobile && (
-                            <LabelList
-                              dataKey="revenue"
-                              content={({ x, y, value, index }) => (
-                                <text
-                                  x={x}
-                                  y={y - (index % 2 === 0 ? 10 : 24)}
-                                  textAnchor="middle"
-                                  fontSize={10}
-                                  fill="#4338ca"
-                                  fontWeight={600}
-                                >
-                                  {`₹${value}`}
-                                </text>
-                              )}
-                            />
-                          )}
-                        </Area>
-                      </AreaChart>
-                    ) : (
-                      <BarChart
-                        data={chartData}
-                        margin={
-                          isMobile
-                            ? { top: 16, right: 30, left: 10, bottom: 40 }
-                            : { top: 20, right: 40, left: 20, bottom: 60 }
-                        }
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                           dataKey="date"
                           tick={{ fontSize: 9 }}
@@ -1125,62 +1302,791 @@ const OwnerRevenue = () => {
                               : `₹${v}`
                           }
                         />
-                        <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, "Revenue"]} />
-                        <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
-                        <Bar dataKey="revenue" fill="#6366f1" radius={[4, 4, 0, 0]}>
-                          {!isMobile && (
-                            <LabelList
-                              dataKey="revenue"
-                              content={({ x, y, width, value, index }) => (
-                                <text
-                                  x={x + width / 2}
-                                  y={y - (index % 2 === 0 ? 8 : 20)}
-                                  textAnchor="middle"
-                                  fontSize={10}
-                                  fill="#4338ca"
-                                  fontWeight={600}
-                                >
-                                  {`₹${value}`}
-                                </text>
+                        
+                        {chartMetric === "COLLECTED" ? (
+                          <>
+                            <Tooltip formatter={(v, name) => [`₹${v.toLocaleString()}`, name === "revenue" ? "Collected" : "Potential"]} />
+                            <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
+                            <Bar dataKey="potential" fill="#fbbf24" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                            <Bar dataKey="revenue" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={36}>
+                              {!isMobile && (
+                                <LabelList
+                                  dataKey="revenue"
+                                  content={({ x, y, width, value, index }) => (
+                                    <text
+                                      x={x + width / 2}
+                                      y={y - (index % 2 === 0 ? 8 : 20)}
+                                      textAnchor="middle"
+                                      fontSize={10}
+                                      fill="#4338ca"
+                                      fontWeight={600}
+                                    >
+                                      {`₹${value}`}
+                                    </text>
+                                  )}
+                                />
                               )}
-                            />
-                          )}
-                        </Bar>
+                            </Bar>
+                          </>
+                        ) : (
+                          <>
+                            <Tooltip formatter={(v, name) => [`₹${v.toLocaleString()}`, name === "revenue" ? "Revenue" : "Expense"]} />
+                            <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
+                            <Bar dataKey="revenue" name="Revenue (₹)" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                            <Bar dataKey="expense" name="Expense (₹)" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                          </>
+                        )}
                       </BarChart>
-                    )}
                   </ResponsiveContainer>
 
                 )}
               </div>
+
             </div>
+
+            {/* BREAKDOWN CHARTS */}
+            {(() => {
+              // Revenue Breakdown Data
+              const revenueBreakdown = [
+                { name: 'Rent Collected', value: 0, color: '#4f46e5' },
+                { name: 'Onboarding Rent', value: 0, color: '#fbbf24' },
+                { name: 'Deposit Deductions', value: 0, color: '#ef4444' }
+              ];
+
+              rentRecords.forEach((rec) => {
+                if (rec.status === "PAID" && isDateInFilter(toDate(rec.paidDate))) {
+                  revenueBreakdown[0].value += Number(rec.rentAmount || 0);
+                }
+              });
+
+              residents.forEach((r) => {
+                if (isDateInFilter(getRevenueDate(r))) {
+                  revenueBreakdown[1].value += Number(r.monthlyRent || 0);
+                }
+                const checkoutDate = toDate(r.actualCheckoutDate);
+                if (isDateInFilter(checkoutDate)) {
+                  const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
+                  if (damage > 0) revenueBreakdown[2].value += damage;
+                }
+              });
+
+              const totalRevenueBreakdown = revenueBreakdown.reduce((acc, curr) => acc + curr.value, 0);
+
+              // Expense Breakdown Data
+              const EXPENSE_COLORS = ['#ef4444', '#4f46e5', '#34d399', '#fbbf24', '#8b5cf6', '#ec4899', '#06b6d4'];
+              const expenseDataMap = {};
+              expenditures.filter(exp => isDateInFilter(new Date(exp.expenseDate || exp.date))).forEach(exp => {
+                const cat = (exp.category || 'Other').replace(/_/g, ' ');
+                if (!expenseDataMap[cat]) expenseDataMap[cat] = 0;
+                expenseDataMap[cat] += Number(exp.amount || 0);
+              });
+              
+              const expenseBreakdown = Object.keys(expenseDataMap).map((key, i) => ({
+                name: key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),
+                value: expenseDataMap[key],
+                color: EXPENSE_COLORS[i % EXPENSE_COLORS.length]
+              }));
+              
+              const totalExpenseBreakdown = expenseBreakdown.reduce((acc, curr) => acc + curr.value, 0);
+
+              return (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px', marginTop: '24px', marginBottom: '24px' }}>
+                  <DonutBreakdownChart 
+                    title="Revenue Breakdown" 
+                    data={revenueBreakdown} 
+                    totalLabel="Total Revenue" 
+                    totalValue={totalRevenueBreakdown} 
+                  />
+                  <DonutBreakdownChart 
+                    title="Expense Breakdown" 
+                    data={expenseBreakdown} 
+                    totalLabel="Total Expenses" 
+                    totalValue={totalExpenseBreakdown} 
+                  />
+                </div>
+              );
+            })()}
           </>
         )}
       </div>
+
+      {/* ===== EXPENSE HISTORY ===== */}
+      {(() => {
+        const isAllPgs = expHistoryPgId === 'ALL';
+
+        const filteredExpenses = filteredExpensesForEh;
+
+        const handleDeleteExpense = async (expId) => {
+          if (!window.confirm("Are you sure you want to delete this expense?")) return;
+          try {
+            await api.delete(`/owner/expenses/${expId}`);
+            // Refresh expenditures
+            const params = selectedPgId === 'ALL' ? {} : { pgId: selectedPgId };
+            const res = await api.get('/owner/expenses', { params });
+            setExpenditures(Array.isArray(res.data) ? res.data : []);
+          } catch (err) {
+            console.error('Failed to delete expense', err);
+            alert("Failed to delete expense");
+          }
+        };
+
+        const handleMarkPaid = async (expId) => {
+          try {
+            setUpdatingStatus(true);
+            await api.patch(`/owner/expenses/${expId}/status`, {
+              paymentStatus: 'PAID',
+              paymentDate: markPaidForm.paymentDate,
+              paymentMethod: markPaidForm.paymentMethod,
+            });
+            // Refresh expenditures
+            const params = selectedPgId === 'ALL' ? {} : { pgId: selectedPgId };
+            const res = await api.get('/owner/expenses', { params });
+            setExpenditures(Array.isArray(res.data) ? res.data : []);
+            setMarkingPaidId(null);
+          } catch (err) {
+            console.error('Failed to mark as paid', err);
+          } finally {
+            setUpdatingStatus(false);
+          }
+        };
+
+        const ehActivePgs = isAllPgs ? pgs.length : 1;
+
+        return (
+          <div className="expense-history-wrapper">
+            <div className="expense-history-top-bar">
+              <div className="expense-history-title-box">
+                <div className="expense-history-icon">
+                  <i className="bi bi-receipt-cutoff"></i>
+                </div>
+                <div>
+                  <h2>Expense History</h2>
+                  <p>Track all expenses and payments across your PGs</p>
+                </div>
+              </div>
+              <div className="expense-history-filters">
+                <select
+                  value={expHistoryPgId}
+                  onChange={e => setExpHistoryPgId(e.target.value)}
+                  className="eh-filter-select"
+                >
+                  <option value="ALL">All PGs Summary</option>
+                  {pgs.map(pg => (
+                    <option key={pg.id} value={pg.id}>{pg.name || pg.pgName}</option>
+                  ))}
+                </select>
+                <select
+                  value={expHistoryStatus}
+                  onChange={e => setExpHistoryStatus(e.target.value)}
+                  className="eh-filter-select"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="PAID">Paid</option>
+                  <option value="PENDING">Pending</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Search category, title..."
+                  className="eh-filter-input"
+                  value={expHistorySearch}
+                  onChange={e => setExpHistorySearch(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* KPI ROW */}
+            <div className="expense-history-kpi-row">
+              <div className="eh-kpi-card">
+                <div className="eh-kpi-icon" style={{ background: '#eff6ff', color: '#3b82f6' }}>
+                  <i className="bi bi-arrow-left-right"></i>
+                </div>
+                <div className="eh-kpi-info">
+                  <p>Total Transactions</p>
+                  <h3 style={{ color: '#3b82f6' }}>{animatedEhTotalTxs}</h3>
+                  <span>{isAllPgs ? 'Across all PGs' : 'For selected PG'}</span>
+                </div>
+              </div>
+              <div className="eh-kpi-card">
+                <div className="eh-kpi-icon" style={{ background: '#fffbeb', color: '#f59e0b' }}>
+                  <i className="bi bi-hourglass-split"></i>
+                </div>
+                <div className="eh-kpi-info">
+                  <p>Pending Amount</p>
+                  <h3 style={{ color: '#f59e0b' }}>₹{animatedEhPendingAmt.toLocaleString()}</h3>
+                  <span>To be paid</span>
+                </div>
+              </div>
+              <div className="eh-kpi-card">
+                <div className="eh-kpi-icon" style={{ background: '#ecfdf5', color: '#10b981' }}>
+                  <i className="bi bi-check-circle"></i>
+                </div>
+                <div className="eh-kpi-info">
+                  <p>Paid Amount</p>
+                  <h3 style={{ color: '#10b981' }}>₹{animatedEhPaidAmt.toLocaleString()}</h3>
+                  <span>Successfully cleared</span>
+                </div>
+              </div>
+              <div className="eh-kpi-card">
+                <div className="eh-kpi-icon" style={{ background: '#fef2f2', color: '#ef4444' }}>
+                  <i className="bi bi-calculator"></i>
+                </div>
+                <div className="eh-kpi-info">
+                  <p>Total Amount</p>
+                  <h3 style={{ color: '#ef4444' }}>₹{animatedEhTotalAmt.toLocaleString()}</h3>
+                  <span>Total expenses recorded</span>
+                </div>
+              </div>
+              <div className="eh-kpi-card">
+                <div className="eh-kpi-icon" style={{ background: '#f0f9ff', color: '#0ea5e9' }}>
+                  <i className="bi bi-building"></i>
+                </div>
+                <div className="eh-kpi-info">
+                  <p>Total PGs</p>
+                  <h3 style={{ color: '#0ea5e9' }}>{ehActivePgs}</h3>
+                  <span>{isAllPgs ? 'Active PGs' : 'Selected PG'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="expense-table-container">
+              {isAllPgs ? (
+                // --- SUMMARY VIEW (Grouped by PG) ---
+                <table className="expense-floating-table">
+                  <thead>
+                    <tr>
+                      <th><i className="bi bi-building"></i> PG NAME</th>
+                      <th><i className="bi bi-arrow-left-right"></i> TOTAL TRANSACTIONS</th>
+                      <th><i className="bi bi-clock-history"></i> PENDING AMOUNT</th>
+                      <th><i className="bi bi-check-circle"></i> PAID AMOUNT</th>
+                      <th><i className="bi bi-credit-card"></i> TOTAL AMOUNT</th>
+                      <th>ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pgs.length === 0 ? (
+                      <tr className="eh-row">
+                        <td colSpan="6" style={{ textAlign: 'center', color: '#94a3b8' }}>
+                          No PGs found.
+                        </td>
+                      </tr>
+                    ) : pgs.map(pg => {
+                      const pgExps = filteredExpenses.filter(e => e.pgId === pg.id);
+                      if (pgExps.length === 0 && expHistoryStatus !== 'ALL') return null;
+
+                      const totalTxs = pgExps.length;
+                      const pendingAmt = pgExps.filter(e => (e.paymentStatus||'').toUpperCase() === 'PENDING').reduce((s, e) => s + (e.amount||0), 0);
+                      const paidAmt = pgExps.filter(e => (e.paymentStatus||'').toUpperCase() !== 'PENDING').reduce((s, e) => s + (e.amount||0), 0);
+                      const totalAmt = pendingAmt + paidAmt;
+
+                      return (
+                        <tr key={pg.id} className="eh-row">
+                          <td data-label="PG Name">
+                            <div className="eh-pg-name-cell">
+                              <div className="eh-avatar">{(pg.name || pg.pgName || 'P').charAt(0).toUpperCase()}</div>
+                              {pg.name || pg.pgName}
+                            </div>
+                          </td>
+                          <td data-label="Transactions">{totalTxs}</td>
+                          <td data-label="Pending" style={{ color: '#f59e0b', fontWeight: 600 }}>₹{pendingAmt.toLocaleString()}</td>
+                          <td data-label="Paid" style={{ color: '#10b981', fontWeight: 600 }}>₹{paidAmt.toLocaleString()}</td>
+                          <td data-label="Total" style={{ color: '#ef4444', fontWeight: 700 }}>₹{totalAmt.toLocaleString()}</td>
+                          <td data-label="Action">
+                            <button
+                              className="eh-btn-view"
+                              onClick={() => setExpHistoryPgId(pg.id)}
+                            >
+                              View Details →
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                // --- DETAILED VIEW (Transactions for 1 PG) ---
+                <table className="expense-floating-table">
+                  <thead>
+                    <tr>
+                      <th><i className="bi bi-calendar"></i> DATE</th>
+                      <th><i className="bi bi-tag"></i> CATEGORY</th>
+                      <th><i className="bi bi-card-text"></i> DESCRIPTION</th>
+                      <th><i className="bi bi-person"></i> PAID TO</th>
+                      <th><i className="bi bi-currency-rupee"></i> AMOUNT</th>
+                      <th><i className="bi bi-check-circle"></i> STATUS</th>
+                      <th>ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredExpenses.length === 0 && (
+                      <tr className="eh-row">
+                        <td colSpan="7" style={{ textAlign: 'center', color: '#94a3b8' }}>
+                          No expenses found for this PG.
+                        </td>
+                      </tr>
+                    )}
+                    {filteredExpenses
+                      .sort((a, b) => new Date(b.expenseDate || b.createdAt) - new Date(a.expenseDate || a.createdAt))
+                      .map((exp, i) => {
+                      const isPending = (exp.paymentStatus || '').toUpperCase() === 'PENDING';
+                      const isMarkingThis = markingPaidId === exp.id;
+
+                      return (
+                        <Fragment key={exp.id || i}>
+                          <tr className="eh-row">
+                            <td data-label="Date">
+                              <div className="eh-pg-name-cell">
+                                <div className="eh-avatar" style={{ background: '#f1f5f9', color: '#64748b' }}>
+                                  <i className="bi bi-calendar-event"></i>
+                                </div>
+                                {exp.expenseDate ? format(new Date(exp.expenseDate), 'dd MMM yyyy') : '—'}
+                              </div>
+                            </td>
+                            <td data-label="Category">{exp.category || '—'}</td>
+                            <td data-label="Description">{exp.title || '—'}</td>
+                            <td data-label="Paid To">{exp.paidTo || '—'}</td>
+                            <td data-label="Amount" style={{ color: '#ef4444', fontWeight: 600 }}>
+                              ₹{Number(exp.amount || 0).toLocaleString()}
+                            </td>
+                            <td data-label="Status">
+                              {isPending
+                                ? <span className="rev-status-badge rev-status-pending">Pending</span>
+                                : <span className="rev-status-badge rev-status-paid">Paid</span>}
+                            </td>
+                            <td data-label="Action">
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                {isPending && (
+                                  <button
+                                    onClick={() => setMarkingPaidId(isMarkingThis ? null : exp.id)}
+                                    className="eh-btn-view"
+                                    style={{ background: isMarkingThis ? '#10b981' : '#ecfdf5', color: isMarkingThis ? '#fff' : '#10b981' }}
+                                  >
+                                    {isMarkingThis ? 'Cancel' : 'Mark Paid'}
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteExpense(exp.id)}
+                                  title="Delete Expense"
+                                  style={{
+                                    background: 'transparent', border: 'none', color: '#ef4444', 
+                                    cursor: 'pointer', padding: '4px', fontSize: '14px'
+                                  }}
+                                >
+                                  <i className="bi bi-trash3"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {isMarkingThis && (
+                            <tr className="eh-row">
+                              <td colSpan="7" style={{ padding: '12px 24px', background: '#f8fffe' }}>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>Payment Date:</label>
+                                  <input
+                                    type="date"
+                                    value={markPaidForm.paymentDate}
+                                    onChange={e => setMarkPaidForm(f => ({ ...f, paymentDate: e.target.value }))}
+                                    className="eh-filter-input"
+                                    style={{ width: '160px' }}
+                                  />
+                                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>Method:</label>
+                                  <select
+                                    value={markPaidForm.paymentMethod}
+                                    onChange={e => setMarkPaidForm(f => ({ ...f, paymentMethod: e.target.value }))}
+                                    className="eh-filter-select"
+                                    style={{ width: 'auto' }}
+                                  >
+                                    {['CASH','UPI','BANK_TRANSFER','CREDIT_CARD','DEBIT_CARD','CHEQUE','NET_BANKING'].map(m => (
+                                      <option key={m} value={m}>{m.replace('_',' ')}</option>
+                                    ))}
+                                  </select>
+                                  <button
+                                    onClick={() => handleMarkPaid(exp.id)}
+                                    disabled={updatingStatus}
+                                    style={{
+                                      padding: '7px 18px', borderRadius: '6px', border: 'none',
+                                      background: '#10b981', color: '#fff', fontWeight: 700,
+                                      fontSize: '13px', cursor: 'pointer',
+                                    }}
+                                  >
+                                    {updatingStatus ? 'Saving...' : 'Confirm Paid'}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
     </DashboardLayout>
   );
 };
 
-const KPI = ({ title, value, icon, color, onClick }) => (
+const KPI = ({ title, value, subtitle, trend, icon, color, onClick }) => (
   <div
     className={`kpi-card ${color || ""}`}
     style={{ cursor: onClick ? "pointer" : "default" }}
     onClick={onClick}
   >
-    <div className="kpi-header">
-
-      <div className="kpi-info">
-        <span>{title}</span>
-        <h2>{value}</h2>
+    {icon && (
+      <div className="kpi-icon">
+        <i className={icon}></i>
       </div>
-
-      {icon && (
-        <div className="kpi-icon">
-          <i className={icon}></i>
-        </div>
-      )}
-
+    )}
+    <div className="kpi-content">
+      <span className="kpi-title">{title}</span>
+      <h2 className="kpi-value">{value}</h2>
+      {subtitle && <div className="kpi-subtitle">{subtitle}</div>}
     </div>
   </div>
 );
+
+const PLSummaryCard = ({
+  potentialRevenue,
+  rentCollected,
+  securityDepositsHeld,
+  totalIncome,
+  pendingRent,
+  overdueRent,
+  futureDepositRefunds,
+  colRate,
+  totalExpenses,
+  netProfit,
+  periodLabel
+}) => {
+  return (
+    <div className="pl-card">
+      <div className="pl-card-header">
+        <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <i className="bi bi-bar-chart-fill" style={{ color: 'var(--accent-from)' }}></i> Financial Summary
+        </h3>
+        <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>{periodLabel}</span>
+      </div>
+
+      <div className="pl-grid">
+        <div className="pl-col">
+          <div className="pl-section">
+            <div className="pl-section-label">INCOME</div>
+            <div className="pl-row pl-header-row">
+              <div className="pl-row-label"></div>
+              <div className="pl-row-potential">POTENTIAL</div>
+              <div className="pl-row-actual">COLLECTED</div>
+            </div>
+            <div className="pl-row">
+              <div className="pl-row-label">Rent Revenue</div>
+              <div className="pl-row-potential">₹{potentialRevenue.toLocaleString()}</div>
+              <div className="pl-row-actual">₹{rentCollected.toLocaleString()}</div>
+            </div>
+            <div className="pl-row">
+              <div className="pl-row-label">Security Deposits Held</div>
+              <div className="pl-row-potential"><span style={{ color: "var(--text-muted)", opacity: 0.5 }}>—</span></div>
+              <div className="pl-row-actual">₹{securityDepositsHeld.toLocaleString()}</div>
+            </div>
+            <div className="pl-row pl-total-row">
+              <div className="pl-row-label">TOTAL INCOME</div>
+              <div className="pl-row-potential">₹{potentialRevenue.toLocaleString()}</div>
+              <div className="pl-row-actual">₹{totalIncome.toLocaleString()}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pl-col" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          <div className="pl-section">
+            <div className="pl-section-label">OUTSTANDING</div>
+            <div className="pl-row pl-header-row">
+              <div className="pl-row-label"></div>
+              <div className="pl-row-actual">AMOUNT</div>
+            </div>
+            <div className="pl-row">
+              <div className="pl-row-label">Pending Rent</div>
+              <div className="pl-row-actual">₹{(pendingRent || 0).toLocaleString()}</div>
+            </div>
+            <div className="pl-row">
+              <div className="pl-row-label">Overdue Rent</div>
+              <div className="pl-row-actual">₹{(overdueRent || 0).toLocaleString()}</div>
+            </div>
+            <div className="pl-row">
+              <div className="pl-row-label">Future Deposit Refunds</div>
+              <div className="pl-row-actual">₹{futureDepositRefunds.toLocaleString()}</div>
+            </div>
+          </div>
+
+          <div className="pl-section">
+            <div className="pl-section-label">EXPENSES & PROFIT</div>
+            <div className="pl-row pl-header-row">
+              <div className="pl-row-label"></div>
+              <div className="pl-row-actual">AMOUNT</div>
+            </div>
+            <div className="pl-row">
+              <div className="pl-row-label">Total Expenses</div>
+              <div className="pl-row-actual" style={{color: 'var(--kpi-red)'}}>- ₹{(totalExpenses || 0).toLocaleString()}</div>
+            </div>
+            <div className="pl-row pl-total-row">
+              <div className="pl-row-label">NET PROFIT</div>
+              <div className="pl-row-actual" style={{color: 'var(--kpi-green)'}}>₹{(netProfit || 0).toLocaleString()}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="pl-footer">
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-muted)' }}>COLLECTION RATE</span>
+          <span style={{ fontSize: '13px', fontWeight: '800', color: 'var(--accent-from)' }}>{colRate}%</span>
+        </div>
+        <div className="pl-collection-bar-wrap">
+          <div className="pl-collection-bar-fill" style={{ width: `${Math.min(colRate, 100)}%` }}></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ResidentLedger = ({ residents, rentRecords, isDateInFilter }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "name", direction: "asc" });
+
+  const ledgerData = useMemo(() => {
+    return residents
+      .filter((r) => isDateInFilter(new Date(r.createdAt || r.onboardingPaymentDate || r.checkinDate)))
+      .map((r) => {
+        // Find latest rent record for this resident in the filter
+        const records = rentRecords.filter(rec => rec.residentId === r.id && isDateInFilter(new Date(rec.paidDate)));
+        const latestRecord = records.sort((a, b) => new Date(b.paidDate) - new Date(a.paidDate))[0];
+
+        return {
+          id: r.id,
+          name: r.name || "Unknown",
+          room: r.roomNumber || r.room || "—",
+          rentAmount: r.monthlyRent || 0,
+          status: latestRecord ? latestRecord.status : (r.status === 'ACTIVE' ? 'PENDING' : r.status),
+          paidOn: latestRecord?.paidDate ? format(new Date(latestRecord.paidDate), "dd MMM") : "—",
+          deposit: r.deposit || 0
+        };
+      });
+  }, [residents, rentRecords, isDateInFilter]);
+
+  const filteredData = useMemo(() => {
+    let data = [...ledgerData];
+    if (searchTerm) {
+      data = data.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    if (sortConfig.key) {
+      data.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return data;
+  }, [ledgerData, searchTerm, sortConfig]);
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getStatusBadge = (status) => {
+    const s = (status || "").toUpperCase();
+    if (s === "PAID") return <span className="rev-status-badge rev-status-paid">Paid</span>;
+    if (s === "PENDING") return <span className="rev-status-badge rev-status-pending">Pending</span>;
+    if (s === "OVERDUE") return <span className="rev-status-badge rev-status-overdue">Overdue</span>;
+    if (s === "RESERVED") return <span className="rev-status-badge rev-status-reserved">Reserved</span>;
+    return <span className="rev-status-badge">{status}</span>;
+  };
+
+  if (ledgerData.length === 0) return null;
+
+  return (
+    <div className="rev-ledger-section" style={{ borderLeft: '4px solid #10b981' }}>
+      <div className="rev-ledger-header">
+        <div className="rev-ledger-header-left">
+          <div className="rev-ledger-icon" style={{ background: '#ecfdf5', color: '#10b981' }}>
+            <i className="bi bi-people"></i>
+          </div>
+          <div>
+            <p className="rev-ledger-title">Resident Ledger</p>
+          </div>
+        </div>
+        <input 
+          type="text" 
+          placeholder="Search resident..." 
+          className="rev-search-input"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="rev-table-container">
+        <table className="rev-table">
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("name")}>Resident Name {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("room")}>Room {sortConfig.key === "room" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("rentAmount")}>Rent Amount {sortConfig.key === "rentAmount" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("status")}>Status {sortConfig.key === "status" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("paidOn")}>Paid On {sortConfig.key === "paidOn" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("deposit")}>Deposit {sortConfig.key === "deposit" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map((row, i) => (
+              <tr key={row.id || i} className="rev-table-row">
+                <td data-label="Resident Name" className="font-medium">{row.name}</td>
+                <td data-label="Room">{row.room}</td>
+                <td data-label="Rent Amount" className="font-semibold text-indigo">₹{row.rentAmount.toLocaleString()}</td>
+                <td data-label="Status">{getStatusBadge(row.status)}</td>
+                <td data-label="Paid On">{row.paidOn}</td>
+                <td data-label="Deposit">₹{row.deposit.toLocaleString()}</td>
+              </tr>
+            ))}
+            {filteredData.length === 0 && (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
+                  No residents found matching your search.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const ExpenseLedger = ({ expenditures, isDateInFilter }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "date", direction: "desc" });
+
+  const ledgerData = useMemo(() => {
+    return expenditures
+      .filter((exp) => isDateInFilter(new Date(exp.expenseDate || exp.date)))
+      .map((exp) => {
+        return {
+          id: exp.id,
+          date: exp.expenseDate || exp.date,
+          category: exp.category || "General",
+          title: exp.title || "—",
+          amount: Number(exp.amount || 0),
+          status: exp.paymentStatus || "—",
+          method: exp.paymentMethod || "—",
+          paidTo: exp.paidTo || "—",
+        };
+      });
+  }, [expenditures, isDateInFilter]);
+
+  const filteredData = useMemo(() => {
+    let data = [...ledgerData];
+    if (searchTerm) {
+      data = data.filter(item => 
+        item.category.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.paidTo.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    if (sortConfig.key) {
+      data.sort((a, b) => {
+        let aVal = a[sortConfig.key];
+        let bVal = b[sortConfig.key];
+        
+        if (sortConfig.key === 'date') {
+          aVal = new Date(aVal).getTime();
+          bVal = new Date(bVal).getTime();
+        }
+
+        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return data;
+  }, [ledgerData, searchTerm, sortConfig]);
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getStatusBadge = (status) => {
+    const s = (status || "").toUpperCase();
+    if (s === "PAID") return <span className="rev-status-badge rev-status-paid">Paid</span>;
+    if (s === "PENDING" || s === "UNPAID") return <span className="rev-status-badge rev-status-overdue">Unpaid</span>;
+    return <span className="rev-status-badge">{status}</span>;
+  };
+
+  if (ledgerData.length === 0) return null;
+
+  return (
+    <div className="rev-ledger-section" style={{ marginTop: '24px', borderLeft: '4px solid #ef4444' }}>
+      <div className="rev-ledger-header">
+        <div className="rev-ledger-header-left">
+          <div className="rev-ledger-icon" style={{ background: '#fef2f2', color: '#ef4444' }}>
+            <i className="bi bi-receipt"></i>
+          </div>
+          <div>
+            <p className="rev-ledger-title">Expense Ledger</p>
+          </div>
+        </div>
+        <input 
+          type="text" 
+          placeholder="Search expenses..." 
+          className="rev-search-input"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="rev-table-container">
+        <table className="rev-table">
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("date")}>Date {sortConfig.key === "date" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("category")}>Category {sortConfig.key === "category" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("title")}>Description {sortConfig.key === "title" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("paidTo")}>Paid To {sortConfig.key === "paidTo" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("method")}>Method {sortConfig.key === "method" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("amount")}>Amount {sortConfig.key === "amount" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+              <th onClick={() => handleSort("status")}>Status {sortConfig.key === "status" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map((row, i) => (
+              <tr key={row.id || i} className="rev-table-row">
+                <td data-label="Date">{row.date ? format(new Date(row.date), "dd MMM yyyy") : "—"}</td>
+                <td data-label="Category" className="font-medium">{row.category}</td>
+                <td data-label="Description">{row.title}</td>
+                <td data-label="Paid To">{row.paidTo}</td>
+                <td data-label="Method">{row.method}</td>
+                <td data-label="Amount" className="font-semibold text-red">₹{row.amount.toLocaleString()}</td>
+                <td data-label="Status">{getStatusBadge(row.status)}</td>
+              </tr>
+            ))}
+            {filteredData.length === 0 && (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
+                  No expenses found matching your search.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 export default OwnerRevenue;
