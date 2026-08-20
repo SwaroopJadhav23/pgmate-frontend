@@ -305,7 +305,7 @@ const Sidebar = ({ open, setOpen }) => {
                 <NavItem
                   icon={<LayoutDashboard size={18} />}
                   to="/owner/ownerRevenue"
-                  label="Revenue"
+                  label="Revenue & Expenditure"
                   close={closeMobile}
                   subscriptionExpired={subscriptionExpired}
                 />

@@ -338,6 +338,8 @@ const PGList = ({role = "OWNER"}) => {
             occupiedBeds: statsMap[pg.id]?.occupiedBeds ?? null,
             availableBeds: statsMap[pg.id]?.availableBeds ?? null,
             occupancyPercent: statsMap[pg.id]?.occupancyPercent ?? null,
+            potentialRevenue: statsMap[pg.id]?.potentialRevenue ?? null,
+            generatedRevenue: statsMap[pg.id]?.generatedRevenue ?? null,
           })),
         );
       } else {
@@ -355,6 +357,8 @@ const PGList = ({role = "OWNER"}) => {
           occupiedBeds: statsMap[pg.id]?.occupiedBeds ?? null,
           availableBeds: statsMap[pg.id]?.availableBeds ?? null,
           occupancyPercent: statsMap[pg.id]?.occupancyPercent ?? null,
+          potentialRevenue: statsMap[pg.id]?.potentialRevenue ?? null,
+          generatedRevenue: statsMap[pg.id]?.generatedRevenue ?? null,
         }));
         setPgs(fetchedPgs);
       }
@@ -935,7 +939,7 @@ const PGList = ({role = "OWNER"}) => {
                                   className={`bi ${isDenied ? "bi-x-circle-fill pgv2-rule-icon denied" : "bi-check-circle-fill pgv2-rule-icon allowed"}`}
                                 ></i>
                                 <span className="pgv2-rule-text">
-                                  {rule}
+                                  <span className="pgv2-rule-text-content" title={rule}>{rule}</span>
                                   {isLastVisible && (
                                     <span className="pgv2-rules-more-side">
                                       +{pg.houseRules.length - 2} more
@@ -983,6 +987,21 @@ const PGList = ({role = "OWNER"}) => {
                         </div>
                       </div>
                     )}
+
+                    {/* FAR RIGHT: Financial Projections */}
+                    <div className="pgv2-section pgv2-finance-section">
+                      <span className="pgv2-section-title">REVENUE (MONTHLY)</span>
+                      <div className="pgv2-finance-summary">
+                        <div className="pgv2-finance-item">
+                          <span className="pgv2-finance-label">Potential</span>
+                          <span className="pgv2-finance-value">₹{pg.potentialRevenue?.toLocaleString('en-IN') || '0'}</span>
+                        </div>
+                        <div className="pgv2-finance-item">
+                          <span className="pgv2-finance-label">Generated</span>
+                          <span className="pgv2-finance-value highlight">₹{pg.generatedRevenue?.toLocaleString('en-IN') || '0'}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pgv2-bottom-row">

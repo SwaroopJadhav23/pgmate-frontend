@@ -447,7 +447,8 @@
    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
    transition: box-shadow 0.35s ease, transform 0.35s ease;
    border: 1px solid #e8edf5;
-   height: 290px;
+   min-height: 320px;
+   height: auto;
 }
 
 .pg-card-v2:hover {
@@ -459,7 +460,6 @@
    position: relative;
    width: 300px;
    min-width: 300px;
-   height: 100%;
    overflow: hidden;
    background: #e2e8f0;
    flex-shrink: 0;
@@ -843,11 +843,15 @@
    align-items: center;
    gap: 6px;
    flex-wrap: nowrap;
+   min-width: 0;
+   max-width: 100%;
+}
+
+.pgv2-rule-text-content {
    white-space: nowrap;
    overflow: hidden;
    text-overflow: ellipsis;
-   min-width: 0;
-   max-width: 100%;
+   flex: 0 1 auto;
 }
 
 /* +x more inline badge */
@@ -1625,4 +1629,46 @@
   justify-content: center;
   flex-shrink: 0;
 }
+}
+
+/* ── FINANCIAL PROJECTIONS ── */
+.pgv2-finance-section {
+  flex: 0 0 auto;
+  width: 185px;
+  min-width: 185px;
+  padding-left: 16px;
+  border-left: 1px solid #f1f5f9;
+}
+
+.pgv2-finance-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.pgv2-finance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pgv2-finance-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.pgv2-finance-value {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: -0.2px;
+}
+
+.pgv2-finance-value.highlight {
+  color: #10b981;
 }

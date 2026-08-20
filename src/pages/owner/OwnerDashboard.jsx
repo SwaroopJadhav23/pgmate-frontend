@@ -15,9 +15,8 @@ import {
   Cell,
   PieChart,
   Pie,
-  Area,
-  AreaChart,
   CartesianGrid,
+  LabelList,
 } from "recharts";
 
 import "../../layouts/layout.css";
@@ -26,7 +25,6 @@ import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
 // import { saveAs } from "file-saver";
 import { getApkDownloadUrl } from "../../utils/apk";
-import languageIcon from "../../assets/Language_icon.png";
 import {
   FaUserCheck,
   FaCheckCircle,
@@ -66,7 +64,11 @@ const fmtINR = (n) => "₹" + Math.round(n ?? 0).toLocaleString("en-IN");
 const useCountUp = (target, duration = 900) => {
   const [value, setValue] = useState(0);
   useEffect(() => {
-    if (!target) return;
+    if (target == null) return;
+    if (target === 0) {
+      setValue(0);
+      return;
+    }
     let start = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
@@ -126,25 +128,6 @@ const ProfileCompletionPopup = ({ profile, onCompleteNow }) => {
   );
 };
 
-/* ─── Custom bar tooltip (enhanced) ────────────────────────── */
-const CustomBarTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="custom-tooltip">
-      <p className="custom-tooltip-label">{label}</p>
-      {payload.map((p) => (
-        <p key={p.name} className="custom-tooltip-item">
-          <span
-            className="custom-tooltip-dot"
-            style={{ background: p.payload.fill || p.color }}
-          />
-          <span className="custom-tooltip-value">{p.value}</span>
-        </p>
-      ))}
-    </div>
-  );
-};
-
 /* ─── Revenue Pulse custom tooltip ─────────────────────────── */
 const RevTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -158,6 +141,8 @@ const RevTooltip = ({ active, payload, label }) => {
 
 /* ─── Revenue Pulse Card — DYNAMIC ─────────────────────────── */
 const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
+  const [timeframe, setTimeframe] = useState("MONTH");
+
   if (!stats) {
     return (
       <div className="dash-chart-card dash-revenue-card dash-chart-card-empty">
@@ -172,39 +157,57 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
   const collected = stats.revenueCollected ?? 0;
   const pending = stats.revenuePending ?? 0;
   const overdue = stats.revenueOverdue ?? 0;
-  const total = collected + pending + overdue;
-  const colRate = total > 0 ? Math.round((collected / total) * 100) : 0;
+  
+  const expectedRent = collected + pending + overdue;
+  const colRate = expectedRent > 0 ? Math.round((collected / expectedRent) * 100) : 0;
 
-  const history =
-    Array.isArray(stats.revenueHistory) && stats.revenueHistory.length > 0
-      ? stats.revenueHistory
-      : [];
+  const totalCollected = timeframe === "MONTH" 
+    ? (stats.totalAmountMonth ?? 0) 
+    : (stats.totalAmountYear ?? 0);
+
+  const maxPotential = timeframe === "MONTH" 
+    ? (stats.maxPotentialRevenue ?? 0)
+    : (stats.maxPotentialRevenue ?? 0) * 12;
+
+  const historyYear = Array.isArray(stats.revenueHistory) ? stats.revenueHistory : [];
+  const historyMonth = Array.isArray(stats.revenueHistoryMonth) ? stats.revenueHistoryMonth : [];
 
   const allMonths = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec",
   ];
   const nowMonth = new Date().getMonth();
-  const chartData = history.map((v, i) => ({
-    month: allMonths[(nowMonth - (history.length - 1 - i) + 12) % 12],
-    amount: v,
-  }));
+
+  let chartData = [];
+  if (timeframe === "YEAR") {
+    // Always produce exactly 6 monthly buckets (last 6 months) filled with 0
+    const BUCKETS = 6;
+    const filled = Array(BUCKETS).fill(0);
+    historyYear.slice(-BUCKETS).forEach((v, i) => {
+      filled[i + Math.max(0, BUCKETS - historyYear.length)] = v;
+    });
+    chartData = filled.map((v, i) => ({
+      label: allMonths[(nowMonth - (BUCKETS - 1 - i) + 12) % 12],
+      amount: v,
+    }));
+  } else {
+    // Always produce exactly 4 weekly buckets
+    const WEEKS = 4;
+    const dailyData = historyMonth.slice(-28); // last 28 days
+    const weeklyData = Array.from({ length: WEEKS }, (_, w) => {
+      const start = w * 7;
+      const end = start + 7;
+      const sum = dailyData.slice(start, end).reduce((a, b) => a + b, 0);
+      return { label: `Week ${w + 1}`, amount: sum };
+    });
+    chartData = weeklyData;
+  }
 
   const pctChange =
-    history.length >= 2
+    historyYear.length >= 2
       ? Math.round(
-        ((history[history.length - 1] - history[history.length - 2]) /
-          (history[history.length - 2] || 1)) *
+        ((historyYear[historyYear.length - 1] - historyYear[historyYear.length - 2]) /
+          (historyYear[historyYear.length - 2] || 1)) *
         100,
       )
       : null;
@@ -212,86 +215,102 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
   return (
     <div
       className={`dash-chart-card dash-revenue-card ${subscriptionExpired ? "dash-card-disabled" : ""}`}
-      onClick={() => onNavigate("ownerRevenue")}
-      style={{ cursor: "pointer" }}
     >
-      <div className="dash-chart-title rev-header">
-        <span className="rev-icon-wrap">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M1 8h3l2-5 3 10 2-6 2 3h2"
-              stroke="#534AB7"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-        Revenue pulse
-        {pctChange !== null && (
-          <span
-            className={`rev-tag ${pctChange >= 0 ? "rev-tag-up" : "rev-tag-down"}`}
-          >
-            {pctChange >= 0 ? "▲" : "▼"} {Math.abs(pctChange)}% this mo.
+      <div className="dash-chart-title rev-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+        <div onClick={() => onNavigate("ownerRevenue")} style={{ cursor: "pointer", display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          <span className="rev-icon-wrap">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M1 8h3l2-5 3 10 2-6 2 3h2"
+                stroke="#534AB7"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </span>
-        )}
+          Revenue pulse
+          {pctChange !== null && (
+            <span
+              className={`rev-tag ${pctChange >= 0 ? "rev-tag-up" : "rev-tag-down"}`}
+            >
+              {pctChange >= 0 ? "▲" : "▼"} {Math.abs(pctChange)}% this mo.
+            </span>
+          )}
+        </div>
+        <div className="rev-timeframe-toggle">
+          <button 
+            className={`rev-toggle-btn ${timeframe === "MONTH" ? "active" : ""}`} 
+            onClick={() => setTimeframe("MONTH")}>
+            Month
+          </button>
+          <button 
+            className={`rev-toggle-btn ${timeframe === "YEAR" ? "active" : ""}`} 
+            onClick={() => setTimeframe("YEAR")}>
+            Year
+          </button>
+        </div>
       </div>
-      <div>
-        <div className="rev-big">{fmtINR(collected)}</div>
-        <div className="rev-sub">Collected this month</div>
+      <div onClick={() => onNavigate("ownerRevenue")} style={{ cursor: "pointer" }}>
+        <div className="rev-big">{fmtINR(maxPotential)}</div>
+        <div className="rev-sub">
+          {timeframe === "MONTH" ? "Collected This Month (Potential Revenue)" : "Collected This Year (Potential Revenue)"}
+        </div>
       </div>
-      <div className="rev-sparkline-wrap">
+      <div className="rev-sparkline-wrap" onClick={() => onNavigate("ownerRevenue")} style={{ cursor: "pointer" }}>
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
+            <BarChart
               data={chartData}
-              margin={{ top: 4, right: 4, left: -32, bottom: 0 }}
+              margin={{ top: 20, right: 8, left: -20, bottom: 0 }}
+              maxBarSize={40}
+              barCategoryGap="25%"
             >
-              <defs>
-                <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#7B74F0" stopOpacity={0.18} />
-                  <stop offset="95%" stopColor="#7B74F0" stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#f0f0f8"
+                strokeDasharray="4 4"
+                stroke="#f1f5f9"
                 vertical={false}
               />
               <XAxis
-                dataKey="month"
-                tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                dataKey="label"
+                tick={{ fill: "#94a3b8", fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
+                interval={0}
+                dy={8}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                tick={{ fill: "#94a3b8", fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) =>
                   v >= 1000 ? `₹${Math.round(v / 1000)}k` : `₹${v}`
                 }
+                width={42}
               />
-              <Tooltip content={<RevTooltip />} />
-              <Area
-                type="monotone"
+              <Tooltip content={<RevTooltip />} cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+              <Bar
                 dataKey="amount"
-                stroke="#7B74F0"
-                strokeWidth={2}
-                fill="url(#revGrad)"
-                dot={false}
-                activeDot={{ r: 4, fill: "#4F46E5" }}
-              />
-            </AreaChart>
+                fill="#818cf8"
+                radius={[5, 5, 0, 0]}
+              >
+                <LabelList 
+                  dataKey="amount" 
+                  position="top" 
+                  formatter={(v) => v >= 1000 ? `₹${Math.round(v / 1000)}k` : (v > 0 ? `₹${v}` : '')} 
+                  style={{ fontSize: '9px', fill: '#64748b', fontWeight: 700 }} 
+                />
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         ) : (
           <div className="dash-chart-empty-text">No history data yet</div>
         )}
       </div>
-      <div className="rev-pills-row">
+      <div className="rev-pills-row" onClick={() => onNavigate("ownerRevenue")} style={{ cursor: "pointer" }}>
         <div className="rev-pill rev-pill-total">
-          <span className="rev-pill-label">Total</span>
-          <span className="rev-pill-val">{fmtINR(total)}</span>
+          <span className="rev-pill-label">Total Collected</span>
+          <span className="rev-pill-val">{fmtINR(totalCollected)}</span>
         </div>
         <div className="rev-pill rev-pill-pending">
           <span className="rev-pill-label">Pending</span>
@@ -302,7 +321,7 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
           <span className="rev-pill-val">{fmtINR(overdue)}</span>
         </div>
       </div>
-      <div>
+      <div onClick={() => onNavigate("ownerRevenue")} style={{ cursor: "pointer" }}>
         <div className="rev-bar-head">
           <span className="rev-bar-label">Collection rate</span>
           <span className="rev-bar-pct">{colRate}%</span>
@@ -397,81 +416,105 @@ const BedHealthCard = ({ stats, onNavigate, subscriptionExpired }) => {
     >
       <div className="dash-chart-title bh-header">
         <span className="bh-icon-wrap">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z"
-              stroke="#3B6D11"
-              strokeWidth="1.5"
-            />
-            <path
-              d="M8 5v3.5l2.5 1.5"
-              stroke="#3B6D11"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" stroke="#3B6D11" strokeWidth="1.5" />
+            <path d="M8 5v3.5l2.5 1.5" stroke="#3B6D11" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </span>
-        Bed health score
+        Bed Health Insights
         <span className={`bh-tag ${gradeClass}`}>{grade}</span>
       </div>
-      <div className="bh-ring-row">
-        <div className="bh-ring-wrap">
-          <svg width="88" height="88" viewBox="0 0 88 88">
-            <circle
-              cx="44"
-              cy="44"
-              r="34"
-              fill="none"
-              stroke="#e8e7fd"
-              strokeWidth="9"
-            />
-            <circle
-              cx="44"
-              cy="44"
-              r="34"
-              fill="none"
-              stroke={arcColor}
-              strokeWidth="9"
-              strokeLinecap="round"
-              strokeDasharray={dash}
-              transform="rotate(-90 44 44)"
-              className="dash-bh-circle-anim"
-            />
-          </svg>
-          <div className="bh-ring-label">
-            <span className="bh-score-num" style={{ color: arcColor }}>
-              {score}
-            </span>
-            <span className="bh-score-denom">/ 100</span>
+
+      <div className="bh-main-content">
+        <div className="bh-ring-section">
+          <div className="bh-ring-wrap">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#F1F5F9" strokeWidth="8" />
+              <circle
+                cx="50"
+                cy="50"
+                r="38"
+                fill="none"
+                stroke={arcColor}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={animated ? `${(score / 100) * (2 * Math.PI * 38)} ${2 * Math.PI * 38}` : `0 ${2 * Math.PI * 38}`}
+                transform="rotate(-90 50 50)"
+                className="dash-bh-circle-anim"
+              />
+            </svg>
+            <div className="bh-ring-label">
+              <span className="bh-score-num" style={{ color: arcColor }}>{score}</span>
+              <span className="bh-score-denom">Health Score</span>
+            </div>
           </div>
         </div>
-        <div className="bh-facts">
-          <div className="bh-fact-row">
-            <span className="bh-fact-label">Avg. days vacant</span>
-            <span className="bh-fact-val">
-              {avgVacant > 0 ? `${avgVacant}d` : "—"}
-            </span>
+
+        <div className="bh-facts-grid">
+          <div className="bh-fact-box">
+            <div className="bh-fact-icon" style={{ color: "#3B82F6", background: "#EFF6FF" }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 2a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 1v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+              </svg>
+            </div>
+            <div className="bh-fact-content">
+              <div className="bh-fact-label">Turnover</div>
+              <div className="bh-fact-val">{turnover > 0 ? `${turnover}%/mo` : "—"}</div>
+            </div>
           </div>
-          <div className="bh-fact-row">
-            <span className="bh-fact-label">Turnover rate</span>
-            <span className="bh-fact-val">
-              {turnover > 0 ? `${turnover}%/mo` : "—"}
-            </span>
+
+          <div className="bh-fact-box">
+            <div className="bh-fact-icon" style={{ color: "#8B5CF6", background: "#F5F3FF" }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2z"/>
+              </svg>
+            </div>
+            <div className="bh-fact-content">
+              <div className="bh-fact-label">Avg Vacancy</div>
+              <div className="bh-fact-val">{avgVacant > 0 ? `${avgVacant}d` : "—"}</div>
+            </div>
           </div>
-          <div className="bh-fact-row">
-            <span className="bh-fact-label">Beds due service</span>
-            <span className="bh-fact-val">{dueService}</span>
+
+          <div className="bh-fact-box">
+            <div className="bh-fact-icon" style={{ color: "#F59E0B", background: "#FFFBEB" }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+              </svg>
+            </div>
+            <div className="bh-fact-content">
+              <div className="bh-fact-label">Long Vacant</div>
+              <div className="bh-fact-val">{longVacant} <span className="bh-subtext">(&gt;14d)</span></div>
+            </div>
           </div>
-          <div className="bh-fact-row">
-            <span className="bh-fact-label">Long-vacant (&gt;14d)</span>
-            <span className="bh-fact-val">{longVacant}</span>
+
+          <div className="bh-fact-box">
+            <div className="bh-fact-icon" style={{ color: "#10B981", background: "#ECFDF5" }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M3 2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V2zm6 11a1 1 0 1 0-2 0 1 1 0 0 0 2 0z"/>
+              </svg>
+            </div>
+            <div className="bh-fact-content">
+              <div className="bh-fact-label">Occupancy</div>
+              <div className="bh-fact-val">{totalBeds > 0 ? Math.round((occupied / totalBeds) * 100) : 0}%</div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="bh-tip">{tip}</div>
-      <div>
+
+      <div className={`bh-tip-box bh-tip-${gradeClass}`}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M8 11.5v-5" strokeLinecap="round"/>
+          <path d="M8 4.5h.01" strokeLinecap="round" strokeWidth="2"/>
+          <circle cx="8" cy="8" r="7"/>
+        </svg>
+        <span>{tip}</span>
+      </div>
+
+      <div className="bh-footer">
         <div className="bh-bar-head">
-          <span className="bh-bar-label">Vacancy pressure</span>
+          <span className="bh-bar-label">Vacancy Pressure</span>
           <span className="bh-bar-pct">{vacancyPressure}%</span>
         </div>
         <div className="bh-bar-track">
@@ -479,12 +522,7 @@ const BedHealthCard = ({ stats, onNavigate, subscriptionExpired }) => {
             className="bh-bar-fill"
             style={{
               width: `${vacancyPressure}%`,
-              background:
-                vacancyPressure > 60
-                  ? "#E24B4A"
-                  : vacancyPressure > 30
-                    ? "#BA7517"
-                    : "#639922",
+              background: vacancyPressure > 60 ? "#EF4444" : vacancyPressure > 30 ? "#F59E0B" : "#10B981",
             }}
           />
         </div>
@@ -502,22 +540,35 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
   const [ownerProfile, setOwnerProfile] = useState(null);
   const [showProfileCompletionPopup, setShowProfileCompletionPopup] =
     useState(false);
+  const [pgs, setPgs] = useState([]);
+  const [selectedPgId, setSelectedPgId] = useState("ALL");
 
   const navigate = useNavigate();
   const { subscriptionExpired } = useContext(AuthContext);
   const exportRef = useRef(null);
 
   const animTotalPgs = useCountUp(stats?.totalPgs ?? 0);
-  const animTotalBeds = useCountUp(stats?.totalBeds ?? 0);
-  const animAvailableBeds = useCountUp(stats?.availableBeds ?? 0);
   const animFloors = useCountUp(stats?.totalFloors ?? 0);
   const animRooms = useCountUp(stats?.totalRooms ?? 0);
-  const animOccupiedBeds = useCountUp(stats?.occupiedBeds ?? 0);
+  const animTotalBeds = useCountUp(stats?.totalBeds ?? 0);
+  const animAvailableBeds = useCountUp(stats?.availableBeds ?? 0);
   const animTotalTenants = useCountUp(stats?.totalTenants ?? 0);
 
+  const unreadEnquiriesCount = stats?.unreadEnquiries ?? 0;
+  const [seenEnquiriesCount, setSeenEnquiriesCount] = useState(() => 
+    parseInt(localStorage.getItem("seen_enquiries_count") || "0", 10)
+  );
+  const showEnquiriesBadge = unreadEnquiriesCount > seenEnquiriesCount;
+
   useEffect(() => {
+    if (apiPrefix === "/owner") {
+      api.get("/owner/pgs")
+        .then(res => setPgs(res.data || []))
+        .catch(err => console.error("Error fetching PGs", err));
+    }
+
     api
-      .get(`${apiPrefix}/dashboard/stats`)
+      .get(`${apiPrefix}/dashboard/stats`, { params: { pgId: selectedPgId } })
       .then((res) => {
         setStats(res.data);
         setOnboardingMode(getOnboardingMode(res.data));
@@ -557,7 +608,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       setOwnerName("Manager");
       setShowProfileCompletionPopup(false);
     }
-  }, [apiPrefix]);
+  }, [apiPrefix, selectedPgId]);
 
   /* ─ exports ─ */
   const exportPDF = async () => {
@@ -829,8 +880,8 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
         icon: "people",
       },
       {
-        label: "Revenue (This Month)",
-        value: rs(stats.revenueCollected ?? 0),
+        label: "Potential Revenue",
+        value: rs(stats.maxPotentialRevenue ?? 0),
         color: PURPLE,
         small: true,
         icon: "revenue",
@@ -1482,37 +1533,17 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       : navigate(`${apiPrefix}/${path}`);
   const goTo = (path, opts) =>
     subscriptionExpired ? navigate("/owner/pricing") : navigate(path, opts);
-
-  const pgBarData = stats
-    ? [
-      { name: "Floors", value: stats.totalFloors ?? 0, fill: "#7B74F0" },
-      { name: "Rooms", value: stats.totalRooms ?? 0, fill: "#4F46E5" },
-      { name: "Occupied", value: stats.occupiedBeds ?? 0, fill: "#a5a0ee" },
-      { name: "Vacant", value: stats.availableBeds ?? 0, fill: "#c7c2f6" },
-    ]
-    : [];
-
   const occupied = stats?.occupiedBeds ?? 0;
   const available = stats?.availableBeds ?? 0;
   const total = stats?.totalBeds ?? 0;
+
   const donutData =
     total > 0
       ? [
-        { value: occupied, fill: "#4F46E5" },
-        { value: available, fill: "#e8e7fd" },
+        { name: "Occupied Beds", value: occupied, fill: "#4F46E5" },
+        { name: "Available Beds", value: available, fill: "#e0e7ff" },
       ]
-      : [{ value: 1, fill: "#e8e7fd" }];
-
-  const [ownerLangOpen, setOwnerLangOpen] = useState(false);
-  const ownerLangRef = useRef(null);
-  useEffect(() => {
-    const h = (e) => {
-      if (ownerLangRef.current && !ownerLangRef.current.contains(e.target))
-        setOwnerLangOpen(false);
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
+      : [{ name: "No Data", value: 1, fill: "#e8e7fd" }];
 
   /* ─── Overview cards data ─────────────────────────────────── */
 
@@ -1582,8 +1613,8 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       onClick: () => navTo("residents"),
     },
     {
-      label: "Revenue (This Month)",
-      value: stats ? fmtINR(stats.revenueCollected ?? 0) : "—",
+      label: "Potential Revenue",
+      value: stats ? fmtINR(stats.maxPotentialRevenue ?? 0) : "—",
       icon: (
         <svg
           width="22"
@@ -1609,6 +1640,20 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
         subtitle="Manage your PG operations"
         rightAction={
           <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
+            {pgs.length > 0 && (
+              <select
+                className="dashboard-global-filter"
+                value={selectedPgId}
+                onChange={(e) => setSelectedPgId(e.target.value)}
+              >
+                <option value="ALL">All PGs</option>
+                {pgs.map((pg) => (
+                  <option key={pg.id} value={pg.id}>
+                    {pg.name}
+                  </option>
+                ))}
+              </select>
+            )}
             <div className="export-wrapper" ref={exportRef}>
               <button
                 className="export-btn-modern"
@@ -1783,8 +1828,17 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
 
             <button
               className="dash-quick-btn qb-cyan"
-              onClick={() => navTo("enquiries")}
+              onClick={() => {
+                localStorage.setItem("seen_enquiries_count", unreadEnquiriesCount.toString());
+                setSeenEnquiriesCount(unreadEnquiriesCount);
+                navTo("enquiries");
+              }}
             >
+              {showEnquiriesBadge && (
+                <div className="dash-quick-badge">
+                  {unreadEnquiriesCount > 99 ? '99+' : unreadEnquiriesCount}
+                </div>
+              )}
               <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#0E7490" strokeWidth="1.3">
                 <path d="M2 3h12v7H5.5L2 13V3z" />
                 <line x1="4.5" y1="6" x2="11.5" y2="6" />
@@ -1859,6 +1913,12 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
                     {stats ? animRooms : "—"}
                   </div>
                 </div>
+                <div className="dash-stat-box">
+                  <div className="dash-stat-box-label">Total Beds</div>
+                  <div className="dash-stat-box-value">
+                    {stats ? animTotalBeds : "—"}
+                  </div>
+                </div>
                 <div
                   className="dash-stat-box"
                   onClick={() => navTo("available-beds")}
@@ -1870,41 +1930,67 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
                 </div>
               </div>
 
-              <div className="dash-pg-bottom">
-                <div>
-                  <div className="dash-bar-legend">
-                    {[
-                      ["#7B74F0", "Floor"],
-                      ["#4F46E5", "Occupied PG"],
-                      ["#c7c2f6", "Available PG"],
-                    ].map(([c, l]) => (
-                      <div key={l} className="dash-legend-item">
-                        <div
-                          className="dash-legend-dot"
-                          style={{ background: c }}
-                        ></div>{" "}
-                        {l}
+              <div className="dash-pg-bottom-layout">
+                <div className="dash-pg-breakdown-grid">
+                  {stats?.pgStatsList && stats.pgStatsList.length > 0 ? (
+                    stats.pgStatsList.map((pgStat, idx) => (
+                      <div key={idx} className="dash-pg-stat-card">
+                        <div className="dash-pg-stat-card-title">{pgStat.pgName}</div>
+                        <div className="dash-pg-stat-row">
+                          <span>Floors</span>
+                          <strong>{pgStat.totalFloors}</strong>
+                        </div>
+                        <div className="dash-pg-stat-row">
+                          <span>Rooms</span>
+                          <strong>{pgStat.totalRooms}</strong>
+                        </div>
+                        <div className="dash-pg-stat-row">
+                          <span>Total Beds</span>
+                          <strong>{pgStat.totalBeds}</strong>
+                        </div>
+                        <div className="dash-pg-stat-row">
+                          <span>Occupied</span>
+                          <strong>{pgStat.occupiedBeds}</strong>
+                        </div>
+                        <div className="dash-pg-stat-row">
+                          <span>Available</span>
+                          <strong>{pgStat.availableBeds}</strong>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  {/* Replace the ResponsiveContainer/BarChart block with this grid */}
-                  <div className="dash-stat-grid">
-                    {pgBarData.map((item) => (
-                      <div
-                        key={item.name}
-                        className="dash-stat-grid-cell"
-                        style={{ "--cell-color": item.fill }}
-                      >
-                        <div className="dash-stat-grid-dot" />
-                        <div className="dash-stat-grid-label">{item.name}</div>
-                        <div className="dash-stat-grid-value">{item.value}</div>
-                      </div>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <>
+                      {[1, 2, 3].map((n) => (
+                        <div key={n} className="dash-pg-stat-card">
+                          <div className="skeleton-box" style={{ height: "18px", width: "50%", marginBottom: "12px" }}></div>
+                          <div className="dash-pg-stat-row">
+                            <div className="skeleton-box" style={{ height: "12px", width: "40%" }}></div>
+                            <div className="skeleton-box" style={{ height: "12px", width: "10%" }}></div>
+                          </div>
+                          <div className="dash-pg-stat-row">
+                            <div className="skeleton-box" style={{ height: "12px", width: "35%" }}></div>
+                            <div className="skeleton-box" style={{ height: "12px", width: "15%" }}></div>
+                          </div>
+                          <div className="dash-pg-stat-row">
+                            <div className="skeleton-box" style={{ height: "12px", width: "45%" }}></div>
+                            <div className="skeleton-box" style={{ height: "12px", width: "10%" }}></div>
+                          </div>
+                          <div className="dash-pg-stat-row">
+                            <div className="skeleton-box" style={{ height: "12px", width: "40%" }}></div>
+                            <div className="skeleton-box" style={{ height: "12px", width: "12%" }}></div>
+                          </div>
+                          <div className="dash-pg-stat-row">
+                            <div className="skeleton-box" style={{ height: "12px", width: "35%" }}></div>
+                            <div className="skeleton-box" style={{ height: "12px", width: "10%" }}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </div>
 
                 <div className="dash-bed-card">
-                  <div className="dash-bed-title">Total Beds</div>
+                  <div className="dash-bed-title">TOTAL BEDS</div>
                   <div className="dash-pie-wrapper">
                     <PieChart width={120} height={120}>
                       <Pie
@@ -1933,11 +2019,11 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
                   <div className="dash-bed-stats">
                     <div className="dash-bed-stat-row">
                       <span>Occupied Beds</span>
-                      <span>{stats ? animOccupiedBeds : "—"}</span>
+                      <span>{occupied}</span>
                     </div>
                     <div className="dash-bed-stat-row">
                       <span>Available Beds</span>
-                      <span>{stats ? animAvailableBeds : "—"}</span>
+                      <span>{available}</span>
                     </div>
                   </div>
                 </div>

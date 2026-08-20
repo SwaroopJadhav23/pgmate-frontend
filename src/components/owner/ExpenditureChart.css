@@ -1,0 +1,31 @@
+.expenditure-chart-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f3f4f6;
+}
+
+.expenditure-chart-container h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.expenditure-chart-empty {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.expenditure-chart-empty p {
+  color: #6b7280;
+  font-size: 14px;
+}
