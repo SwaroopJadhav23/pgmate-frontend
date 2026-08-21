@@ -966,6 +966,7 @@
 .kpi-orange h2 {
   background: none;
   -webkit-background-clip: initial;
+  background-clip: initial;
   -webkit-text-fill-color: initial;
   color: #10b981; /* Green color for revenue */
 }
@@ -982,6 +983,7 @@
 .kpi-red h2 {
   background: none;
   -webkit-background-clip: initial;
+  background-clip: initial;
   -webkit-text-fill-color: initial;
   color: #dc2626;
 }
