@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import './AddExpense.css';
-import { HelpCircle, UploadCloud, CheckCircle, Receipt, Building, RefreshCw, CreditCard, Flag, Save, Tag, Grid, Calendar, FileText, Plus, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { UploadCloud, CheckCircle, Receipt, Building, CreditCard, Flag, Tag, Grid, Calendar, FileText, ChevronDown, Trash2 } from 'lucide-react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 
 const ExpenseCategories = [
@@ -124,10 +124,6 @@ const AddExpense = () => {
         if (items.length > 1) {
             setItems(items.filter((_, i) => i !== index));
         }
-    };
-
-    const handleGstToggle = (applicable) => {
-        setFormData(prev => ({ ...prev, gstApplicable: applicable }));
     };
 
     const handleExpenseTypeToggle = (type) => {

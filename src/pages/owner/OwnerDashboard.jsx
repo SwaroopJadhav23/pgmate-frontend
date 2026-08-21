@@ -405,9 +405,6 @@ const BedHealthCard = ({ stats, onNavigate, subscriptionExpired }) => {
       "High vacancy pressure. Review pricing and listing visibility urgently.";
   }
 
-  const circ = 2 * Math.PI * 34;
-  const dash = animated ? `${(score / 100) * circ} ${circ}` : `0 ${circ}`;
-
   return (
     <div
       className={`dash-chart-card dash-bh-card ${subscriptionExpired ? "dash-card-disabled" : ""}`}

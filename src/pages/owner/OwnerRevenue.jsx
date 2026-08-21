@@ -11,8 +11,6 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import "./OwnerRevenue.css";
 import {
-  AreaChart,
-  Area,
   BarChart,
   Bar,
   XAxis,
@@ -30,7 +28,6 @@ import {
   startOfMonth,
   endOfMonth,
   isWithinInterval,
-  parse,
   format,
 } from "date-fns";
 import DonutBreakdownChart from "../../components/owner/DonutBreakdownChart";
@@ -84,7 +81,6 @@ const useCountUp = (target, duration = 1200) => {
 const OwnerRevenue = () => {
   const navigate = useNavigate();
   const [residents, setResidents] = useState([]);
-  const [enquiries, setEnquiries] = useState([]);
   const [stats, setStats] = useState(null);
   const [filter, setFilter] = useState("MONTH");
   const [loading, setLoading] = useState(true);
@@ -109,7 +105,7 @@ const OwnerRevenue = () => {
   const isMobile = window.innerWidth < 768;
 
   const [expenditures, setExpenditures] = useState([]);
-  const [viewMode, setViewMode] = useState("month");
+  const [viewMode] = useState("month");
 
   // Expense History
   const [expHistoryPgId, setExpHistoryPgId] = useState("ALL");
@@ -130,6 +126,7 @@ const OwnerRevenue = () => {
   useEffect(() => {
     loadData();
     loadStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPgId, viewMode]);
 
 
@@ -139,11 +136,10 @@ const OwnerRevenue = () => {
       setLoading(true);
       const params = selectedPgId === "ALL" ? {} : { pgId: selectedPgId };
       // Include viewMode to trigger re-fetch as requested
-      const [active, records, reserved, enq, rentRes, expRes] = await Promise.all([
+      const [active, records, reserved, rentRes, expRes] = await Promise.all([
         api.get("/owner/residents", { params }),
         api.get("/owner/residents/records", { params }),
         api.get("/owner/residents/reserved", { params }),
-        api.get("/enquiry/enquiries", { params }),
         api.get("/owner/rent?status=PAID", { params }),
         api.get("/owner/expenses", { params, viewMode })
       ]);
@@ -161,7 +157,6 @@ const OwnerRevenue = () => {
       );
 
       setResidents(uniqueResidents);
-      setEnquiries(Array.isArray(enq.data) ? enq.data : []);
     } catch (err) {
       console.error("Owner revenue error:", err);
     } finally {
@@ -381,19 +376,6 @@ const OwnerRevenue = () => {
     );
   }).length;
 
-  const totalEnquiries = enquiries.filter((e) => {
-    if (!e.createdAt) return false;
-
-    const parsedDate = parse(
-      e.createdAt,
-      "dd-MM-yyyy HH:mm:ss",
-      new Date()
-    );
-
-    if (isNaN(parsedDate)) return false;
-
-    return isDateInFilter(parsedDate);
-  }).length;
 
   const avgRevenuePerResident =
     totalActiveResidents > 0
@@ -530,8 +512,6 @@ const OwnerRevenue = () => {
   const animatedTotalRevenue = useCountUp(totalRevenue);
   const animatedRentCollected = useCountUp(totalRentCollected);
   const animatedDepositHeld = useCountUp(totalDepositHeld);
-  const animatedAvg = useCountUp(avgRevenuePerResident);
-
   const animatedFutureRefund = useCountUp(futureDepositRefund);
   const animatedPotential = useCountUp(potentialRevenue);
   const animatedExpenses = useCountUp(totalExpensesAmount);
@@ -563,9 +543,6 @@ const OwnerRevenue = () => {
   const animatedEhPendingAmt = useCountUp(ehPendingAmt);
   const animatedEhPaidAmt = useCountUp(ehPaidAmt);
   const animatedEhTotalAmt = useCountUp(ehTotalAmt);
-
-  const tenantsPaidCount = stats?.tenantsPaidCount || 0;
-  const tenantsRemainingToPayCount = stats?.tenantsRemainingToPayCount || 0;
 
   const [showExport, setShowExport] = useState(false);
   const exportRef = useRef(null);
@@ -1748,345 +1725,4 @@ const KPI = ({ title, value, subtitle, trend, icon, color, onClick }) => (
     </div>
   </div>
 );
-
-const PLSummaryCard = ({
-  potentialRevenue,
-  rentCollected,
-  securityDepositsHeld,
-  totalIncome,
-  pendingRent,
-  overdueRent,
-  futureDepositRefunds,
-  colRate,
-  totalExpenses,
-  netProfit,
-  periodLabel
-}) => {
-  return (
-    <div className="pl-card">
-      <div className="pl-card-header">
-        <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <i className="bi bi-bar-chart-fill" style={{ color: 'var(--accent-from)' }}></i> Financial Summary
-        </h3>
-        <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>{periodLabel}</span>
-      </div>
-
-      <div className="pl-grid">
-        <div className="pl-col">
-          <div className="pl-section">
-            <div className="pl-section-label">INCOME</div>
-            <div className="pl-row pl-header-row">
-              <div className="pl-row-label"></div>
-              <div className="pl-row-potential">POTENTIAL</div>
-              <div className="pl-row-actual">COLLECTED</div>
-            </div>
-            <div className="pl-row">
-              <div className="pl-row-label">Rent Revenue</div>
-              <div className="pl-row-potential">₹{potentialRevenue.toLocaleString()}</div>
-              <div className="pl-row-actual">₹{rentCollected.toLocaleString()}</div>
-            </div>
-            <div className="pl-row">
-              <div className="pl-row-label">Security Deposits Held</div>
-              <div className="pl-row-potential"><span style={{ color: "var(--text-muted)", opacity: 0.5 }}>—</span></div>
-              <div className="pl-row-actual">₹{securityDepositsHeld.toLocaleString()}</div>
-            </div>
-            <div className="pl-row pl-total-row">
-              <div className="pl-row-label">TOTAL INCOME</div>
-              <div className="pl-row-potential">₹{potentialRevenue.toLocaleString()}</div>
-              <div className="pl-row-actual">₹{totalIncome.toLocaleString()}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="pl-col" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <div className="pl-section">
-            <div className="pl-section-label">OUTSTANDING</div>
-            <div className="pl-row pl-header-row">
-              <div className="pl-row-label"></div>
-              <div className="pl-row-actual">AMOUNT</div>
-            </div>
-            <div className="pl-row">
-              <div className="pl-row-label">Pending Rent</div>
-              <div className="pl-row-actual">₹{(pendingRent || 0).toLocaleString()}</div>
-            </div>
-            <div className="pl-row">
-              <div className="pl-row-label">Overdue Rent</div>
-              <div className="pl-row-actual">₹{(overdueRent || 0).toLocaleString()}</div>
-            </div>
-            <div className="pl-row">
-              <div className="pl-row-label">Future Deposit Refunds</div>
-              <div className="pl-row-actual">₹{futureDepositRefunds.toLocaleString()}</div>
-            </div>
-          </div>
-
-          <div className="pl-section">
-            <div className="pl-section-label">EXPENSES & PROFIT</div>
-            <div className="pl-row pl-header-row">
-              <div className="pl-row-label"></div>
-              <div className="pl-row-actual">AMOUNT</div>
-            </div>
-            <div className="pl-row">
-              <div className="pl-row-label">Total Expenses</div>
-              <div className="pl-row-actual" style={{color: 'var(--kpi-red)'}}>- ₹{(totalExpenses || 0).toLocaleString()}</div>
-            </div>
-            <div className="pl-row pl-total-row">
-              <div className="pl-row-label">NET PROFIT</div>
-              <div className="pl-row-actual" style={{color: 'var(--kpi-green)'}}>₹{(netProfit || 0).toLocaleString()}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="pl-footer">
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-muted)' }}>COLLECTION RATE</span>
-          <span style={{ fontSize: '13px', fontWeight: '800', color: 'var(--accent-from)' }}>{colRate}%</span>
-        </div>
-        <div className="pl-collection-bar-wrap">
-          <div className="pl-collection-bar-fill" style={{ width: `${Math.min(colRate, 100)}%` }}></div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ResidentLedger = ({ residents, rentRecords, isDateInFilter }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "name", direction: "asc" });
-
-  const ledgerData = useMemo(() => {
-    return residents
-      .filter((r) => isDateInFilter(new Date(r.createdAt || r.onboardingPaymentDate || r.checkinDate)))
-      .map((r) => {
-        // Find latest rent record for this resident in the filter
-        const records = rentRecords.filter(rec => rec.residentId === r.id && isDateInFilter(new Date(rec.paidDate)));
-        const latestRecord = records.sort((a, b) => new Date(b.paidDate) - new Date(a.paidDate))[0];
-
-        return {
-          id: r.id,
-          name: r.name || "Unknown",
-          room: r.roomNumber || r.room || "—",
-          rentAmount: r.monthlyRent || 0,
-          status: latestRecord ? latestRecord.status : (r.status === 'ACTIVE' ? 'PENDING' : r.status),
-          paidOn: latestRecord?.paidDate ? format(new Date(latestRecord.paidDate), "dd MMM") : "—",
-          deposit: r.deposit || 0
-        };
-      });
-  }, [residents, rentRecords, isDateInFilter]);
-
-  const filteredData = useMemo(() => {
-    let data = [...ledgerData];
-    if (searchTerm) {
-      data = data.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-    if (sortConfig.key) {
-      data.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
-        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
-    return data;
-  }, [ledgerData, searchTerm, sortConfig]);
-
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getStatusBadge = (status) => {
-    const s = (status || "").toUpperCase();
-    if (s === "PAID") return <span className="rev-status-badge rev-status-paid">Paid</span>;
-    if (s === "PENDING") return <span className="rev-status-badge rev-status-pending">Pending</span>;
-    if (s === "OVERDUE") return <span className="rev-status-badge rev-status-overdue">Overdue</span>;
-    if (s === "RESERVED") return <span className="rev-status-badge rev-status-reserved">Reserved</span>;
-    return <span className="rev-status-badge">{status}</span>;
-  };
-
-  if (ledgerData.length === 0) return null;
-
-  return (
-    <div className="rev-ledger-section" style={{ borderLeft: '4px solid #10b981' }}>
-      <div className="rev-ledger-header">
-        <div className="rev-ledger-header-left">
-          <div className="rev-ledger-icon" style={{ background: '#ecfdf5', color: '#10b981' }}>
-            <i className="bi bi-people"></i>
-          </div>
-          <div>
-            <p className="rev-ledger-title">Resident Ledger</p>
-          </div>
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search resident..." 
-          className="rev-search-input"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
-      <div className="rev-table-container">
-        <table className="rev-table">
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("name")}>Resident Name {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("room")}>Room {sortConfig.key === "room" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("rentAmount")}>Rent Amount {sortConfig.key === "rentAmount" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("status")}>Status {sortConfig.key === "status" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("paidOn")}>Paid On {sortConfig.key === "paidOn" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("deposit")}>Deposit {sortConfig.key === "deposit" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((row, i) => (
-              <tr key={row.id || i} className="rev-table-row">
-                <td data-label="Resident Name" className="font-medium">{row.name}</td>
-                <td data-label="Room">{row.room}</td>
-                <td data-label="Rent Amount" className="font-semibold text-indigo">₹{row.rentAmount.toLocaleString()}</td>
-                <td data-label="Status">{getStatusBadge(row.status)}</td>
-                <td data-label="Paid On">{row.paidOn}</td>
-                <td data-label="Deposit">₹{row.deposit.toLocaleString()}</td>
-              </tr>
-            ))}
-            {filteredData.length === 0 && (
-              <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
-                  No residents found matching your search.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-const ExpenseLedger = ({ expenditures, isDateInFilter }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "date", direction: "desc" });
-
-  const ledgerData = useMemo(() => {
-    return expenditures
-      .filter((exp) => isDateInFilter(new Date(exp.expenseDate || exp.date)))
-      .map((exp) => {
-        return {
-          id: exp.id,
-          date: exp.expenseDate || exp.date,
-          category: exp.category || "General",
-          title: exp.title || "—",
-          amount: Number(exp.amount || 0),
-          status: exp.paymentStatus || "—",
-          method: exp.paymentMethod || "—",
-          paidTo: exp.paidTo || "—",
-        };
-      });
-  }, [expenditures, isDateInFilter]);
-
-  const filteredData = useMemo(() => {
-    let data = [...ledgerData];
-    if (searchTerm) {
-      data = data.filter(item => 
-        item.category.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.paidTo.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (sortConfig.key) {
-      data.sort((a, b) => {
-        let aVal = a[sortConfig.key];
-        let bVal = b[sortConfig.key];
-        
-        if (sortConfig.key === 'date') {
-          aVal = new Date(aVal).getTime();
-          bVal = new Date(bVal).getTime();
-        }
-
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
-    return data;
-  }, [ledgerData, searchTerm, sortConfig]);
-
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getStatusBadge = (status) => {
-    const s = (status || "").toUpperCase();
-    if (s === "PAID") return <span className="rev-status-badge rev-status-paid">Paid</span>;
-    if (s === "PENDING" || s === "UNPAID") return <span className="rev-status-badge rev-status-overdue">Unpaid</span>;
-    return <span className="rev-status-badge">{status}</span>;
-  };
-
-  if (ledgerData.length === 0) return null;
-
-  return (
-    <div className="rev-ledger-section" style={{ marginTop: '24px', borderLeft: '4px solid #ef4444' }}>
-      <div className="rev-ledger-header">
-        <div className="rev-ledger-header-left">
-          <div className="rev-ledger-icon" style={{ background: '#fef2f2', color: '#ef4444' }}>
-            <i className="bi bi-receipt"></i>
-          </div>
-          <div>
-            <p className="rev-ledger-title">Expense Ledger</p>
-          </div>
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search expenses..." 
-          className="rev-search-input"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
-      <div className="rev-table-container">
-        <table className="rev-table">
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("date")}>Date {sortConfig.key === "date" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("category")}>Category {sortConfig.key === "category" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("title")}>Description {sortConfig.key === "title" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("paidTo")}>Paid To {sortConfig.key === "paidTo" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("method")}>Method {sortConfig.key === "method" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("amount")}>Amount {sortConfig.key === "amount" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-              <th onClick={() => handleSort("status")}>Status {sortConfig.key === "status" && (sortConfig.direction === "asc" ? "↑" : "↓")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((row, i) => (
-              <tr key={row.id || i} className="rev-table-row">
-                <td data-label="Date">{row.date ? format(new Date(row.date), "dd MMM yyyy") : "—"}</td>
-                <td data-label="Category" className="font-medium">{row.category}</td>
-                <td data-label="Description">{row.title}</td>
-                <td data-label="Paid To">{row.paidTo}</td>
-                <td data-label="Method">{row.method}</td>
-                <td data-label="Amount" className="font-semibold text-red">₹{row.amount.toLocaleString()}</td>
-                <td data-label="Status">{getStatusBadge(row.status)}</td>
-              </tr>
-            ))}
-            {filteredData.length === 0 && (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
-                  No expenses found matching your search.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
 export default OwnerRevenue;
