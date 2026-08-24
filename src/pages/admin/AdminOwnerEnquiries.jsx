@@ -16,6 +16,24 @@ const getInitials = (name) => {
   return p.length === 1 ? p[0][0].toUpperCase() : (p[0][0] + p[p.length - 1][0]).toUpperCase();
 };
 
+const formatDateTime = (isoString) => {
+  if (!isoString) return ["-", ""];
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return ["-", ""];
+  const datePart = d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).replace(/\//g, "-");
+  const timePart = d.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  return [datePart, timePart];
+};
+
 
 const ActionMenu = ({ anchorRect, onDelete }) => {
   if (!anchorRect) return null;
@@ -100,7 +118,7 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
 
   const toggleSort = () => setSortDir((prev) => (prev === "desc" ? "asc" : "desc"));
   const [filterOpen, setFilterOpen] = useState(false);
-  const resetFilters = () => setFilters({ pg: "", owner: "", status: "", sharing: "", room: "" });
+  const resetFilters = () => setFilters({ pg: "", owner: "", status: "", sharing: "", room: "", contactMethod: "" });
 
   const [summary, setSummary] = useState({
     pgs: [],
@@ -116,6 +134,7 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
     status: "",
     sharing: "",
     room: "",
+    contactMethod: "",
   });
 
   // { id, rect } of the enquiry whose action menu is open, or null
@@ -149,6 +168,7 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
       if (filters.status) params.append("status", filters.status);
       if (filters.sharing) params.append("sharing", filters.sharing);
       if (filters.room) params.append("room", filters.room);
+      if (filters.contactMethod) params.append("contactMethod", filters.contactMethod);
       params.append("sortDir", sortDir);
 
       const res = await api.get(`${basePath}/paged?${params.toString()}`);
@@ -166,7 +186,7 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [basePath, filters.owner, filters.pg, filters.room, filters.sharing, filters.status, search, sortDir]);
+  }, [basePath, filters.contactMethod, filters.owner, filters.pg, filters.room, filters.sharing, filters.status, search, sortDir]);
 
   useEffect(() => {
     loadSummary();
@@ -206,8 +226,8 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
   };
 
   const hasFilters = useMemo(
-    () => Boolean(search || filters.pg || filters.owner || filters.status || filters.sharing || filters.room),
-    [filters.owner, filters.pg, filters.room, filters.sharing, filters.status, search]
+    () => Boolean(search || filters.pg || filters.owner || filters.status || filters.sharing || filters.room || filters.contactMethod),
+    [filters.contactMethod, filters.owner, filters.pg, filters.room, filters.sharing, filters.status, search]
   );
 
   const copyPhone = (phone, id) => {
@@ -400,6 +420,15 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
         </button>
       </div>
 
+      <div className="pgenq-field">
+        <label className="pgenq-field-label">VIA</label>
+        <select name="contactMethod" className="pgenq-field-input" value={filters.contactMethod} onChange={handleFilterChange}>
+          <option value="">All</option>
+          <option value="WHATSAPP">WhatsApp</option>
+          <option value="ENQUIRY">Enquiry</option>
+        </select>
+      </div>
+
     </div>
 
     <div className="pgenq-filter-actions">
@@ -421,30 +450,43 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
         <table className="pgenq-table">
           <thead>
             <tr>
-              <th>Sr No</th>
-              <th>PG</th>
-              <th>Owner</th>
-              <th>Enquirer</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Note</th>
-              <th>Sharing</th>
-              <th>Room</th>
-              <th>Status</th>
+              <th><div className="th-content">Sr No <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Date <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">PG <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Owner <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Enquirer <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Phone <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Email <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Note <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Sharing <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Room <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Via <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
+              <th><div className="th-content">Status <i className="bi bi-arrow-down-up pgenq-sort-icon"></i></div></th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <TableSkeleton rows={8} cols={11} />
+              <TableSkeleton rows={8} cols={12} />
             ) : enquiries.length === 0 ? (
               <tr>
-                <td colSpan="11" className="pgenq-empty">{emptyMessage}</td>
+                <td colSpan="12" className="pgenq-empty">{emptyMessage}</td>
               </tr>
             ) : (
               enquiries.map((e, index) => (
                 <tr key={e.id}>
                   <td>{page * PAGE_SIZE + index + 1}</td>
+                  <td>
+                    {(() => {
+                      const [d, t] = formatDateTime(e.createdAt || e.date || e.enquiryDate);
+                      return (
+                        <div className="pgenq-date-cell">
+                          <div className="pgenq-date-part">{d}</div>
+                          {t && <div className="pgenq-time-part">{t}</div>}
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td>
                     <div className="pgenq-name-cell">
                       <div className="pgenq-pg-icon"><FaHome /></div>
@@ -463,10 +505,16 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
                   <td className="enq-table-truncate">{e.adminNote || "-"}</td>
                   <td>{e.sharingType ? <span className="sharing-badge">{e.sharingType}</span> : "-"}</td>
                   <td className="enq-table-muted">{e.roomTypeName || "-"}</td>
+                  <td>
+                    {e.contactMethod === "WHATSAPP"
+                      ? <span style={{ color: "#25D366", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}><i className="bi bi-whatsapp" /> WA</span>
+                      : <span style={{ color: "#6b7280", fontSize: 13 }}>Form</span>
+                    }
+                  </td>
                   <td><span className={`status-pill ${e.status}`}>{e.status}</span></td>
                   <td className="enq-action-cell" onClick={(ev) => ev.stopPropagation()}>
                     <button
-                      className="icon-btn"
+                      className="pgenq-action-dots"
                       title="Actions"
                       onClick={(ev) => toggleMenu(ev, e.id)}
                     >
@@ -498,10 +546,10 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
               <div className="pgenq-card-body">
 
                 <div className="enq-card-header-flex">
-                  <span>#{page * PAGE_SIZE + index + 1}</span>
+                  <span>#{page * PAGE_SIZE + index + 1} • {formatDateTime(e.createdAt || e.date || e.enquiryDate).join(" ")}</span>
                   <div className="enq-action-cell" onClick={(ev) => ev.stopPropagation()}>
                     <button
-                      className="icon-btn"
+                      className="pgenq-action-dots"
                       title="Actions"
                       onClick={(ev) => toggleMenu(ev, e.id)}
                     >
@@ -548,6 +596,11 @@ const AdminOwnerEnquiries = ({ basePath = "/admin/admin-enquiries" }) => {
                   {e.roomTypeName && (
                     <div className="pgenq-card-meta-item">
                       <i className="bi bi-door-open-fill"></i>{e.roomTypeName}
+                    </div>
+                  )}
+                  {e.contactMethod === "WHATSAPP" && (
+                    <div className="pgenq-card-meta-item" style={{ color: "#25D366", fontWeight: 600 }}>
+                      <i className="bi bi-whatsapp"></i> via WhatsApp
                     </div>
                   )}
                 </div>

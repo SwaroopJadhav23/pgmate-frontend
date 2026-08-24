@@ -649,16 +649,6 @@ const Navbar = () => {
             <Link to="/login" className="pg-login-btn desktop-only">
               <i className="bi bi-person"></i> Login
             </Link>
-          ) : roleUpper === "USER" ? (
-            <Link
-              to={location.pathname === "/profile" ? "/" : "/profile"}
-              className="pg-profile desktop-only"
-              style={{ textDecoration: "none" }}
-            >
-              <div className="pg-avatar">
-                <i className="bi bi-person-fill"></i>
-              </div>
-            </Link>
           ) : (
             <div
               className="pg-profile desktop-only"
@@ -672,6 +662,15 @@ const Navbar = () => {
               </div>
               {showProfileMenu && (
                 <div className="pg-profile-menu">
+                  {roleUpper === "USER" && (
+                    <NavLink
+                      to="/profile"
+                      className="pg-menu-link"
+                      onClick={() => setShowProfileMenu(false)}
+                    >
+                      <i className="bi bi-speedometer2"></i> Dashboard
+                    </NavLink>
+                  )}
                   {roleUpper === "OWNER" && (
                     <>
                       <NavLink

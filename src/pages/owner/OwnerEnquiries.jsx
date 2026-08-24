@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import React from "react";
-import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
@@ -9,47 +8,6 @@ import "./OwnerEnquiries.css";
 import { TableSkeleton } from "../public/Skeleton";
 
 const PAGE_SIZE = 20;
-
-// Renders the 3-dot action menu into document.body via portal, positioned
-// with `fixed` coords from the trigger button's bounding rect. This escapes
-// any parent `overflow: auto/hidden` (e.g. the horizontally scrollable
-// desktop table wrapper), so the menu never gets clipped for the last rows.
-const ActionMenu = ({ anchorRect, onDelete }) => {
-  if (!anchorRect) return null;
-
-  const MENU_WIDTH = 140;
-  const MENU_HEIGHT_ESTIMATE = 44; // single "Delete" item
-
-  let top = anchorRect.bottom + 6;
-  let left = anchorRect.right - MENU_WIDTH;
-
-  // Flip above the button if there isn't enough room below the viewport
-  if (top + MENU_HEIGHT_ESTIMATE > window.innerHeight) {
-    top = anchorRect.top - MENU_HEIGHT_ESTIMATE - 6;
-  }
-  // Keep menu inside viewport horizontally
-  if (left < 8) left = 8;
-  if (left + MENU_WIDTH > window.innerWidth - 8) {
-    left = window.innerWidth - MENU_WIDTH - 8;
-  }
-
-  const style = {
-    position: "fixed",
-    top,
-    left,
-    minWidth: MENU_WIDTH,
-    zIndex: 1000,
-  };
-
-  return createPortal(
-    <div className="enq-action-menu" style={style} onClick={(ev) => ev.stopPropagation()}>
-      <button className="enq-action-menu-item enq-action-delete" onClick={onDelete}>
-        <i className="bi bi-trash" /> Delete
-      </button>
-    </div>,
-    document.body,
-  );
-};
 
 const OwnerEnquiries = () => {
   const [enquiries, setEnquiries] = useState([]);
@@ -60,9 +18,7 @@ const OwnerEnquiries = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [summary, setSummary] = useState({ total: 0, NEW: 0, CONTACTED: 0, CONVERTED: 0, CLOSED: 0 });
-  // { id, rect } of the enquiry whose action menu is open, or null
-  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [summary, setSummary] = useState({ total: 0, NEW: 0, RESPONDED: 0, THIS_MONTH: 0 });
 
   const queryParams = useMemo(
     () => ({ search: searchTerm.trim(), status: statusFilter || undefined }),
@@ -75,12 +31,26 @@ const OwnerEnquiries = () => {
         params: { page: 0, size: 9999 },
       });
       const all = res.data?.content || [];
+      const now = new Date();
+      const thisMonthEnquiries = all.filter(e => {
+        if (!e.createdAt) return false;
+        // Assuming format dd-MM-yyyy HH:mm:ss, but handle ISO as well
+        let dt;
+        if (e.createdAt.includes("-") && e.createdAt.indexOf("-") === 2) {
+          // dd-MM-yyyy
+          const parts = e.createdAt.substring(0, 10).split("-");
+          dt = new Date(parts[2], parseInt(parts[1]) - 1, parts[0]);
+        } else {
+          dt = new Date(e.createdAt);
+        }
+        return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
+      });
+
       setSummary({
         total: res.data?.totalElements || all.length,
         NEW: all.filter((e) => e.status === "NEW").length,
-        CONTACTED: all.filter((e) => e.status === "CONTACTED").length,
-        CONVERTED: all.filter((e) => e.status === "CONVERTED").length,
-        CLOSED: all.filter((e) => e.status === "CLOSED").length,
+        RESPONDED: all.filter((e) => e.status === "CONTACTED" || e.status === "CONVERTED").length,
+        THIS_MONTH: thisMonthEnquiries.length,
       });
     } catch (err) {
       console.error("Summary load error", err);
@@ -121,25 +91,6 @@ const OwnerEnquiries = () => {
     return () => clearTimeout(timeoutId);
   }, [loadPage]);
 
-  // Close the 3-dot action menu on any outside click
-  useEffect(() => {
-    const closeMenu = () => setMenuAnchor(null);
-    document.addEventListener("click", closeMenu);
-    return () => document.removeEventListener("click", closeMenu);
-  }, []);
-
-  // Close the menu on scroll/resize so it doesn't stay pinned to a stale position
-  useEffect(() => {
-    if (!menuAnchor) return;
-    const close = () => setMenuAnchor(null);
-    window.addEventListener("scroll", close, true);
-    window.addEventListener("resize", close);
-    return () => {
-      window.removeEventListener("scroll", close, true);
-      window.removeEventListener("resize", close);
-    };
-  }, [menuAnchor]);
-
   const updateStatus = async (id, status) => {
     try {
       await api.put(`/enquiry/${id}/status/${status}`);
@@ -164,13 +115,7 @@ const OwnerEnquiries = () => {
   };
 
   const handleDeleteClick = (id) => {
-    setMenuAnchor(null);
     confirmDelete(id);
-  };
-
-  const toggleMenu = (ev, id) => {
-    const rect = ev.currentTarget.getBoundingClientRect();
-    setMenuAnchor((prev) => (prev?.id === id ? null : { id, rect }));
   };
 
   const confirmDelete = async (id) => {
@@ -200,85 +145,80 @@ const OwnerEnquiries = () => {
   };
 
   return (
-    <DashboardLayout title="PG Enquiries" subtitle="Leads from your PG detail pages">
+    <DashboardLayout title="Enquiries" subtitle="Manage and respond to all enquiries">
 
       {/* ── STAT CARDS ── */}
       <div className="owners-stats-row">
-        <div className="owners-stat-card owners-stat-card--purple">
+        <div className="owners-stat-card">
           <div className="owners-stat-icon owners-stat-icon--purple">
-            <i className="bi bi-envelope-fill"></i>
+            <i className="bi bi-file-earmark-text"></i>
           </div>
           <div className="owners-stat-info">
-            <div className="owners-stat-value">{summary.total}</div>
             <div className="owners-stat-label">Total Enquiries</div>
-            <div className="owners-stat-sub">All incoming leads</div>
+            <div className="owners-stat-value">{summary.total}</div>
           </div>
         </div>
-        <div className="owners-stat-card owners-stat-card--blue">
+        <div className="owners-stat-card">
           <div className="owners-stat-icon owners-stat-icon--blue">
-            <i className="bi bi-bell-fill"></i>
+            <i className="bi bi-check2-square"></i>
           </div>
           <div className="owners-stat-info">
+            <div className="owners-stat-label">New Enquiries</div>
             <div className="owners-stat-value">{summary.NEW}</div>
-            <div className="owners-stat-label">New</div>
-            <div className="owners-stat-sub">Awaiting response</div>
           </div>
         </div>
-        <div className="owners-stat-card owners-stat-card--orange">
-          <div className="owners-stat-icon owners-stat-icon--orange">
-            <i className="bi bi-telephone-fill"></i>
-          </div>
-          <div className="owners-stat-info">
-            <div className="owners-stat-value">{summary.CONTACTED}</div>
-            <div className="owners-stat-label">Contacted</div>
-            <div className="owners-stat-sub">Follow-up in progress</div>
-          </div>
-        </div>
-        <div className="owners-stat-card owners-stat-card--green">
+        <div className="owners-stat-card">
           <div className="owners-stat-icon owners-stat-icon--green">
-            <i className="bi bi-check-circle-fill"></i>
+            <i className="bi bi-person-lines-fill"></i>
           </div>
           <div className="owners-stat-info">
-            <div className="owners-stat-value">{summary.CONVERTED}</div>
-            <div className="owners-stat-label">Converted</div>
-            <div className="owners-stat-sub">Successful leads</div>
+            <div className="owners-stat-label">Responded</div>
+            <div className="owners-stat-value">{summary.RESPONDED}</div>
           </div>
         </div>
-        <div className="owners-stat-card owners-stat-card--red">
-          <div className="owners-stat-icon owners-stat-icon--red">
-            <i className="bi bi-x-circle-fill"></i>
+        <div className="owners-stat-card">
+          <div className="owners-stat-icon owners-stat-icon--orange">
+            <i className="bi bi-clock-history"></i>
           </div>
           <div className="owners-stat-info">
-            <div className="owners-stat-value">{summary.CLOSED}</div>
-            <div className="owners-stat-label">Closed</div>
-            <div className="owners-stat-sub">No longer active</div>
+            <div className="owners-stat-label">This Month</div>
+            <div className="owners-stat-value">{summary.THIS_MONTH}</div>
           </div>
         </div>
       </div>
 
       {/* ── SHELL ── */}
-      <div className="card p-3 enquiries-shell">
+      <div className="enquiries-shell">
 
-        {/* Filter bar */}
-        <div className="filter-bar enquiries-filter-bar">
-          <input
-            type="text"
-            className="form-control search-input"
-            placeholder="Search by name, phone, email, PG..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <select
-            className="form-select status-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">All Status</option>
-            <option value="NEW">NEW</option>
-            <option value="CONTACTED">CONTACTED</option>
-            <option value="CONVERTED">CONVERTED</option>
-            <option value="CLOSED">CLOSED</option>
-          </select>
+        {/* Toolbar */}
+        <div className="enquiries-toolbar">
+          <div className="enquiries-toolbar-left">
+            <div className="enquiries-search-box">
+              <i className="bi bi-search"></i>
+              <input
+                type="text"
+                placeholder="Search by name, phone or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <select
+              className="form-select status-select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All Status</option>
+              <option value="NEW">NEW</option>
+              <option value="CONTACTED">CONTACTED</option>
+              <option value="CONVERTED">CONVERTED</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
+          </div>
+          <div className="enquiries-toolbar-right">
+            <button className="enquiries-export-btn" onClick={() => toast("Export feature coming soon")}>
+              <i className="bi bi-download"></i> Export
+            </button>
+          </div>
         </div>
 
         {/* ── TABLE SCOPE ── */}
@@ -288,83 +228,91 @@ const OwnerEnquiries = () => {
           <div className="enq-desktop-wrap">
             <table className="enq-desktop-table">
               <colgroup>
-                <col width="52" />
-                <col width="140" />
-                <col width="220" />
-                <col width="170" />
-                <col width="130" />
-                <col width="155" />
-                <col width="130" />
-                <col width="160" />
                 <col width="60" />
+                <col width="220" />
+                <col width="160" />
+                <col width="200" />
+                <col width="250" />
+                <col width="140" />
+                <col width="120" />
+                <col width="120" />
+                <col width="80" />
               </colgroup>
               <thead>
                 <tr>
-                  <th>No.</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th>Message</th>
-                  <th>Status</th>
+                  <th>NO.</th>
+                  <th>NAME</th>
+                  <th>CONTACT</th>
+                  <th>EMAIL</th>
+                  <th>MESSAGE</th>
+                  <th>STATUS</th>
                   <th>PG</th>
-                  <th>Date</th>
-                  <th>Action</th>
+                  <th>DATE</th>
+                  <th>ACTION</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <TableSkeleton rows={6} cols={9} />
+                  <tr><td colSpan="9"><TableSkeleton rows={6} cols={9} /></td></tr>
                 ) : enquiries.length === 0 ? (
                   <tr>
                     <td colSpan="9" className="enq-empty">No matching enquiries found</td>
                   </tr>
                 ) : (
-                  enquiries.map((e, i) => (
-                    <tr key={e.id} className="enq-dt-row">
-                      <td>{i + 1}</td>
-                      <td>{e.name}</td>
-                      <td>
-                        <div className="enq-phone-wrap">
-                          <span className="enq-phone-num">{e.phone}</span>
-                          <button className="enq-icon-btn" onClick={() => { navigator.clipboard.writeText(e.phone); setCopiedId(e.id); setTimeout(() => setCopiedId(null), 1500); }}>
-                            {copiedId === e.id ? <i className="bi bi-check2 text-success" /> : <i className="bi bi-copy" />}
+                  enquiries.map((e, i) => {
+                    const dateParts = e.createdAt ? e.createdAt.split(" ") : ["-"];
+                    return (
+                      <tr key={e.id} className="enq-card-row">
+                        <td className="enq-no-cell">
+                          <div className="enq-no-badge">{page * PAGE_SIZE + i + 1}</div>
+                        </td>
+                        <td className="enq-name-cell-table">
+                          <div className="enq-name-wrapper">
+                            <div className="enq-avatar"><i className="bi bi-person"></i></div>
+                            <span className="enq-name-text">{e.name}</span>
+                          </div>
+                        </td>
+                        <td className="enq-contact-cell-table">
+                          <div className="enq-phone-number">{e.phone}</div>
+                          <div className="enq-contact-actions">
+                            <button className="enq-action-icon" onClick={() => { navigator.clipboard.writeText(e.phone); setCopiedId(e.id); setTimeout(() => setCopiedId(null), 1500); }} title="Copy">
+                              {copiedId === e.id ? <i className="bi bi-check2 text-success" /> : <i className="bi bi-copy" />}
+                            </button>
+                            <a href={`tel:${e.phone}`} className="enq-action-icon" title="Call"><i className="bi bi-telephone-fill" style={{color: '#10B981'}} /></a>
+                            <a href={`https://wa.me/91${e.phone}`} target="_blank" rel="noopener noreferrer" className="enq-action-icon" title="WhatsApp"><i className="bi bi-whatsapp" style={{color: '#22C55E'}} /></a>
+                          </div>
+                        </td>
+                        <td className="enq-email-cell">{e.email || "-"}</td>
+                        <td className="enq-msg-cell">{e.adminNote || "-"}</td>
+                        <td className="enq-status-cell">
+                          <select
+                            className={`enq-status-badge enq-status-badge--${e.status.toLowerCase()}`}
+                            value={e.status}
+                            onChange={(ev) => updateStatus(e.id, ev.target.value)}
+                          >
+                            <option value="NEW">NEW</option>
+                            <option value="CONTACTED">CONTACTED</option>
+                            <option value="CONVERTED">CONVERTED</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+                        </td>
+                        <td className="enq-pg-cell">{e.pgName}</td>
+                        <td className="enq-date-cell">
+                          <div className="enq-date-part">{dateParts[0]}</div>
+                          {dateParts[1] && <div className="enq-time-part">{dateParts[1]}</div>}
+                        </td>
+                        <td className="enq-action-cell-table" onClick={(ev) => ev.stopPropagation()}>
+                          <button
+                            className="enq-action-dots enq-delete-btn"
+                            onClick={() => handleDeleteClick(e.id)}
+                            title="Delete"
+                          >
+                            <i className="bi bi-trash" />
                           </button>
-                          <a href={`tel:${e.phone}`} className="enq-icon-btn"><i className="bi bi-telephone-fill text-success" /></a>
-                          <a href={`https://wa.me/91${e.phone}`} target="_blank" rel="noopener noreferrer" className="enq-icon-btn"><i className="bi bi-whatsapp text-success" /></a>
-                        </div>
-                      </td>
-                      <td>{e.email || "-"}</td>
-                      <td className="enq-msg-cell">{e.adminNote || "-"}</td>
-                      <td>
-                        <select
-                          className="enq-dt-status-select"
-                          value={e.status}
-                          onChange={(ev) => updateStatus(e.id, ev.target.value)}
-                        >
-                          <option value="NEW">NEW</option>
-                          <option value="CONTACTED">CONTACTED</option>
-                          <option value="CONVERTED">CONVERTED</option>
-                          <option value="CLOSED">CLOSED</option>
-                        </select>
-                      </td>
-                      <td>{e.pgName}</td>
-                      <td>{e.createdAt}</td>
-                      <td className="enq-action-cell" onClick={(ev) => ev.stopPropagation()}>
-                        <button
-                          className="enq-icon-btn"
-                          onClick={(ev) => toggleMenu(ev, e.id)}
-                        >
-                          <i className="bi bi-three-dots-vertical" />
-                        </button>
-                        {menuAnchor?.id === e.id && (
-                          <ActionMenu
-                            anchorRect={menuAnchor.rect}
-                            onDelete={() => handleDeleteClick(e.id)}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -390,17 +338,12 @@ const OwnerEnquiries = () => {
                       <span className={`enq-badge enq-badge--${e.status.toLowerCase()}`}>{e.status}</span>
                       <div className="enq-action-cell" onClick={(ev) => ev.stopPropagation()}>
                         <button
-                          className="enq-icon-btn"
-                          onClick={(ev) => toggleMenu(ev, e.id)}
+                          className="enq-icon-btn enq-delete-btn"
+                          onClick={() => handleDeleteClick(e.id)}
+                          title="Delete"
                         >
-                          <i className="bi bi-three-dots-vertical" />
+                          <i className="bi bi-trash" />
                         </button>
-                        {menuAnchor?.id === e.id && (
-                          <ActionMenu
-                            anchorRect={menuAnchor.rect}
-                            onDelete={() => handleDeleteClick(e.id)}
-                          />
-                        )}
                       </div>
                     </div>
                   </div>

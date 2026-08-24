@@ -107,6 +107,8 @@ const ReservedResidents = ({
   const [collectSigResident, setCollectSigResident] = useState(null);
   const [savingSig, setSavingSig] = useState(false);
   const [stats, setStats] = useState({ total: 0, monthly: 0, daily: 0 });
+  const [detailResident, setDetailResident] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const saveSignatureForResident = async (residentId, signatureDataUrl) => {
     setSavingSig(true);
@@ -148,6 +150,10 @@ const ReservedResidents = ({
       );
     }
   }, [pendingSignatureUpdate]);
+
+  const liveDetail = detailResident
+    ? residents.find((r) => r.residentId === detailResident.residentId) ?? detailResident
+    : null;
 
   const loadResidents = useCallback(
     async (nextPage = 0, append = false) => {
@@ -327,10 +333,6 @@ const ReservedResidents = ({
               <th>Room</th>
               <th>Bed</th>
               <th>Stay</th>
-              <th>Charge</th>
-              <th>Extra</th>
-              <th>Check-in</th>
-              <th>Expected Checkout</th>
               <th>Payment Status</th>
               <th>Actions</th>
             </tr>
@@ -341,7 +343,7 @@ const ReservedResidents = ({
             ) : residents.length === 0 ? (
               <tr>
                 <td
-                  colSpan="13"
+                  colSpan="9"
                   style={{
                     textAlign: "center",
                     padding: "32px 0",
@@ -357,20 +359,35 @@ const ReservedResidents = ({
               </tr>
             ) : (
               residents.map((r) => (
-                <tr key={r.residentId}>
+                <tr key={r.residentId} onClick={() => setDetailResident(r)} style={{ cursor: "pointer" }}>
                   <td data-label="Name">{r.name}</td>
                   <td data-label="Phone">
                     <div className="phone-cell">
                       <span>{r.phone}</span>
                       <button
                         className="copy-btn"
-                        onClick={() => {
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px',
+                          padding: '4px 10px',
+                          backgroundColor: '#f1f5f9',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '6px',
+                          color: '#475569',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                          transition: 'all 0.2s ease',
+                          fontSize: '12px'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
                           navigator.clipboard.writeText(r.phone);
                           setCopiedId(r.residentId);
                           setTimeout(() => setCopiedId(null), 1500);
                         }}
                       >
-                        {copiedId === r.residentId ? "Done" : "Copy"}
+                        {copiedId === r.residentId ? <i className="bi bi-check-lg text-success"></i> : <i className="bi bi-copy"></i>}
                       </button>
                     </div>
                   </td>
@@ -381,12 +398,6 @@ const ReservedResidents = ({
                     {r.bedNumber ? `Bed ${r.bedNumber}` : "-"}
                   </td>
                   <td data-label="Stay">{stayLabel(r)}</td>
-                  <td data-label="Charge">{chargeLabel(r)}</td>
-                  <td data-label="Extra">{extraLabel(r)}</td>
-                  <td data-label="Check-in">{formatDate(r.checkinDate)}</td>
-                  <td data-label="Expected Checkout">
-                    {formatDate(r.expectedCheckoutDate)}
-                  </td>
                   <td data-label="Payment Status">
                     {r.reservationAmount > 0 ? (
                       <span className="pay-status-badge pay-status-success">✓ Successful</span>
@@ -395,19 +406,58 @@ const ReservedResidents = ({
                     )}
                   </td>
                   <td data-label="Actions">
-                    <div className="d-flex justify-content-center gap-2">
-                      <button
-                        className="action-btn confirm"
-                        onClick={() => onConfirm(r)}
-                      >
-                        Confirm
-                      </button>
-                      <button
-                        className="action-btn deny"
-                        onClick={() => onDenied(r.residentId)}
-                      >
-                        Deny
-                      </button>
+                    <div className="d-flex justify-content-center gap-2 flex-nowrap">
+                      {r.status === "RESERVED" && (
+                        <button
+                          className="action-btn"
+                          style={{ 
+                            backgroundColor: "#3b82f6", 
+                            color: "white", 
+                            padding: "8px 16px",
+                            boxShadow: "0 4px 10px rgba(59, 130, 246, 0.3)",
+                            borderRadius: "8px",
+                            border: "none",
+                            fontWeight: "600",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px"
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDetailResident(r);
+                          }}
+                        >
+                          <i className="bi bi-file-earmark-text-fill"></i> Review
+                        </button>
+                      )}
+                      {r.status === "PENDING_TENANT_DETAILS" && (
+                        <span className="text-muted small" style={{ fontWeight: 600 }}>
+                          Waiting for Tenant
+                        </span>
+                      )}
+                      {r.status === "PENDING_OWNER_VERIFICATION" && (
+                        <button
+                          className="action-btn"
+                          style={{ 
+                            backgroundColor: "#10b981", 
+                            color: "white", 
+                            padding: "8px 16px",
+                            boxShadow: "0 4px 10px rgba(16, 185, 129, 0.3)",
+                            borderRadius: "8px",
+                            border: "none",
+                            fontWeight: "600",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px"
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDetailResident(r);
+                          }}
+                        >
+                          <i className="bi bi-person-check-fill"></i> Verify
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -451,7 +501,7 @@ const ReservedResidents = ({
         ) : (
           <div className="rr-cards-wrap">
             {residents.map((r) => (
-              <div key={r.residentId} className="rr-card">
+              <div key={r.residentId} className="rr-card" onClick={() => setDetailResident(r)} style={{ cursor: 'pointer' }}>
                 {/* Card head: avatar · name · pg · stay badge */}
                 <div className="rr-card__head">
                   <div className="rr-card__avatar">
@@ -496,14 +546,28 @@ const ReservedResidents = ({
                     <div className="rr-card__phone">
                       <span className="rr-card__cell-val">{r.phone}</span>
                       <button
-                        className="rr-card__copy"
-                        onClick={() => {
+                        className="rr-card__copy-btn"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '4px 10px',
+                          backgroundColor: '#f1f5f9',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '6px',
+                          color: '#475569',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                          fontSize: '12px',
+                          marginLeft: '8px'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
                           navigator.clipboard.writeText(r.phone);
                           setCopiedId(r.residentId);
                           setTimeout(() => setCopiedId(null), 1500);
                         }}
                       >
-                        {copiedId === r.residentId ? "✓" : "⎘"}
+                        {copiedId === r.residentId ? <i className="bi bi-check-lg text-success"></i> : <i className="bi bi-copy"></i>}
                       </button>
                     </div>
                   </div>
@@ -560,26 +624,349 @@ const ReservedResidents = ({
                   </div>
                 )}
 
-                {/* Action buttons */}
-                <div className="rr-card__actions">
-                  <button
-                    className="rr-card__btn rr-card__btn--confirm"
-                    onClick={() => onConfirm(r)}
-                  >
-                    ✓ Confirm Move-in
-                  </button>
-                  <button
-                    className="rr-card__btn rr-card__btn--deny"
-                    onClick={() => onDenied(r.residentId)}
-                  >
-                    ✕ Deny
-                  </button>
+                <div className="rr-card__actions" style={{ flexWrap: "wrap", justifyContent: "center" }}>
+                  {r.status === "RESERVED" && (
+                    <button
+                      className="rr-card__btn"
+                      style={{ 
+                        backgroundColor: "#3b82f6", 
+                        color: "white", 
+                        padding: "8px 16px",
+                        boxShadow: "0 4px 10px rgba(59, 130, 246, 0.3)",
+                        borderRadius: "8px",
+                        border: "none",
+                        fontWeight: "600",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailResident(r);
+                      }}
+                    >
+                      <i className="bi bi-file-earmark-text-fill"></i> Review
+                    </button>
+                  )}
+                  {r.status === "PENDING_TENANT_DETAILS" && (
+                    <span className="text-muted small" style={{ fontWeight: 600, padding: "8px" }}>
+                      Waiting for Tenant Details
+                    </span>
+                  )}
+                  {r.status === "PENDING_OWNER_VERIFICATION" && (
+                    <button
+                      className="rr-card__btn"
+                      style={{ 
+                        backgroundColor: "#10b981", 
+                        color: "white", 
+                        padding: "8px 16px",
+                        boxShadow: "0 4px 10px rgba(16, 185, 129, 0.3)",
+                        borderRadius: "8px",
+                        border: "none",
+                        fontWeight: "600",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailResident(r);
+                      }}
+                    >
+                      <i className="bi bi-person-check-fill"></i> Verify
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* DETAIL POPUP — compact card layout */}
+      {liveDetail && (
+        <div className="modal-backdrop-custom" onClick={() => setDetailResident(null)}>
+          <div className="modal-box rdp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="rdp-header">
+              <div className="rdp-avatar">
+                {liveDetail.profilePhotoUrl ? (
+                  <img src={liveDetail.profilePhotoUrl} alt="Profile" className="rdp-avatar-img" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  liveDetail.name ? liveDetail.name.charAt(0).toUpperCase() : "?"
+                )}
+              </div>
+              <div className="rdp-header-text">
+                <h4>{liveDetail.name}</h4>
+                <span>{liveDetail.pgName} &nbsp;·&nbsp; Room {liveDetail.roomNumber || "-"}, Bed {liveDetail.bedNumber || "-"} &nbsp;·&nbsp; {liveDetail.stayType === "DAILY_BASIC" ? "Daily" : "Monthly"}</span>
+              </div>
+              <button className="rdp-close-btn" onClick={() => setDetailResident(null)}>✕</button>
+            </div>
+
+            <div className="rdp-body" style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '65vh', overflowY: 'auto', paddingRight: '10px' }}>
+              
+              {/* BASIC & CONTACT INFO */}
+              <div className="rdp-col" style={{ width: '100%', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <span className="rdp-col-title" style={{ color: '#3b82f6', marginBottom: '12px', display: 'block' }}>CONTACT & INFO</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '15px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="rdp-label">Phone</span>
+                    <span className="rdp-value">{liveDetail.phone}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="rdp-label">Email</span>
+                    <span className="rdp-value">{liveDetail.email || "-"}</span>
+                  </div>
+                  {liveDetail.dob && (
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">DOB</span>
+                        <span className="rdp-value">{liveDetail.dob}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Gender</span>
+                        <span className="rdp-value">{liveDetail.gender}</span>
+                      </div>
+                    </>
+                  )}
+                  {liveDetail.aadhaarNumber && (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">Aadhaar No.</span>
+                      <span className="rdp-value">{liveDetail.aadhaarNumber}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* PROFESSIONAL DETAILS */}
+              {liveDetail.occupation && (
+                <div className="rdp-col" style={{ width: '100%', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                  <span className="rdp-col-title" style={{ color: '#3b82f6', marginBottom: '12px', display: 'block' }}>PROFESSIONAL DETAILS</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '15px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">Occupation</span>
+                      <span className="rdp-value">{liveDetail.occupation}</span>
+                    </div>
+                    {liveDetail.education && (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Education</span>
+                        <span className="rdp-value">{liveDetail.education}</span>
+                      </div>
+                    )}
+                    {liveDetail.collegeOrCompanyName && (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Organization</span>
+                        <span className="rdp-value">{liveDetail.collegeOrCompanyName}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* ADDRESS DETAILS */}
+              {liveDetail.permanentAddress && (
+                <div className="rdp-col" style={{ width: '100%', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                  <span className="rdp-col-title" style={{ color: '#3b82f6', marginBottom: '12px', display: 'block' }}>ADDRESS DETAILS</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">Permanent Address</span>
+                      <span className="rdp-value">{liveDetail.permanentAddress}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">City</span>
+                      <span className="rdp-value">{liveDetail.permanentCity}</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">State</span>
+                      <span className="rdp-value">{liveDetail.permanentState}</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">Pincode</span>
+                      <span className="rdp-value">{liveDetail.permanentPincode}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* EMERGENCY & GUARDIAN */}
+              {(liveDetail.emergencyContactName || liveDetail.guardianName) && (
+                <div className="rdp-col" style={{ width: '100%', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                  <span className="rdp-col-title" style={{ color: '#3b82f6', marginBottom: '12px', display: 'block' }}>EMERGENCY & GUARDIAN</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
+                    {liveDetail.emergencyContactName && (
+                      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #e9ecef' }}>
+                        <span className="rdp-label" style={{ fontWeight: 'bold' }}>Emergency Contact</span>
+                        <span className="rdp-value">{liveDetail.emergencyContactName} ({liveDetail.emergencyContactRelation})</span>
+                        <span className="rdp-value">{liveDetail.emergencyContact}</span>
+                      </div>
+                    )}
+                    {liveDetail.guardianName && (
+                      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #e9ecef' }}>
+                        <span className="rdp-label" style={{ fontWeight: 'bold' }}>Guardian</span>
+                        <span className="rdp-value">{liveDetail.guardianName} ({liveDetail.guardianRelation})</span>
+                        <span className="rdp-value">{liveDetail.guardianPhone}</span>
+                      </div>
+                    )}
+                    {liveDetail.localGuardianName && (
+                      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #e9ecef' }}>
+                        <span className="rdp-label" style={{ fontWeight: 'bold' }}>Local Guardian</span>
+                        <span className="rdp-value">{liveDetail.localGuardianName} ({liveDetail.localGuardianRelation})</span>
+                        <span className="rdp-value">{liveDetail.localGuardianPhone}</span>
+                        <span className="rdp-value" style={{ fontSize: '12px', marginTop: '4px' }}>{liveDetail.localGuardianAddress}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* CHARGES & DATES */}
+              <div className="rdp-col" style={{ width: '100%', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <span className="rdp-col-title" style={{ color: '#3b82f6', marginBottom: '12px', display: 'block' }}>CHARGES & DATES</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '15px' }}>
+                  {liveDetail.stayType === "DAILY_BASIC" ? (
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Daily Rent</span>
+                        <span className="rdp-value">{formatMoney(liveDetail.dailyRent)}/day</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Days Booked</span>
+                        <span className="rdp-value">{liveDetail.numberOfDays || 0}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Monthly Rent</span>
+                        <span className="rdp-value">{formatMoney(liveDetail.monthlyRent)}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Deposit</span>
+                        <span className="rdp-value">{formatMoney(liveDetail.deposit)}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="rdp-label">Future Refund Amount</span>
+                        <span className="rdp-value">{formatMoney(liveDetail.futureDepositRefund)}</span>
+                      </div>
+                    </>
+                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="rdp-label">Check-in</span>
+                    <span className="rdp-value">{formatDate(liveDetail.checkinDate)}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="rdp-label">Checkout</span>
+                    <span className="rdp-value">{formatDate(liveDetail.expectedCheckoutDate)}</span>
+                  </div>
+                  {liveDetail.foodPreference && (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">Food Preference</span>
+                      <span className="rdp-value">{liveDetail.foodPreference}</span>
+                    </div>
+                  )}
+                  {liveDetail.foodFacility && (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="rdp-label">Food Facility</span>
+                      <span className="rdp-value">{liveDetail.foodFacility}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* DOCUMENTS */}
+              {(liveDetail.aadhaarCardUrl || liveDetail.depositProofUrl || liveDetail.onboardingPaymentProofUrl || liveDetail.agreementSignatureUrl) && (
+                <div className="rdp-col" style={{ width: '100%', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                  <span className="rdp-col-title" style={{ color: '#3b82f6', marginBottom: '12px', display: 'block' }}>DOCUMENTS & PROOFS</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+                    {liveDetail.aadhaarCardUrl && (
+                      <a href={liveDetail.aadhaarCardUrl} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 12px', backgroundColor: '#e2e8f0', borderRadius: '6px', fontSize: '13px', color: '#1e293b', textDecoration: 'none', fontWeight: 600 }}>
+                        <i className="bi bi-file-earmark-person"></i> Aadhaar Card
+                      </a>
+                    )}
+                    {liveDetail.depositProofUrl && (
+                      <a href={liveDetail.depositProofUrl} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 12px', backgroundColor: '#e2e8f0', borderRadius: '6px', fontSize: '13px', color: '#1e293b', textDecoration: 'none', fontWeight: 600 }}>
+                        <i className="bi bi-receipt"></i> Deposit Proof
+                      </a>
+                    )}
+                    {liveDetail.onboardingPaymentProofUrl && (
+                      <a href={liveDetail.onboardingPaymentProofUrl} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 12px', backgroundColor: '#e2e8f0', borderRadius: '6px', fontSize: '13px', color: '#1e293b', textDecoration: 'none', fontWeight: 600 }}>
+                        <i className="bi bi-receipt"></i> Payment Proof
+                      </a>
+                    )}
+                    {liveDetail.agreementSignatureUrl && (
+                      <a href={liveDetail.agreementSignatureUrl} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 12px', backgroundColor: '#e2e8f0', borderRadius: '6px', fontSize: '13px', color: '#1e293b', textDecoration: 'none', fontWeight: 600 }}>
+                        <i className="bi bi-pen"></i> Agreement Signature
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="rdp-actions" style={{ justifyContent: 'center', gap: '15px', paddingTop: '15px' }}>
+              {liveDetail.status === "RESERVED" && (
+                <>
+                  <button
+                    className="action-btn confirm"
+                    style={{ padding: '8px 24px', fontSize: '14px' }}
+                    onClick={() => {
+                      onConfirm(liveDetail);
+                      setDetailResident(null);
+                    }}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className="action-btn deny"
+                    style={{ padding: '8px 24px', fontSize: '14px' }}
+                    onClick={() => {
+                      onDenied(liveDetail.residentId);
+                      setDetailResident(null);
+                    }}
+                  >
+                    ✕ Deny
+                  </button>
+                </>
+              )}
+              {liveDetail.status === "PENDING_TENANT_DETAILS" && (
+                <span className="text-muted small" style={{ fontWeight: 600 }}>
+                  Waiting for Tenant Details
+                </span>
+              )}
+              {liveDetail.status === "PENDING_OWNER_VERIFICATION" && (
+                <>
+                  <button
+                    className="action-btn confirm"
+                    style={{ padding: '8px 24px', fontSize: '14px', backgroundColor: '#10b981', borderColor: '#10b981', color: '#fff' }}
+                    onClick={async () => {
+                      try {
+                        await api.put(`${apiPrefix}/${liveDetail.residentId}/verify-and-activate`);
+                        setDetailResident(null);
+                        window.location.reload();
+                      } catch (err) {
+                        toast.error("Failed to verify resident.");
+                      }
+                    }}
+                  >
+                    ✓ Activate
+                  </button>
+                  <button
+                    className="action-btn deny"
+                    style={{ padding: '8px 24px', fontSize: '14px' }}
+                    onClick={() => {
+                      onDenied(liveDetail.residentId);
+                      setDetailResident(null);
+                    }}
+                  >
+                    ✕ Reject
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── LOAD MORE ───────────────────────────────────────────────── */}
       {hasMore && (

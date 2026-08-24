@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   X,
+  Home,
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api/axios";
@@ -25,10 +26,12 @@ const UserLayout = ({ children, hideWelcome }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch profile
     api.get("/users/me")
       .then((res) => setUserProfile(res.data))
       .catch(() => {});
@@ -38,6 +41,12 @@ const UserLayout = ({ children, hideWelcome }) => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [sidebarOpen]);
+
+  useEffect(() => {
+    const closeProfileMenu = () => setShowProfileMenu(false);
+    window.addEventListener("click", closeProfileMenu);
+    return () => window.removeEventListener("click", closeProfileMenu);
+  }, []);
   
   const handleLogout = () => {
     logout();
@@ -52,14 +61,41 @@ const UserLayout = ({ children, hideWelcome }) => {
     <>
       <div className="user-topbar">
         <div className="user-topbar-logo" onClick={() => setSidebarOpen(true)} style={{cursor:"pointer"}}>
-  <Menu size={20} className="user-topbar-menu-icon" />
-</div>
-        <button
-  className="user-topbar-avatar-btn"
-  onClick={() => navigate("/")}
->
-  <UserIcon size={18} />
-</button>
+          <Menu size={20} className="user-topbar-menu-icon" />
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            className="user-topbar-avatar-btn user-topbar-home-btn user-custom-tooltip"
+            onClick={() => navigate("/")}
+            data-tooltip="Go to Home"
+          >
+            <Home size={18} strokeWidth={2.5} />
+          </button>
+          
+          <div className="user-topbar-profile" onClick={(e) => {
+            e.stopPropagation();
+            setShowProfileMenu((prev) => !prev);
+          }}>
+            <button
+              className="user-topbar-avatar-btn"
+              title="Profile"
+            >
+              <UserIcon size={18} />
+            </button>
+            {showProfileMenu && (
+              <div className="user-topbar-menu">
+                <button
+                  className="user-topbar-logout"
+                  onClick={() => setShowLogoutConfirm(true)}
+                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
       <div className="user-shell">
 

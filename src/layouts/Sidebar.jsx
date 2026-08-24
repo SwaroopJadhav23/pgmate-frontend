@@ -33,6 +33,7 @@ const Sidebar = ({ open, setOpen }) => {
   // ✅ Dismissible expiry NOTICE — closing this only hides the popup.
   // subscriptionExpired itself (from context) stays true so card clicks still redirect.
   const [showExpiryNotice, setShowExpiryNotice] = useState(false);
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
 
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
@@ -114,6 +115,21 @@ const Sidebar = ({ open, setOpen }) => {
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
   }, [open]);
+
+  useEffect(() => {
+    if (role !== "OWNER" && role !== "PG_MANAGER") return;
+    const fetchCount = () => {
+      const prefix = role === "PG_MANAGER" ? "/manager/residents" : "/owner/residents";
+      api.get(`${prefix}/reserved/paged?page=0&size=1`)
+        .then(res => setPendingBookingsCount(res.data?.totalElements || 0))
+        .catch(() => {});
+    };
+    
+    fetchCount();
+    
+    window.addEventListener("bookingsUpdated", fetchCount);
+    return () => window.removeEventListener("bookingsUpdated", fetchCount);
+  }, [role, location.pathname]);
 
 
 
@@ -287,6 +303,7 @@ const Sidebar = ({ open, setOpen }) => {
                   label="Bookings"
                   close={closeMobile}
                   subscriptionExpired={subscriptionExpired}
+                  badge={pendingBookingsCount}
                 />
                 <NavItem
                   icon={<FileText size={18} />}
@@ -676,7 +693,7 @@ const Sidebar = ({ open, setOpen }) => {
 };
 
 /* NAV ITEM COMPONENT */
-const NavItem = ({ icon, to, label, close, subscriptionExpired }) => {
+const NavItem = ({ icon, to, label, close, subscriptionExpired, badge }) => {
   const navigate = useNavigate();
   const allowed = to === "/owner/dashboard" || to === "/owner/pricing";
 
@@ -699,8 +716,23 @@ const NavItem = ({ icon, to, label, close, subscriptionExpired }) => {
         isActive ? "sidebar-link active" : "sidebar-link"
       }
     >
-      {icon}
-      <span>{label}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
+        {icon}
+        <span>{label}</span>
+      </div>
+      {badge > 0 && (
+        <span style={{
+          background: "#ef4444",
+          color: "white",
+          fontSize: "11px",
+          fontWeight: "bold",
+          padding: "2px 7px",
+          borderRadius: "10px",
+          marginLeft: "auto"
+        }}>
+          {badge}
+        </span>
+      )}
     </NavLink>
   );
 };

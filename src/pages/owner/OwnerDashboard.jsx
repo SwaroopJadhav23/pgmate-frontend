@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import pgmateLogo from "../../assets/PGMate.png";
 import api from "../../api/axios";
+import toast from "react-hot-toast";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import OnboardingGuide from "../../components/OnboardingGuide";
 import {
@@ -539,6 +540,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     useState(false);
   const [pgs, setPgs] = useState([]);
   const [selectedPgId, setSelectedPgId] = useState("ALL");
+  const [subSummary, setSubSummary] = useState(null);
 
   const navigate = useNavigate();
   const { subscriptionExpired } = useContext(AuthContext);
@@ -562,6 +564,10 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       api.get("/owner/pgs")
         .then(res => setPgs(res.data || []))
         .catch(err => console.error("Error fetching PGs", err));
+        
+      api.get("/owner/subscription/summary")
+        .then((res) => setSubSummary(res.data))
+        .catch((err) => console.error("Error fetching sub summary", err));
     }
 
     api
@@ -1715,9 +1721,14 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
           >
             <button
               className="dash-quick-btn qb-indigo"
-              onClick={() =>
-                goTo(`${apiPrefix}/pgs`, { state: { openCreate: true } })
-              }
+              style={subSummary?.pgLimit >= 0 && subSummary?.pgUsed >= subSummary?.pgLimit ? { opacity: 0.6 } : {}}
+              onClick={() => {
+                if (subSummary?.pgLimit >= 0 && subSummary?.pgUsed >= subSummary?.pgLimit) {
+                  toast.error("Upgrade plan to add more PGs");
+                  return;
+                }
+                goTo(`${apiPrefix}/pgs`, { state: { openCreate: true } });
+              }}
             >
               <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#4F46E5" strokeWidth="1.3">
                 <circle cx="8" cy="8" r="6.5" />

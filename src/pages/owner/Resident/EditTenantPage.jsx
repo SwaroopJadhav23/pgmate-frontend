@@ -422,6 +422,17 @@ const EditTenantPage = ({ apiPrefix }) => {
       }
     >
       <div className="arm-page">
+        {resident.noticeServed && (
+          <div style={{ backgroundColor: "#fef2f2", color: "#b91c1c", border: "1px solid #f87171", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "20px" }}>⚠️</span>
+            <div>
+              <div style={{ fontWeight: 600 }}>Notice Served</div>
+              <div style={{ fontSize: "14px" }}>
+                This tenant served notice on {resident.noticeDate ? new Date(resident.noticeDate).toLocaleDateString("en-GB") : "-"} and is scheduled to move out on {resident.expectedCheckoutDate ? new Date(resident.expectedCheckoutDate).toLocaleDateString("en-GB") : "-"}.
+              </div>
+            </div>
+          </div>
+        )}
         <div className="arm-page-body">
           <div className="arm-grid">
             

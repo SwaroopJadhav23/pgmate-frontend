@@ -289,6 +289,64 @@
   align-items: center;
   justify-content: center;
 }
+
+.user-topbar-home-btn {
+  background-color: #f3f4ff;
+  color: #4f46e5;
+  transition: all 0.2s ease;
+}
+
+.user-topbar-home-btn:hover {
+  background-color: #e5e7fa;
+}
+
+/* Instant Custom Tooltip for User Layout */
+.user-custom-tooltip {
+  position: relative;
+}
+
+.user-custom-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #1f2937;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease, visibility 0.1s ease, transform 0.1s ease;
+  pointer-events: none;
+  z-index: 999;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.user-custom-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border-width: 0 4px 4px 4px;
+  border-style: solid;
+  border-color: transparent transparent #1f2937 transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease, visibility 0.1s ease;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.user-custom-tooltip:hover::after,
+.user-custom-tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
 .user-topbar-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -300,6 +358,27 @@
   min-width: 150px;
   padding: 6px;
   z-index: 50;
+}
+
+.user-topbar-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.user-topbar-logout:hover {
+  background: #fef2f2;
 }
 @media (max-width: 900px) {
   .user-topbar { margin-left: 0; }
