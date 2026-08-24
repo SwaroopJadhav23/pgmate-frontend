@@ -71,10 +71,11 @@ const ApkDownloadModal = ({ show, setShow }) => {
   };
 
   const handleClose = () => {
+    window.apkModalDismissed = true;
     setShow(false);
   };
 
-  if (!show) return null;
+  if (!show || window.apkModalDismissed) return null;
 
   return (
     <div className="apk-overlay">

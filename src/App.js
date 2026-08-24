@@ -114,6 +114,7 @@ import NotFound from "./pages/NotFound/NotFound";
 import AdminDeletionRequests from "./pages/admin/AdminDeletionRequests";
 
 import EditTenantPage from "./pages/owner/Resident/EditTenantPage";
+import GlobalTenantOnboarding from "./pages/Users/GlobalTenantOnboarding";
 
 function App() {
   return (
@@ -127,6 +128,7 @@ function App() {
           }}
         />
         <ScrollToTop />
+        <GlobalTenantOnboarding />
         <Routes>
           {/* PUBLIC */}
           <Route path="/" element={<Home />} />

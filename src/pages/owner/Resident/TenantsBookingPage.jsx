@@ -43,6 +43,7 @@ const ReservedResidentsPage = () => {
             await api.put(`/owner/residents/${id}/deny`);
             toast.success("Reservation Denied.");
             reloadList();
+            window.dispatchEvent(new Event("bookingsUpdated"));
           } catch {
             toast.error("Unable to deny reservation.");
           }
@@ -53,7 +54,7 @@ const ReservedResidentsPage = () => {
         show={showConfirm}
         resident={selectedResident}
         onClose={() => { setShowConfirm(false); setSelectedResident(null); }}
-        onSuccess={() => { setShowConfirm(false); setSelectedResident(null); reloadList(); }}
+        onSuccess={() => { setShowConfirm(false); setSelectedResident(null); reloadList(); window.dispatchEvent(new Event("bookingsUpdated")); }}
         apiPrefix="/owner/residents"
       />
     </DashboardLayout>

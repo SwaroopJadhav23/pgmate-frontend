@@ -999,10 +999,35 @@
 }
 
 .ar-modal-content {
-  margin-bottom: 14px;
-  font-size: 13px;
-  color: #374151;
+  margin-bottom: 18px;
+  font-size: 13.5px;
+  color: #1e293b;
   line-height: 1.7;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.ar-modal-content .agreement-title {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #0f172a;
+}
+
+.ar-modal-content .agreement-body {
+  margin-bottom: 12px;
+}
+
+.ar-modal-content .agreement-terms {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.ar-modal-content .agreement-terms li {
+  margin-bottom: 8px;
 }
 
 .ar-sig-label {
@@ -1771,18 +1796,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #d7dbef;
+  border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  color: #111827;
-  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  color: #1e293b;
+  font-size: 16px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
 }
 
 .ar-filter-btn:hover {
-  background: #f9fafb;
+  background: #f5f7ff;
+  border-color: #c7cdec;
 }
 
 @media (max-width: 768px) {

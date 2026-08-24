@@ -58,6 +58,23 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
+const MovingOutLogo = ({ title = "Moving Out" }) => (
+  <div className="ar-custom-tooltip" data-tooltip={title} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginLeft: '12px', cursor: 'default', verticalAlign: 'middle' }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" style={{ position: 'absolute', top: '-11px', right: '-11px', zIndex: 1 }} fill="none">
+      <path d="M12 4l1 3" stroke="#eab308" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M17 5.5l-1.5 2.5" stroke="#eab308" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M20 9.5l-3 1" stroke="#eab308" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+    <div style={{ width: '28px', height: '28px', backgroundColor: '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, position: 'relative' }}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 3h7v18H5z" fill="#ef4444"/>
+        <path d="M10 11v2" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M14 12h6m0 0l-2.5-2.5M20 12l-2.5 2.5" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </div>
+  </div>
+);
+
 const PAGE_SIZE = 20;
 const formatDate = (dt) => dt ? new Date(dt).toLocaleDateString("en-GB") : "-";
 const normalize = (v) => (typeof v === "string" ? v.trim().toUpperCase() : "");
@@ -283,187 +300,85 @@ const sortedResidents = useMemo(() => {
 </div>
       <p className="search-result-count">Showing <strong>{residents.length}</strong> of {totalElements} residents</p>
 
-      {/* DESKTOP TABLE */}
-      {!isMobile && (
-        <div className="residents-table-scroll">
-          <table className="modern-table">
-            <thead>
-              <tr>
-                <th>S.No</th><th>Name</th><th>Phone</th><th>Rent</th><th>Check-in</th><th>Exp. Checkout</th><th>Stay Type</th><th>Paid</th><th>Police Verif.</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <TableSkeleton rows={6} cols={10} />
-              ) : residents.length === 0 ? (
-                <tr><td colSpan="10" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
-              ) : (
-  sortedResidents.map((r, idx) => {
-    // eslint-disable-next-line
-    const mode = normalize(r?.onboardingPaymentMode || "");
-                  // eslint-disable-next-line
-                  const amount = r?.onboardingPaymentAmount || 0;
-                  return (
-                    <tr key={r.residentId} onClick={() => setDetailResident(r)} className="ar-cursor-pointer">
-                      <td data-label="S.No">{idx + 1}</td>
-                      <td data-label="Name">{r.name}</td>
-                      <td data-label="Phone">
-                        <div className="phone-cell">
-                          <span className="phone-number">{r.phone}</span>
-                          <button className="copy-btn" onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(r.phone); setCopiedId(r.residentId); setTimeout(() => setCopiedId(null), 1500); }}>
-                            {copiedId === r.residentId ? <i className="bi bi-check-lg text-success"></i> : <i className="bi bi-copy"></i>}
-                          </button>
-                        </div>
-                      </td>
-                      <td data-label="Charge">{chargeLabel(r)}</td>
-                      <td data-label="Check-in">{formatDate(r.checkinDate)}</td>
-                      <td data-label="Exp. Checkout">{formatDate(r.expectedCheckoutDate)}</td>
-                      <td data-label="Stay Type">
-                        <span className={`payment-pill ${isDailyResident(r) ? "pill-cash" : "pill-online"}`}>
-                          {isDailyResident(r) ? "Daily" : "Monthly"}
-                        </span>
-                      </td>
-                      <td data-label="Paid">
-                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-cash"}`}>
-                          {r.hasPendingDues ? "Pending" : "Paid"}
-                        </span>
-                      </td>
-                      <td data-label="Police Verif." onClick={(e) => e.stopPropagation()}>
-                        <div className="pv-status-cell">
-                          {isPoliceVerificationComplete(r) ? (
-                            <>
-                              <span className="pv-icon pv-icon--ok" title="Verification Complete">
-                                <i className="bi bi-check-lg"></i>
-                              </span>
-                              <button
-                                className="pv-action-btn pv-action-btn--view"
-                                title="View Police Form"
-                                onClick={(e) => { e.stopPropagation(); setPoliceResident(r); }}
-                              >
-                                <i className="bi bi-eye"></i>
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <span className="pv-icon pv-icon--warn" title="Verification Incomplete">
-                                <i className="bi bi-exclamation-triangle-fill"></i>
-                              </span>
-                              <button
-                                className="pv-action-btn pv-action-btn--edit"
-                                title="Complete Verification"
-                                onClick={(e) => { e.stopPropagation(); navigate(`/owner/residents/edit/${r.residentId}`, { state: { resident: r, apiPrefix } }); }}
-                              >
-                                <i className="bi bi-pencil-square"></i>
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td data-label="Actions" className="d-flex gap-2 justify-content-center align-items-center" onClick={(e) => e.stopPropagation()}>
-                        <a href={`tel:${r.phone}`} className="icon-btn" aria-label="Call">
-                          <i className="bi bi-telephone-fill text-success"></i>
-                        </a>
-                        <a href={`https://wa.me/91${r.phone}`} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="WhatsApp">
-                          <i className="bi bi-whatsapp text-success"></i>
-                        </a>
-                        {isOwner && (
-                          <span
-                            className="payment-pill pill-dues ar-cursor-pointer"
-                            onClick={(e) => { e.stopPropagation(); goToDues(r); }}>
-                            Dues
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* UNIFIED CARD LAYOUT */}
+      <div className="resident-card-list">
+        {loading ? (
+          [...Array(6)].map((_, i) => (
+            <div key={i} className="resident-card-item" style={{ height: "100px", background: "#f8fafc", animation: "pulse 1.5s infinite" }}></div>
+          ))
+        ) : residents.length === 0 ? (
+          <div className="ar-text-center py-4" style={{ color: "#64748b", background: "#fff", borderRadius: "12px", border: "1px solid #f1f5f9" }}>
+            {search ? `No residents found for "${search}"` : "No active residents"}
+          </div>
+        ) : (
+          sortedResidents.map((r, idx) => (
+            <div key={r.residentId} className={`resident-card-item ${r.noticeServed ? 'moving-out-card' : ''}`} onClick={() => setDetailResident(r)}>
+              {/* 1. S.No & Name */}
+              <div className="r-card-col r-card-profile">
+                <div className="r-card-sno">{idx + 1}</div>
+                <div className="r-card-name-group">
+                  <div className="r-card-name">
+                    {r.name}
+                    {r.noticeServed && (
+                      <MovingOutLogo title="Moving Out" />
+                    )}
+                  </div>
+                  <div className="r-card-pill">{isDailyResident(r) ? "Daily" : "Monthly"}</div>
+                </div>
+              </div>
+              
+              {/* 2. Stay Type */}
+              <div className="r-card-col r-card-staytype">
+                <div className="r-card-label">Stay Type</div>
+                <div className="r-card-value">{isDailyResident(r) ? "Daily" : "Monthly"}</div>
+              </div>
+              
+              {/* 3. Paid Status */}
+              <div className="r-card-col">
+                <div className="r-card-label">Paid Status</div>
+                <div className="r-card-value">
+                  <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-cash"}`}>
+                    {r.hasPendingDues ? "Pending" : "Paid"}
+                  </span>
+                </div>
+              </div>
+              
+              {/* 4. Police Verification */}
+              <div className="r-card-col" onClick={(e) => e.stopPropagation()}>
+                <div className="r-card-label">Police Verification</div>
+                <div className="r-card-value pv-flex mt-1">
+                  {isPoliceVerificationComplete(r) ? (
+                    <>
+                      <span className="pv-text-ok"><i className="bi bi-shield-check"></i> Verified</span>
+                      <button className="pv-action-btn pv-action-btn--view ms-2" onClick={(e) => { e.stopPropagation(); setPoliceResident(r); }}><i className="bi bi-eye"></i></button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="pv-text-warn"><i className="bi bi-exclamation-triangle-fill"></i> Not Verified</span>
+                      <button className="pv-action-btn pv-action-btn--edit ms-2" onClick={(e) => { e.stopPropagation(); navigate(`/owner/residents/edit/${r.residentId}`, { state: { resident: r, apiPrefix } }); }}><i className="bi bi-pencil-square"></i></button>
+                    </>
+                  )}
+                </div>
+              </div>
+              
+              {/* 5. Actions */}
+              <div className="r-card-col" onClick={(e) => e.stopPropagation()}>
+                <div className="r-card-label">Actions</div>
+                <div className="r-card-value d-flex gap-2 mt-1">
+                  <a href={`tel:${r.phone}`} className="icon-btn" onClick={(e) => e.stopPropagation()}><i className="bi bi-telephone-fill text-success"></i></a>
+                  <a href={`https://wa.me/91${r.phone}?text=Hi%20${encodeURIComponent(r.name)},%20`} target="_blank" rel="noopener noreferrer" className="icon-btn" onClick={(e) => e.stopPropagation()}><i className="bi bi-whatsapp text-success"></i></a>
+                  {isOwner && <span className="payment-pill pill-dues ar-cursor-pointer" onClick={(e) => { e.stopPropagation(); goToDues(r); }}>Dues</span>}
+                </div>
+              </div>
 
-      {/* MOBILE Table */}
-      {isMobile && (
-        <div className="residents-table-scroll">
-          <table className="modern-table mob-table">
-            <thead>
-              <tr>
-                <th>S.No</th><th>Name</th><th>Rent</th><th>Paid Status</th><th>Police Verif.</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <TableSkeleton rows={6} cols={6} />
-              ) : residents.length === 0 ? (
-                <tr><td colSpan="6" className="ar-text-center">{search ? `No residents found for "${search}"` : "No active residents"}</td></tr>
-             ) : (
-  sortedResidents.map((r, idx) => {
-    return (
-      <tr key={r.residentId} onClick={() => setDetailResident(r)} className="ar-cursor-pointer">
-        <td data-label="S.No">{idx + 1}</td>
-                      <td data-label="Name">{r.name}</td>
-                      <td data-label="Rent">{chargeLabel(r)}</td>
-                      <td data-label="Paid Status">
-                        <span className={`payment-pill ${r.hasPendingDues ? "pill-dues" : "pill-cash"}`} style={{ fontSize: "0.75rem" }}>
-                          {r.hasPendingDues ? "Pending" : "Paid"}
-                        </span>
-                      </td>
-                      <td data-label="Police Verif." onClick={(e) => e.stopPropagation()}>
-                        <div className="pv-status-cell">
-                          {isPoliceVerificationComplete(r) ? (
-                            <>
-                              <span className="pv-icon pv-icon--ok" title="Verification Complete">
-                                <i className="bi bi-check-lg"></i>
-                              </span>
-                              <button
-                                className="pv-action-btn pv-action-btn--view"
-                                title="View Police Form"
-                                onClick={(e) => { e.stopPropagation(); setPoliceResident(r); }}
-                              >
-                                <i className="bi bi-eye"></i>
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <span className="pv-icon pv-icon--warn" title="Verification Incomplete">
-                                <i className="bi bi-exclamation-triangle-fill"></i>
-                              </span>
-                              <button
-                                className="pv-action-btn pv-action-btn--edit"
-                                title="Complete Verification"
-                                onClick={(e) => { e.stopPropagation(); navigate(`/owner/residents/edit/${r.residentId}`, { state: { resident: r, apiPrefix } }); }}
-                              >
-                                <i className="bi bi-pencil-square"></i>
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                        <div className="mob-actions-wrap">
-                          <div className="mob-actions-icons">
-                            <a href={`tel:${r.phone}`} className="icon-btn" aria-label="Call"><i className="bi bi-telephone-fill text-success"></i></a>
-                            <a href={`https://wa.me/91${r.phone}`} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="WhatsApp"><i className="bi bi-whatsapp text-success"></i></a>
-                          </div>
-                          {isOwner && (
-                            <span
-                              className="payment-pill pill-dues ar-cursor-pointer"
-                              onClick={(e) => { e.stopPropagation(); goToDues(r); }}
-                            >
-                              Dues
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+              {/* 6. Three-dot Menu */}
+              <div className="r-card-options" onClick={(e) => { e.stopPropagation(); navigate(`/owner/residents/edit/${r.residentId}`, { state: { resident: r, apiPrefix } }); }}>
+                <i className="bi bi-three-dots-vertical" style={{ cursor: 'pointer' }}></i>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
       {hasMore && <div className="residents-load-more-wrap"><button className="residents-load-more-btn" onClick={() => loadResidents(page + 1, true)} disabled={loadingMore}>{loadingMore ? "Loading..." : "Load More"}</button></div>}
 
@@ -517,6 +432,13 @@ const sortedResidents = useMemo(() => {
               <button className="rdp-close-btn" onClick={() => setDetailResident(null)}>✕</button>
             </div>
 
+            {liveDetail.noticeServed && (
+              <div style={{ backgroundColor: "#fef2f2", color: "#b91c1c", borderBottom: "1px solid #fecaca", padding: "10px 26px", fontSize: "13.5px", display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "16px" }}>⚠️</span>
+                <span><strong>Notice Served:</strong> This tenant is scheduled to move out on <strong>{formatDate(liveDetail.expectedCheckoutDate)}</strong>.</span>
+              </div>
+            )}
+
             {isMobile ? (
               <div className="rdp-body-mobile">
 
@@ -527,8 +449,8 @@ const sortedResidents = useMemo(() => {
                     <span className="rdpm-value">{liveDetail.phone}</span>
                   </div>
                   <div className="rdp-phone-icons">
-                    <a href={`tel:${liveDetail.phone}`} aria-label="Call"><i className="bi bi-telephone-fill text-success"></i></a>
-                    <a href={`https://wa.me/91${liveDetail.phone}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i className="bi bi-whatsapp text-success"></i></a>
+                    <a href={`tel:${liveDetail.phone}`} aria-label="Call" onClick={(e) => e.stopPropagation()}><i className="bi bi-telephone-fill text-success"></i></a>
+                    <a href={`https://wa.me/91${liveDetail.phone}?text=Hi%20${encodeURIComponent(liveDetail.name)},%20`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={(e) => e.stopPropagation()}><i className="bi bi-whatsapp text-success"></i></a>
                   </div>
                 </div>
                 <div className="rdpm-row">
@@ -637,8 +559,8 @@ const sortedResidents = useMemo(() => {
                   <span className="rdp-label">Phone</span>
                   <span className="rdp-value">{liveDetail.phone}</span>
                   <div className="rdp-phone-icons">
-                    <a href={`tel:${liveDetail.phone}`} aria-label="Call"><i className="bi bi-telephone-fill text-success"></i></a>
-                    <a href={`https://wa.me/91${liveDetail.phone}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i className="bi bi-whatsapp text-success"></i></a>
+                    <a href={`tel:${liveDetail.phone}`} aria-label="Call" onClick={(e) => e.stopPropagation()}><i className="bi bi-telephone-fill text-success"></i></a>
+                    <a href={`https://wa.me/91${liveDetail.phone}?text=Hi%20${encodeURIComponent(liveDetail.name)},%20`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={(e) => e.stopPropagation()}><i className="bi bi-whatsapp text-success"></i></a>
                   </div>
                   <span className="rdp-label">Food Facility</span>
                   <span className="rdp-value">

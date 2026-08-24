@@ -89,7 +89,10 @@
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: 8px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
 }
 
 .residents-table,
@@ -380,30 +383,43 @@
 ───────────────────────────────────────────────────── */
 .action-btn {
   border: none;
-  padding: 5px 12px;
+  padding: 6px 14px;
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .action-btn.confirm {
   background: #dcfce7;
   color: #166534;
+  border: 1px solid transparent;
 }
 
 .action-btn.confirm:hover {
-  background: #bbf7d0;
+  background: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
 }
 
 .action-btn.deny {
   background: #fee2e2;
   color: #991b1b;
+  border: 1px solid transparent;
 }
 
 .action-btn.deny:hover {
-  background: #fecaca;
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
 }
 
 .add-resident-btn {
@@ -430,8 +446,8 @@
 ───────────────────────────────────────────────────── */
 .status-tabs-row {
   display: flex;
-  align-items: stretch;
-  gap: 0px;
+  align-items: center;
+  gap: 16px;
 }
 
 .ar-filter-wrap {
@@ -447,12 +463,16 @@
 }
 
 .status-btn {
-  padding: 10px 22px !important;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px !important;
   border-radius: 30px !important;
   border: 1px solid #d7dbef !important;
   background: #f5f7ff !important;
   font-weight: 600 !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   color: #5a5f7d !important;
   transition: all 0.2s ease !important;
 }
@@ -2402,4 +2422,228 @@
 .mob-actions-icons {
   display: flex;
   gap: 6px;
+}
+
+/* ─────────────────────────────────────────────────────
+   RESIDENT CARD LAYOUT (New UI Design)
+───────────────────────────────────────────────────── */
+.resident-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.resident-card-item {
+  display: grid;
+  grid-template-columns: minmax(220px, 3fr) 1fr 1fr 1.5fr 1.2fr;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  padding-right: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  gap: 20px;
+}
+
+.resident-card-item:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+  border-color: #e2e8f0;
+}
+
+/* 1. Profile Section */
+.r-card-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.r-card-profile {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  min-width: 200px;
+}
+
+.r-card-sno {
+  background: #f3f4ff;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.r-card-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.r-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.r-card-pill {
+  background: #eff6ff;
+  color: #3b82f6;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+/* Shared Labels */
+.r-card-label {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.r-card-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Police Verif. custom */
+.pv-flex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pv-text-ok {
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+}
+.pv-text-warn {
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+}
+
+.r-card-options {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #94a3b8;
+  font-size: 18px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .resident-card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 16px;
+  }
+  .r-card-profile {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .r-card-sno {
+    display: none;
+  }
+  .r-card-staytype {
+    display: none !important;
+  }
+  .r-card-options {
+    top: 16px;
+    right: 16px;
+  }
+  .r-card-col {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .r-card-label {
+    font-size: 13px;
+  }
+}
+
+/* Moving Out Highlight */
+.moving-out-card {
+  border: 1.5px solid #fca5a5 !important;
+  background: #fffcfc !important;
+}
+
+.moving-out-card:hover {
+  border-color: #ef4444 !important;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12) !important;
+}
+
+/* Instant Custom Tooltip */
+.ar-custom-tooltip {
+  position: relative;
+}
+
+.ar-custom-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background: #1f2937;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease, visibility 0.1s ease, transform 0.1s ease;
+  pointer-events: none;
+  z-index: 999;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.ar-custom-tooltip::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0px);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1f2937 transparent transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease, visibility 0.1s ease, transform 0.1s ease;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.ar-custom-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.ar-custom-tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(3px);
 }

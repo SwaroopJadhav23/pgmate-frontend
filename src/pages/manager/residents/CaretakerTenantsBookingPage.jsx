@@ -43,6 +43,7 @@ const CaretakerTenantsBookingPage = () => {
             await api.put(`/manager/residents/${id}/deny`);
             Swal.fire({ icon: "success", title: "Reservation Denied", timer: 1500, showConfirmButton: false });
             reloadList();
+            window.dispatchEvent(new Event("bookingsUpdated"));
           } catch {
             Swal.fire({ icon: "error", title: "Failed", text: "Unable to deny reservation" });
           }
@@ -53,7 +54,7 @@ const CaretakerTenantsBookingPage = () => {
         show={showConfirm}
         resident={selectedResident}
         onClose={() => { setShowConfirm(false); setSelectedResident(null); }}
-        onSuccess={() => { setShowConfirm(false); setSelectedResident(null); reloadList(); }}
+        onSuccess={() => { setShowConfirm(false); setSelectedResident(null); reloadList(); window.dispatchEvent(new Event("bookingsUpdated")); }}
         apiPrefix="/manager/residents"
       />
     </DashboardLayout>
