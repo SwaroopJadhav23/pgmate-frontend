@@ -206,7 +206,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
     if (refund !== form.futureDepositRefund) {
       setForm((prev) => ({ ...prev, futureDepositRefund: refund }));
     }
-  }, [form.deposit]); // Only run when deposit changes
+  }, [form.deposit, form.futureDepositRefund]); // Only run when deposit changes
 
   // ── auto checkout date ────────────────────────────────────────────
   useEffect(() => {
@@ -219,7 +219,6 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
   }, [form.checkinDate, form.expectedCheckoutDate, form.stayType]);
 
   // ── derived ───────────────────────────────────────────────────────
-  const selectedRoom = useMemo(() => rooms.find((r) => r.id === form.roomId), [rooms, form.roomId]);
   // eslint-disable-next-line
   const selectedPgName = useMemo(() => pgs.find((p) => p.id === form.pgId)?.name || prefill?.pgName || "", [pgs, form.pgId, prefill]);
   const isDaily = form.stayType === "DAILY_BASIC";
@@ -341,30 +340,6 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
     }
   };
 
-  // ── progress calculation ──────────────────────────────────────────
-  const requiredChecks = [
-    !!form.pgId,
-    !!form.floorId,
-    !!form.roomId,
-    !!form.bedId,
-    form.name.trim().length > 0,
-    form.phone.length === 10,
-    form.email.trim().length > 0,
-    !!form.dob,
-    !!form.guardianName,
-    form.guardianPhone.length === 10,
-    !!form.aadhaarNumber,
-    !!form.foodFacility,
-    !!form.onboardingPaymentMode,
-    !!form.checkinDate,
-    !!form.expectedCheckoutDate,
-    !!aadhaarCard,
-    isDaily ? Number(form.dailyRent) > 0 : Number(form.monthlyRent) > 0,
-    isDaily ? Number(form.numberOfDays) > 0 : true,
-  ];
-  const filledCount = requiredChecks.filter(Boolean).length;
-  const progressPct = Math.round((filledCount / requiredChecks.length) * 100);
-
   return (
     <DashboardLayout
       title="Add Tenant"
@@ -408,7 +383,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             {/* PG — own row, pairs with Floor on desktop via arm-row-4, full-width alone on mobile */}
             <div className="arm-row-4 full">
               <div className="arm-field">
-                <label>PG</label>
+                <label>PG<span className="req">*</span></label>
                 <Form.Select isInvalid={errors.pgId} value={form.pgId}
                   onChange={(e) => setForm({ ...EMPTY_FORM, pgId: e.target.value, stayType: form.stayType })}
                 >
@@ -418,7 +393,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
               </div>
 
               <div className="arm-field">
-                <label>Floor</label>
+                <label>Floor<span className="req">*</span></label>
                 <Form.Select isInvalid={errors.floorId} value={form.floorId}
                   onChange={(e) => setForm({ ...form, floorId: e.target.value, roomId: "", bedId: "" })}
                 >
@@ -429,7 +404,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
               {/* Room / Bed — desktop: stay in same arm-row-4 grid (2x2 visual via wrap) */}
               <div className="arm-field">
-                <label>Room</label>
+                <label>Room<span className="req">*</span></label>
                 <Form.Select isInvalid={errors.roomId} value={form.roomId}
                   onChange={(e) => {
                     const room = rooms.find((r) => r.id === e.target.value);
@@ -442,7 +417,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
               </div>
 
               <div className="arm-field">
-                <label>Bed</label>
+                <label>Bed<span className="req">*</span></label>
                 <Form.Select isInvalid={errors.bedId} value={form.bedId}
                   onChange={(e) => setForm({ ...form, bedId: e.target.value })}
                 >
@@ -453,7 +428,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             </div>
             {/* Stay type — full width on desktop, pairs with Bed on mobile */}
             <div className="arm-field full arm-rent-type-field">
-              <label>Rent Type</label>
+              <label>Rent Type<span className="req">*</span></label>
               <Form.Select isInvalid={errors.stayType} value={form.stayType}
                 onChange={(e) => setForm({ ...form, stayType: e.target.value })}
               >
@@ -469,7 +444,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
           <div className="arm-grid">
           {/* Tenant details */}
             <div className="arm-field" data-mobile-full="true">
-              <label>Full Name</label>
+              <label>Full Name<span className="req">*</span></label>
               <Form.Control
                 placeholder="Enter full name" isInvalid={errors.name} value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
@@ -478,7 +453,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Phone</label>              <Form.Control
+              <label>Phone<span className="req">*</span></label>              <Form.Control
                 placeholder="Enter phone number (10 digits)"
                 type="tel"
                 inputMode="numeric"
@@ -489,7 +464,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Email</label>
+              <label>Email<span className="req">*</span></label>
               <Form.Control
                 type="email"
                 placeholder="Enter email address" isInvalid={errors.email} value={form.email}
@@ -511,7 +486,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             </div>
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Date of Birth</label>
+              <label>Date of Birth<span className="req">*</span></label>
               <Form.Control
                 type="date"
                 max={new Date(Date.now() - 86400000).toISOString().split("T")[0]}
@@ -549,7 +524,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             </div>
 
             <div className="arm-field" data-mobile-full="true">
-              <label>Food Facility</label>
+              <label>Food Facility<span className="req">*</span></label>
               <Form.Select isInvalid={errors.foodFacility} value={form.foodFacility}
                 onChange={(e) => setForm({ ...form, foodFacility: e.target.value })}
               >
@@ -612,7 +587,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             {/* Guardian Information */}
             <h6 className="mt-3" style={{ gridColumn: "1 / -1" }}>Guardian Information</h6>
             <div className="arm-field" data-mobile-full="true">
-              <label>Father's / Guardian's Name *</label>
+              <label>Father's / Guardian's Name<span className="req">*</span></label>
               <Form.Control
                 placeholder="Guardian Name" isInvalid={errors.guardianName} value={form.guardianName}
                 onChange={(e) => setForm({ ...form, guardianName: e.target.value.replace(/[^a-zA-Z\s]/g, '').trimStart() })}
@@ -632,7 +607,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
               </Form.Select>
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Father's / Guardian's Phone *</label>
+              <label>Father's / Guardian's Phone<span className="req">*</span></label>
               <Form.Control
                 placeholder="Guardian Phone"
                 type="tel"
@@ -724,18 +699,18 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             {isDaily ? (
               <>
                 <div className="arm-field">
-                  <label>Daily Rent</label>
+                  <label>Daily Rent<span className="req">*</span></label>
                   <Form.Control type="number" placeholder="Enter daily rent" isInvalid={errors.dailyRent} value={form.dailyRent} onChange={(e) => setForm({ ...form, dailyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
                 <div className="arm-field">
-                  <label>Number of Days</label>
+                  <label>Number of Days<span className="req">*</span></label>
                   <Form.Control type="number" placeholder="Enter number of days" isInvalid={errors.numberOfDays} value={form.numberOfDays} onChange={(e) => setForm({ ...form, numberOfDays: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
               </>
             ) : (
               <>
                 <div className="arm-field">
-                  <label>Monthly Rent</label>
+                  <label>Monthly Rent<span className="req">*</span></label>
                   <Form.Control type="number" placeholder="Enter monthly rent" isInvalid={errors.monthlyRent} value={form.monthlyRent} onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })} onWheel={(e) => e.target.blur()} />
                 </div>
                 <div className="arm-field">
@@ -758,12 +733,12 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
 
             {/* Dates & payment */}
             <div className="arm-field">
-              <label>Check-in Date</label>
+              <label>Check-in Date<span className="req">*</span></label>
               <Form.Control type="date" isInvalid={errors.checkinDate} value={form.checkinDate} onChange={(e) => setForm({ ...form, checkinDate: e.target.value })} />
             </div>
 
             <div className="arm-field">
-              <label>Expected Checkout Date</label>
+              <label>Expected Checkout Date<span className="req">*</span></label>
               <Form.Control type="date" min={form.checkinDate || undefined} isInvalid={errors.expectedCheckoutDate} value={form.expectedCheckoutDate} onChange={(e) => setForm({ ...form, expectedCheckoutDate: e.target.value })} />
             </div>
 
@@ -773,7 +748,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             </div>
 
             <div className="arm-field">
-              <label>Payment Mode</label>
+              <label>Payment Mode<span className="req">*</span></label>
               <Form.Select isInvalid={errors.onboardingPaymentMode} value={form.onboardingPaymentMode}
                 onChange={(e) => setForm({ ...form, onboardingPaymentMode: e.target.value })}
               >
@@ -805,7 +780,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
             {/* Documents */}
             <h6 className="mt-3" style={{ gridColumn: "1 / -1" }}>Documents</h6>
             <div className="arm-field full">
-              <label>Aadhaar Card Number *</label>
+              <label>Aadhaar Card Number<span className="req">*</span></label>
               <Form.Control
                 placeholder="12 digit Aadhaar Number"
                 type="tel"
@@ -819,7 +794,7 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
               <Form.Control type="file" accept="image/*" onChange={(e) => setProfilePhoto(e.target.files[0])} />
             </div>
             <div className="arm-field" data-mobile-full="true">
-              <label>Aadhaar Card Upload *</label>
+              <label>Aadhaar Card Upload<span className="req">*</span></label>
               <Form.Control type="file" accept="image/*,.pdf" isInvalid={errors.aadhaarCard} onChange={(e) => { setAadhaarCard(e.target.files[0]); setErrors(prev => ({ ...prev, aadhaarCard: false })); }} />
             </div>
 

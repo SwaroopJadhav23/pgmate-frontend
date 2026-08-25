@@ -1,4 +1,4 @@
-import { FaLeaf, FaDrumstickBite, FaFileAlt, FaUtensils, FaTimesCircle, FaFilter } from "react-icons/fa";
+import { FaFileAlt, FaUtensils, FaTimesCircle } from "react-icons/fa";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +7,6 @@ import api from "../../../api/axios";
 import "./ActiveResidents.css";
 import "./Resident.css";
 import "./Agreement.css";
-import { TableSkeleton } from "../../public/Skeleton";
 import AgreementSignaturePad from "./AgreementSignaturePad";
 import PoliceVerificationModal from "./PoliceVerificationModal";
 
@@ -77,7 +76,6 @@ const MovingOutLogo = ({ title = "Moving Out" }) => (
 
 const PAGE_SIZE = 20;
 const formatDate = (dt) => dt ? new Date(dt).toLocaleDateString("en-GB") : "-";
-const normalize = (v) => (typeof v === "string" ? v.trim().toUpperCase() : "");
 const PAYMENT_MODES = ["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "WALLET"];
 const STAY_FILTERS = [
   { key: "ALL", label: "All" },
@@ -86,7 +84,6 @@ const STAY_FILTERS = [
 ];
 const formatMoney = (value) => `₹${Number(value ?? 0).toLocaleString("en-IN")}`;
 const isDailyResident = (resident) => resident?.stayType === "DAILY_BASIC";
-const chargeLabel = (resident) => isDailyResident(resident) ? `${formatMoney(resident.dailyRent)}/day` : formatMoney(resident.monthlyRent);
 // eslint-disable-next-line
 const extraLabel = (resident) => isDailyResident(resident) ? `${resident.numberOfDays || 0} day(s)` : formatMoney(resident.deposit);
 // Police verification completeness: all key personal/guardian fields must be filled
@@ -108,7 +105,6 @@ const ActiveResidents = ({ refreshKey, onReload, apiPrefix }) => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [copiedId, setCopiedId] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [stayFilter, setStayFilter] = useState("ALL");
@@ -130,6 +126,57 @@ const SORT_OPTIONS = [
   const [policeResident, setPoliceResident] = useState(null);
   const [settlementForm, setSettlementForm] = useState({ deductedAmount: "", deductionReason: "", refundPaymentMode: "" });
   const [refundFile, setRefundFile] = useState(null);
+  
+  // Payment History state for checkout
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [loadingPaymentHistory, setLoadingPaymentHistory] = useState(false);
+
+  const fetchPaymentHistory = async (resident) => {
+    const residentId = resident.residentId;
+    setLoadingPaymentHistory(true);
+    setShowPaymentHistory(true);
+    try {
+      const [manualRes, pendingRentRes, paidRentRes] = await Promise.all([
+        api.get(`/owner/rent/manual/resident/${residentId}`),
+        api.get("/owner/rent?status=ALL"),
+        api.get("/owner/rent?status=PAID")
+      ]);
+      const manualDues = Array.isArray(manualRes.data) ? manualRes.data : [];
+      
+      const pendingRents = Array.isArray(pendingRentRes.data) ? pendingRentRes.data : [];
+      const paidRents = Array.isArray(paidRentRes.data) ? paidRentRes.data : [];
+      const allRents = [...pendingRents, ...paidRents];
+      
+      const residentRents = allRents.filter(r => r.residentId === residentId);
+      
+      const combined = [
+        ...manualDues.map(d => ({ ...d, isManual: true })),
+        ...residentRents.map(r => ({ ...r, isManual: false }))
+      ];
+
+      if (resident.deposit && Number(resident.deposit) > 0) {
+        combined.push({
+          isManual: true,
+          dueFor: "Security Deposit",
+          description: "Paid during check-in",
+          dueDate: resident.checkinDate,
+          paidDate: resident.checkinDate,
+          amount: resident.deposit,
+          status: 'PAID',
+          paymentMode: "At Onboarding"
+        });
+      }
+
+      combined.sort((a, b) => new Date(b.dueDate || 0) - new Date(a.dueDate || 0));
+      setPaymentHistory(combined);
+    } catch (err) {
+      console.error("Failed to fetch payment history", err);
+      Swal.fire({ icon: "error", title: "Error", text: "Could not load payment history.", confirmButtonColor: "#5B5BD6" });
+    } finally {
+      setLoadingPaymentHistory(false);
+    }
+  };
 
   const loadResidents = useCallback(async (nextPage = 0, append = false) => {
     try {
@@ -277,7 +324,7 @@ const sortedResidents = useMemo(() => {
       aria-label="Sort filter"
       type="button"
     >
-      <FaFilter />
+      <i className="bi bi-sliders" style={{ fontSize: '16px' }}></i>
     </button>
     {sortMenuOpen && (
       <>
@@ -368,6 +415,9 @@ const sortedResidents = useMemo(() => {
                   <a href={`tel:${r.phone}`} className="icon-btn" onClick={(e) => e.stopPropagation()}><i className="bi bi-telephone-fill text-success"></i></a>
                   <a href={`https://wa.me/91${r.phone}?text=Hi%20${encodeURIComponent(r.name)},%20`} target="_blank" rel="noopener noreferrer" className="icon-btn" onClick={(e) => e.stopPropagation()}><i className="bi bi-whatsapp text-success"></i></a>
                   {isOwner && <span className="payment-pill pill-dues ar-cursor-pointer" onClick={(e) => { e.stopPropagation(); goToDues(r); }}>Dues</span>}
+                  {isOwner && (
+                    <span className="payment-pill ar-cursor-pointer" style={{ backgroundColor: '#eef2ff', color: '#4f46e5' }} onClick={(e) => { e.stopPropagation(); setSettlementResident(r); fetchPaymentHistory(r); }}>History</span>
+                  )}
                 </div>
               </div>
 
@@ -405,9 +455,179 @@ const sortedResidents = useMemo(() => {
                 </>
               )}
             </div>
-            <div className="modal-actions ar-modal-sticky-actions">
-              <button className="modal-btn cancel" onClick={() => setShowSettlement(false)}>Cancel</button>
-              <button className="modal-btn success" onClick={submitSettlement}>{currentSettlementIsDaily ? "Complete Checkout" : "Confirm and Checkout"}</button>
+            <div className="modal-actions ar-modal-sticky-actions" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <button className="modal-btn outline" style={{ marginRight: 'auto' }} onClick={() => fetchPaymentHistory(settlementResident)}>
+                View Payment History
+              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button className="modal-btn cancel" onClick={() => setShowSettlement(false)}>Cancel</button>
+                <button className="modal-btn success" onClick={submitSettlement}>{currentSettlementIsDaily ? "Complete Checkout" : "Confirm and Checkout"}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PAYMENT HISTORY MODAL */}
+      {showPaymentHistory && (
+        <div className="modal-backdrop-custom" style={{ zIndex: 1060 }}>
+          <div className="modal-box ar-modal-fullscreen-mobile" style={{ maxWidth: '600px' }}>
+            <div className="modal-header-custom">
+              <h4>Payment History ({settlementResident?.name})</h4>
+              <button className="modal-close-btn" onClick={() => setShowPaymentHistory(false)}>✕</button>
+            </div>
+            <div className="modal-body ar-modal-scrollable-body" style={{ padding: '0', backgroundColor: '#f8fafc' }}>
+              {loadingPaymentHistory ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                  <div className="spinner-border text-primary mb-3" role="status"></div>
+                  <div>Loading payment history...</div>
+                </div>
+              ) : paymentHistory.length === 0 ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                  <i className="bi bi-receipt" style={{ fontSize: '32px', color: '#cbd5e1', display: 'block', marginBottom: '12px' }}></i>
+                  No payment records found.
+                </div>
+              ) : (
+                <div style={{ padding: isMobile ? '12px' : '10px 12px 24px' }}>
+                  {isMobile ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {paymentHistory.map((record, idx) => {
+                        const isRent = !record.isManual || record.dueFor === "Rent";
+                        const isPaid = record.status === 'PAID';
+                        return (
+                          <div key={idx} style={{ background: '#ffffff', borderRadius: '12px', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ 
+                                  width: '36px', height: '36px', borderRadius: '10px', minWidth: '36px',
+                                  backgroundColor: isRent ? '#eef2ff' : '#fff1f2', 
+                                  color: isRent ? '#4f46e5' : '#e11d48', 
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' 
+                                }}>
+                                  <i className={`bi ${isRent ? 'bi-house-door-fill' : 'bi-lightning-charge-fill'}`}></i>
+                                </div>
+                                <div>
+                                  <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '14px' }}>{record.isManual ? (record.dueFor || "Manual Due") : "Monthly Rent"}</div>
+                                  <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Due: {formatDate(record.dueDate)}</div>
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>
+                                  {formatMoney(record.totalAmount || record.amount || record.rentAmount)}
+                                </div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
+                              <div>
+                                {isPaid && record.paidDate ? (
+                                  <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: '600' }}>
+                                    <i className="bi bi-calendar-check" style={{ marginRight: '4px' }}></i>Paid: {formatDate(record.paidDate)}
+                                  </div>
+                                ) : (
+                                  <div style={{ fontSize: '12px', color: '#64748b' }}>Pending</div>
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <span style={{ 
+                                  padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700',
+                                  backgroundColor: isPaid ? '#dcfce7' : '#fee2e2',
+                                  color: isPaid ? '#16a34a' : '#dc2626',
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px'
+                                }}>
+                                  {isPaid && <i className="bi bi-check-circle-fill"></i>}
+                                  {record.status || "PENDING"}
+                                </span>
+                                {isPaid && record.paymentMode && (
+                                  <div style={{ fontSize: '10px', color: '#64748b', marginTop: '4px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                    Via {record.paymentMode.replace('_', ' ')}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            {record.description && (
+                              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '10px', padding: '8px', backgroundColor: '#f8fafc', borderRadius: '6px' }}>
+                                {record.description}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="table-responsive" style={{ margin: 0 }}>
+                      <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+                        <thead style={{ position: 'sticky', top: 0, backgroundColor: '#f8fafc', zIndex: 1 }}>
+                          <tr>
+                            <th style={{ padding: '4px 10px', color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none', textAlign: 'left' }}>Type</th>
+                            <th style={{ padding: '4px 10px', color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none', textAlign: 'left' }}>Due Date</th>
+                            <th style={{ padding: '4px 10px', color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none', textAlign: 'left' }}>Amount</th>
+                            <th style={{ padding: '4px 10px', color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none', textAlign: 'left' }}>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paymentHistory.map((record, idx) => {
+                            const isRent = !record.isManual || record.dueFor === "Rent";
+                            const isPaid = record.status === 'PAID';
+                            return (
+                              <tr key={idx} style={{ background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}>
+                                <td style={{ padding: '12px 10px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px', border: '1px solid #f1f5f9', borderRight: 'none' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ 
+                                      width: '36px', height: '36px', borderRadius: '10px', minWidth: '36px',
+                                      backgroundColor: isRent ? '#eef2ff' : '#fff1f2', 
+                                      color: isRent ? '#4f46e5' : '#e11d48', 
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' 
+                                    }}>
+                                      <i className={`bi ${isRent ? 'bi-house-door-fill' : 'bi-lightning-charge-fill'}`}></i>
+                                    </div>
+                                    <div>
+                                      <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '13.5px', whiteSpace: 'nowrap' }}>{record.isManual ? (record.dueFor || "Manual Due") : "Monthly Rent"}</div>
+                                      {record.description && <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{record.description}</div>}
+                                    </div>
+                                  </div>
+                              </td>
+                              <td style={{ padding: '12px 10px', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', color: '#475569', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                                <div>{formatDate(record.dueDate)}</div>
+                                {isPaid && record.paidDate && (
+                                  <div style={{ fontSize: '11px', color: '#16a34a', marginTop: '4px', fontWeight: '600' }}>
+                                    <i className="bi bi-calendar-check" style={{ marginRight: '4px' }}></i>
+                                    Paid: {formatDate(record.paidDate)}
+                                  </div>
+                                )}
+                              </td>
+                              <td style={{ padding: '12px 10px', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', color: '#1e293b', fontSize: '14px', fontWeight: '700' }}>
+                                {formatMoney(record.totalAmount || record.amount || record.rentAmount)}
+                              </td>
+                              <td style={{ padding: '12px 10px', borderTopRightRadius: '10px', borderBottomRightRadius: '10px', border: '1px solid #f1f5f9', borderLeft: 'none', whiteSpace: 'nowrap' }}>
+                                <span style={{ 
+                                  padding: '4px 8px', 
+                                  borderRadius: '6px', 
+                                  fontSize: '11px', 
+                                  fontWeight: '700',
+                                  backgroundColor: isPaid ? '#dcfce7' : '#fee2e2',
+                                  color: isPaid ? '#16a34a' : '#dc2626',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  {isPaid && <i className="bi bi-check-circle-fill"></i>}
+                                  {record.status || "PENDING"}
+                                </span>
+                                {isPaid && record.paymentMode && (
+                                  <div style={{ fontSize: '10px', color: '#64748b', marginTop: '4px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                    Via {record.paymentMode.replace('_', ' ')}
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -108,7 +108,6 @@ const ReservedResidents = ({
   const [savingSig, setSavingSig] = useState(false);
   const [stats, setStats] = useState({ total: 0, monthly: 0, daily: 0 });
   const [detailResident, setDetailResident] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
 
   const saveSignatureForResident = async (residentId, signatureDataUrl) => {
     setSavingSig(true);

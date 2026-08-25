@@ -122,6 +122,8 @@ h6 {
   transition: all 0.3s ease;
   font-family: inherit;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+  height: auto !important;
+  line-height: 1.5;
 }
 
 .arm-field .form-control:focus, .pfield .form-control:focus, .arm-field .form-select:focus, .pfield .form-select:focus {
@@ -129,6 +131,15 @@ h6 {
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 2px 4px rgba(0,0,0,0.01);
   outline: none;
+}
+
+.arm-field .form-control.is-invalid, .pfield .form-control.is-invalid, .arm-field .form-select.is-invalid, .pfield .form-select.is-invalid {
+  border-color: #ef4444;
+}
+
+.arm-field .form-control.is-invalid:focus, .pfield .form-control.is-invalid:focus, .arm-field .form-select.is-invalid:focus, .pfield .form-select.is-invalid:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), inset 0 2px 4px rgba(0,0,0,0.01);
 }
 
 .arm-field .form-control:disabled, .pfield .form-control:disabled, .arm-field .form-select:disabled, .pfield .form-select:disabled {
@@ -150,6 +161,10 @@ h6 {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .arm-btn-primary:hover:not(:disabled) {
@@ -173,6 +188,10 @@ h6 {
   font-size: 14.5px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .arm-btn-outline:hover {
