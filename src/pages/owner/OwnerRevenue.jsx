@@ -604,12 +604,12 @@ const OwnerRevenue = () => {
       type: "currency",
     },
     {
-      label: "Pending Rent",
+      label: "Total Unpaid Rent",
       value: stats?.revenuePending || 0,
       type: "currency",
     },
     {
-      label: "Overdue Rent",
+      label: "Of which is Overdue",
       value: stats?.revenueOverdue || 0,
       type: "currency",
     },
@@ -1163,18 +1163,12 @@ const OwnerRevenue = () => {
               />
 
               <KPI
-                title="Pending Rent"
+                title="Total Unpaid Rent"
                 value={`₹${animatedPendingRent.toLocaleString()}`}
-                icon="bi bi-hourglass"
-                color="kpi-blue"
+                subtitle={`Includes ₹${animatedOverdueRent.toLocaleString()} overdue`}
+                icon="bi bi-hourglass-split"
+                color="kpi-orange"
                 trend={{ direction: 'down', value: '100%' }}
-              />
-              <KPI
-                title="Overdue Rent"
-                value={`₹${animatedOverdueRent.toLocaleString()}`}
-                icon="bi bi-exclamation-triangle"
-                color="kpi-red"
-                trend={{ direction: 'up', value: '14.7%' }}
               />
               <KPI
                 title="Collection Rate"

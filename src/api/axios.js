@@ -85,10 +85,12 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // SERVER ERRORS (500+) — generic user-friendly message
+    // SERVER ERRORS (500+) — generic user-friendly message, but for debugging we'll show the actual backend message if available
     if (status >= 500) {
-      toast.error("Something went wrong on our end. Please try again shortly.", {
-        duration: 4000,
+      const backendMsg = error.response?.data?.message || JSON.stringify(error.response?.data) || "Something went wrong on our end.";
+      console.error(`[AXIOS] 500 Error on ${url}:`, backendMsg);
+      toast.error(backendMsg, {
+        duration: 8000,
         id: "server-error",
       });
       return Promise.reject(error);
