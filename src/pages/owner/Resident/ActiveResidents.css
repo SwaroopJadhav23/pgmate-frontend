@@ -1797,18 +1797,16 @@
   align-items: center;
   justify-content: center;
   border: 1px solid #d7dbef;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  color: #1e293b;
+  border-radius: 30px;
+  background: #f5f7ff;
+  color: #5a5f7d;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .ar-filter-btn:hover {
-  background: #f5f7ff;
-  border-color: #c7cdec;
+  background: #eef1ff;
 }
 
 @media (max-width: 768px) {
