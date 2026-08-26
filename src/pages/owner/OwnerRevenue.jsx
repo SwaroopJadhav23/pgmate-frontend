@@ -41,13 +41,15 @@ const MONTH_NAMES = [
 
 /* ================= COUNT UP HOOK ================= */
 
-const useCountUp = (target, duration = 1200) => {
+// AnimatedNumber component isolates re-renders so the main page doesn't lag 
+// during the 60fps animation.
+const AnimatedNumber = ({ value, duration = 1200, prefix = "", suffix = "" }) => {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    const value = Number(target) || 0;
-    if (value <= 0) {
-      setDisplay(value);
+    const target = Number(value) || 0;
+    if (target <= 0) {
+      setDisplay(target);
       return;
     }
 
@@ -58,24 +60,24 @@ const useCountUp = (target, duration = 1200) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
       
-      // Cubic ease-out for a smooth deceleration
+      // Cubic ease-out
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       
-      setDisplay(Math.floor(easeProgress * value));
+      setDisplay(Math.floor(easeProgress * target));
 
       if (progress < 1) {
         animationFrame = window.requestAnimationFrame(step);
       } else {
-        setDisplay(value);
+        setDisplay(target);
       }
     };
 
     animationFrame = window.requestAnimationFrame(step);
 
     return () => window.cancelAnimationFrame(animationFrame);
-  }, [target, duration]);
+  }, [value, duration]);
 
-  return display;
+  return <>{prefix}{display.toLocaleString()}{suffix}</>;
 };
 
 const OwnerRevenue = () => {
@@ -125,9 +127,15 @@ const OwnerRevenue = () => {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPgId, selectedMonth, selectedYear, filter]);
+
+  // Re-fetch stats whenever the date filter changes so that
+  // pending/overdue KPIs reflect the selected month/year
+  useEffect(() => {
     loadStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPgId, viewMode]);
+  }, [selectedPgId, selectedMonth, selectedYear, filter]);
 
 
 
@@ -166,7 +174,14 @@ const OwnerRevenue = () => {
 
   const loadStats = async () => {
     try {
-      const params = selectedPgId === "ALL" ? { viewMode } : { pgId: selectedPgId, viewMode };
+      // Bug Fix 1: Pass the currently selected month/year to the backend
+      // so that revenuePending and revenueOverdue are scoped to the selected period.
+      // Backend expects 0-indexed month (matching JS Date.getMonth())
+      const params = {
+        ...(selectedPgId !== "ALL" ? { pgId: selectedPgId } : {}),
+        ...(filter === "MONTH" ? { month: selectedMonth, year: selectedYear } : {}),
+        ...(filter === "YEAR"  ? { year: selectedYear } : {}),
+      };
       const res = await api.get("/owner/dashboard/stats", { params });
       setStats(res.data);
     } catch (err) {
@@ -222,7 +237,26 @@ const OwnerRevenue = () => {
   }, []);
   */
 
-  const toDate = (value) => (value ? new Date(value) : null);
+  // Parses date/datetime strings consistently as IST (local time).
+  // - Plain date "YYYY-MM-DD" → parsed as local midnight (avoids UTC shift)
+  // - DateTime with offset "...+05:30" → natively handled correctly by Date
+  // - DateTime without offset "...T19:00:00" → treated as local (IST) time
+  const toDate = (value) => {
+    if (!value) return null;
+    const str = String(value);
+    // Plain date string "2026-08-22" — parse as local to avoid UTC midnight shift
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+    // DateTime already has timezone offset (e.g. +05:30 or Z) — parse natively
+    if (/[Z+\-]\d{2}:\d{2}$/.test(str) || str.endsWith('Z')) {
+      return new Date(str);
+    }
+    // DateTime with no offset "2026-08-21T19:00:00" — treat as local (IST) time
+    // Replace the T separator so Date constructor treats it as local
+    return new Date(str.replace('T', ' '));
+  };
 
   const isDateInFilter = useCallback(
     (date) => {
@@ -253,38 +287,26 @@ const OwnerRevenue = () => {
 
 
   /* ================= REVENUE ================= */
+  // collectionsInRange: all revenue within the selected filter range.
+  // Rent comes ONLY from rentRecords to avoid double-counting with onboarding.
+  // Deposit damage (checkout deductions) is counted separately as extra income.
   const calculateRevenue = () => {
     let total = 0;
 
-    // 1. Rent from rentRecords (monthly payments)
+    // 1. Rent from rentRecords only (avoids double-counting with onboarding)
     rentRecords.forEach((rec) => {
       const paidDate = toDate(rec.paidDate);
-
       if (rec.status === "PAID" && isDateInFilter(paidDate)) {
         total += Number(rec.rentAmount || 0);
       }
     });
 
-    // 2. Onboarding / first rent (from residents)
-    residents.forEach((r) => {
-      const revenueDate = getRevenueDate(r);
-
-      if (isDateInFilter(revenueDate)) {
-        total += Number(r.monthlyRent || 0);
-      }
-    });
-
-    // 3. Deposit damage (extra income)
+    // 2. Deposit damage income (deductions kept at checkout)
     residents.forEach((r) => {
       const checkoutDate = toDate(r.actualCheckoutDate);
-
       if (isDateInFilter(checkoutDate)) {
-        const damage =
-          Number(r.deposit || 0) - Number(r.refundAmount || 0);
-
-        if (damage > 0) {
-          total += damage;
-        }
+        const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
+        if (damage > 0) total += damage;
       }
     });
 
@@ -305,27 +327,18 @@ const OwnerRevenue = () => {
   */
 
   /* ================= RENT COLLECTED ================= */
+  // Bug Fix 2: Only count paid rentRecords to avoid double-counting.
+  // Previously, residents' monthlyRent was also added (via getRevenueDate / createdAt),
+  // which caused double-counting if a first-month rent record already existed.
+  // Deposits are handled separately in totalDepositHeld.
   const totalRentCollected = (() => {
     let total = 0;
-
-    // rent records (monthly payments)
     rentRecords.forEach((rec) => {
       const paidDate = toDate(rec.paidDate);
-
       if (rec.status === "PAID" && isDateInFilter(paidDate)) {
         total += Number(rec.rentAmount || 0);
       }
     });
-
-    // onboarding rent (first payment)
-    residents.forEach((r) => {
-      const revenueDate = getRevenueDate(r);
-
-      if (isDateInFilter(revenueDate)) {
-        total += Number(r.monthlyRent || 0);
-      }
-    });
-
     return total;
   })();
   /* ================= DEPOSIT HELD ================= */
@@ -367,15 +380,10 @@ const OwnerRevenue = () => {
     return Math.round((occupiedBeds / totalBeds) * 100);
   }, [stats]);
 
-  const totalActiveResidents = residents.filter((r) => {
-    const revenueDate = getRevenueDate(r);
-
-    return (
-      r.status === "ACTIVE" &&
-      isDateInFilter(revenueDate)
-    );
-  }).length;
-
+  // totalActiveResidents: count of ALL currently active residents (not date-filtered).
+  // We do NOT filter by revenue date here — an active resident is active regardless
+  // of when they joined. Date filtering only applies to payments, not headcount.
+  const totalActiveResidents = residents.filter((r) => r.status === "ACTIVE").length;
 
   const avgRevenuePerResident =
     totalActiveResidents > 0
@@ -416,7 +424,7 @@ const OwnerRevenue = () => {
       });
       
       expenditures.forEach(exp => {
-        const date = new Date(exp.expenseDate || exp.date);
+        const date = toDate(exp.expenseDate || exp.date);  // use toDate() for IST consistency
         if (date && date.getFullYear() === selectedYear) {
             const monthStr = format(date, "MMM");
             if (monthlyMap[monthStr] !== undefined) {
@@ -454,7 +462,7 @@ const OwnerRevenue = () => {
       });
       
       expenditures.forEach(exp => {
-        const date = new Date(exp.expenseDate || exp.date);
+        const date = toDate(exp.expenseDate || exp.date);  // use toDate() for IST consistency
         if (date && date.getFullYear() === selectedYear && date.getMonth() === selectedMonth) {
             const day = date.getDate();
             const weekIdx = Math.min(Math.floor((day - 1) / 7), 3);
@@ -488,7 +496,7 @@ const OwnerRevenue = () => {
     });
     
     expenditures.forEach(exp => {
-      const date = new Date(exp.expenseDate || exp.date);
+      const date = toDate(exp.expenseDate || exp.date);  // use toDate() for IST consistency
       if (!isDateInFilter(date)) return;
       const key = format(date, "dd MMM");
       if (!map[key]) map[key] = { date: key, revenue: 0, expense: 0, potential: Math.round(monthlyPotential / 30) };
@@ -500,25 +508,24 @@ const OwnerRevenue = () => {
   /* ================= ANIMATIONS ================= */
 
   const totalRevenue = totalRentCollected + totalDepositHeld;
-  const potentialRevenue = stats?.maxPotentialRevenue || 0;
+
+  // Potential Revenue scales with the selected period:
+  // - MONTH view  → 1 month of potential (monthly bed revenue)
+  // - YEAR view   → 12 months of potential (annual bed revenue)
+  // - Other views → monthly value (best approximation)
+  const monthlyPotential = stats?.maxPotentialRevenue || 0;
+  const potentialRevenue = filter === "YEAR" ? monthlyPotential * 12 : monthlyPotential;
+
   const colRate = potentialRevenue > 0 ? Math.round((totalRentCollected / potentialRevenue) * 100) : 0;
 
   const totalExpensesAmount = useMemo(() => {
     return expenditures
-      .filter(exp => isDateInFilter(new Date(exp.expenseDate || exp.date)))
+      .filter(exp => isDateInFilter(toDate(exp.expenseDate || exp.date)))  // use toDate() for IST
       .reduce((sum, exp) => sum + Number(exp.amount), 0);
   }, [expenditures, isDateInFilter]);
-
-  const animatedTotalRevenue = useCountUp(totalRevenue);
-  const animatedRentCollected = useCountUp(totalRentCollected);
-  const animatedDepositHeld = useCountUp(totalDepositHeld);
-  const animatedFutureRefund = useCountUp(futureDepositRefund);
-  const animatedPotential = useCountUp(potentialRevenue);
-  const animatedExpenses = useCountUp(totalExpensesAmount);
   
-  const animatedPendingRent = useCountUp(stats?.revenuePending || 0);
-  const animatedOverdueRent = useCountUp(stats?.revenueOverdue || 0);
-  const animatedColRate = useCountUp(colRate);
+  // NOTE: Animations have been moved to the <AnimatedNumber /> component 
+  // in the JSX to prevent the entire page from re-rendering 60 times a second.
 
   const isAllPgsEh = expHistoryPgId === 'ALL';
   const filteredExpensesForEh = useMemo(() => expenditures
@@ -538,11 +545,6 @@ const OwnerRevenue = () => {
   const ehPendingAmt = useMemo(() => filteredExpensesForEh.filter(e => (e.paymentStatus||'').toUpperCase() === 'PENDING').reduce((s, e) => s + (e.amount||0), 0), [filteredExpensesForEh]);
   const ehPaidAmt = useMemo(() => filteredExpensesForEh.filter(e => (e.paymentStatus||'').toUpperCase() !== 'PENDING').reduce((s, e) => s + (e.amount||0), 0), [filteredExpensesForEh]);
   const ehTotalAmt = ehPendingAmt + ehPaidAmt;
-
-  const animatedEhTotalTxs = useCountUp(ehTotalTxs);
-  const animatedEhPendingAmt = useCountUp(ehPendingAmt);
-  const animatedEhPaidAmt = useCountUp(ehPaidAmt);
-  const animatedEhTotalAmt = useCountUp(ehTotalAmt);
 
   const [showExport, setShowExport] = useState(false);
   const exportRef = useRef(null);
@@ -1125,38 +1127,38 @@ const OwnerRevenue = () => {
             <div className="owner-kpi-grid">
               <KPI
                 title="Total Revenue"
-                value={`₹${animatedTotalRevenue.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={totalRevenue} />}
                 icon="bi bi-wallet2"
                 color="kpi-green"
               />
               <KPI
                 title="Rent Collected"
-                value={`₹${animatedRentCollected.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={totalRentCollected} />}
                 icon="bi bi-wallet2"
                 color="kpi-purple"
               />
               <KPI
                 title="Deposit Held"
-                value={`₹${animatedDepositHeld.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={totalDepositHeld} />}
                 icon="bi bi-safe"
                 color="kpi-green"
               />
               <KPI
                 title="Future Deposit Refund"
-                value={`₹${animatedFutureRefund.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={futureDepositRefund} />}
                 icon="bi bi-calendar-check"
                 color="kpi-red"
               />
               <KPI
                 title="Potential Revenue"
-                value={`₹${animatedPotential.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={potentialRevenue} />}
                 icon="bi bi-house-door"
                 color="kpi-purple"
                 trend={{ direction: 'up', value: '8.3%' }}
               />
               <KPI
                 title="Total Expenses"
-                value={`₹${animatedExpenses.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={totalExpensesAmount} />}
                 icon="bi bi-graph-down"
                 color="kpi-red"
                 trend={{ direction: 'up', value: '5.8%' }}
@@ -1164,11 +1166,11 @@ const OwnerRevenue = () => {
 
               <KPI
                 title="Total Unpaid Rent"
-                value={`₹${animatedPendingRent.toLocaleString()}`}
+                value={<AnimatedNumber prefix="₹" value={stats?.revenuePending || 0} />}
                 subtitle={
                   stats?.revenuePending === stats?.revenueOverdue && stats?.revenuePending > 0
                     ? "100% of this amount is overdue"
-                    : `Includes ₹${animatedOverdueRent.toLocaleString()} overdue`
+                    : <span>Includes <AnimatedNumber prefix="₹" value={stats?.revenueOverdue || 0} /> overdue</span>
                 }
                 icon="bi bi-hourglass-split"
                 color="kpi-orange"
@@ -1176,7 +1178,7 @@ const OwnerRevenue = () => {
               />
               <KPI
                 title="Collection Rate"
-                value={`${animatedColRate}%`}
+                value={<AnimatedNumber value={colRate} suffix="%" />}
                 icon="bi bi-percent"
                 color="kpi-blue"
                 trend={{ direction: 'up', value: '15.3%' }}
@@ -1477,7 +1479,7 @@ const OwnerRevenue = () => {
                 </div>
                 <div className="eh-kpi-info">
                   <p>Total Transactions</p>
-                  <h3 style={{ color: '#3b82f6' }}>{animatedEhTotalTxs}</h3>
+                  <h3 style={{ color: '#3b82f6' }}><AnimatedNumber value={ehTotalTxs} /></h3>
                   <span>{isAllPgs ? 'Across all PGs' : 'For selected PG'}</span>
                 </div>
               </div>
@@ -1487,7 +1489,7 @@ const OwnerRevenue = () => {
                 </div>
                 <div className="eh-kpi-info">
                   <p>Pending Amount</p>
-                  <h3 style={{ color: '#f59e0b' }}>₹{animatedEhPendingAmt.toLocaleString()}</h3>
+                  <h3 style={{ color: '#f59e0b' }}><AnimatedNumber prefix="₹" value={ehPendingAmt} /></h3>
                   <span>To be paid</span>
                 </div>
               </div>
@@ -1497,7 +1499,7 @@ const OwnerRevenue = () => {
                 </div>
                 <div className="eh-kpi-info">
                   <p>Paid Amount</p>
-                  <h3 style={{ color: '#10b981' }}>₹{animatedEhPaidAmt.toLocaleString()}</h3>
+                  <h3 style={{ color: '#10b981' }}><AnimatedNumber prefix="₹" value={ehPaidAmt} /></h3>
                   <span>Successfully cleared</span>
                 </div>
               </div>
@@ -1507,7 +1509,7 @@ const OwnerRevenue = () => {
                 </div>
                 <div className="eh-kpi-info">
                   <p>Total Amount</p>
-                  <h3 style={{ color: '#ef4444' }}>₹{animatedEhTotalAmt.toLocaleString()}</h3>
+                  <h3 style={{ color: '#ef4444' }}><AnimatedNumber prefix="₹" value={ehTotalAmt} /></h3>
                   <span>Total expenses recorded</span>
                 </div>
               </div>
