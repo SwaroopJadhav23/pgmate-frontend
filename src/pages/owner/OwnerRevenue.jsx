@@ -1165,7 +1165,11 @@ const OwnerRevenue = () => {
               <KPI
                 title="Total Unpaid Rent"
                 value={`₹${animatedPendingRent.toLocaleString()}`}
-                subtitle={`Includes ₹${animatedOverdueRent.toLocaleString()} overdue`}
+                subtitle={
+                  stats?.revenuePending === stats?.revenueOverdue && stats?.revenuePending > 0
+                    ? "100% of this amount is overdue"
+                    : `Includes ₹${animatedOverdueRent.toLocaleString()} overdue`
+                }
                 icon="bi bi-hourglass-split"
                 color="kpi-orange"
                 trend={{ direction: 'down', value: '100%' }}
