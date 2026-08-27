@@ -90,14 +90,15 @@
 }
 
 /* ── Desktop table ── */
-.oc-table { display: block; overflow-x: auto; }
+.oc-table { display: block; overflow-x: auto; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border-radius: 12px; }
 .oc-table-head {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
-  background: #1e1b4b;
-  padding: 12px 20px;
+  background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 100%);
+  padding: 14px 20px;
   gap: 12px;
   min-width: 760px;
+  border-bottom: 2px solid #312e81;
 }
 .oc-table-head div {
   font-size: 11px;
@@ -108,11 +109,21 @@
 .oc-table-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
-  padding: 14px 20px;
+  padding: 18px 20px;
   gap: 12px;
   align-items: center;
   border-bottom: 1px solid #f1f5f9;
   min-width: 760px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+.oc-table-row:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  z-index: 10;
+  position: relative;
+  border-bottom-color: transparent;
 }
 
 /* ── Mobile card list — hidden on desktop ── */
@@ -120,12 +131,23 @@
 
 /* ── Action buttons ── */
 .oc-action-btn {
-  padding: 5px 10px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.oc-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.oc-action-btn:active {
+  transform: translateY(0);
 }
 
 /* ── Modal images ── */
@@ -320,13 +342,11 @@
   .oc-table-head div:nth-child(4),
   .oc-table-row > div:nth-child(4) { display: none; }
 }
-/* Force city dropdown to open downward */
+/* Custom dropdown handling not needed for native select */
 .oc-filters {
   position: relative;
   z-index: 100;
   overflow: visible;
-  padding-bottom: 260px;  /* give browser room so native select opens downward */
-  margin-bottom: -240px;  /* cancel out visual gap so layout stays intact */
 }
 
 .oc-filters select {
@@ -370,7 +390,8 @@
 .oc-row-odd { background: #f8fafc; }
 .oc-subject { font-weight: 600; color: #1e1b4b; font-size: 13px; margin: 0; }
 .oc-desc { font-size: 11px; color: #94a3b8; margin: 2px 0 0; }
-.oc-read-more { color: #4f46e5; font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 4px; }
+.oc-read-more { color: #4f46e5; font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 4px; transition: color 0.2s; }
+.oc-read-more:hover { color: #3730a3; text-decoration: underline; }
 .oc-view-images-btn { margin-top: 6px; padding: 3px 8px; border-radius: 6px; background: #e0e7ff; color: #4f46e5; border: none; font-size: 11px; font-weight: 600; cursor: pointer; }
 .oc-user { font-size: 13px; color: #374151; }
 .oc-category-badge { padding: 3px 8px; border-radius: 6px; background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; }
@@ -378,8 +399,11 @@
 .oc-status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
 .oc-actions-container { display: flex; gap: 6px; flex-wrap: wrap; }
 .oc-btn-in-progress { background: #dbeafe; color: #1d4ed8; }
+.oc-btn-in-progress:hover { background: #bfdbfe; color: #1e3a8a; }
 .oc-btn-resolved { background: #dcfce7; color: #166534; }
+.oc-btn-resolved:hover { background: #bbf7d0; color: #14532d; }
 .oc-btn-respond { background: #f1f5f9; color: #475569; }
+.oc-btn-respond:hover { background: #e2e8f0; color: #334155; }
 .oc-response-container { padding: 0 20px 10px; border-bottom: 1px solid #f1f5f9; }
 .oc-response-box { background: #f0fdf4; border-radius: 8px; padding: 8px 14px; border-left: 3px solid #22c55e; }
 .oc-response-title { font-size: 11px; font-weight: 700; color: #166534; margin-bottom: 2px; }

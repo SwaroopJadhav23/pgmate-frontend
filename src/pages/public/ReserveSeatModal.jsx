@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import api from "../../api/axios";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import BedPickerPopup from "./BedPickerPopup";
 import { useNavigate } from "react-router-dom";
+import { Info, AlertTriangle } from "lucide-react";
 import "./reserveSeatModal.css";
 
 // eslint-disable-next-line no-unused-vars
@@ -51,8 +52,13 @@ const ReserveSeatModal = ({ pg, sharingType: initialSharingType, selectedBeds = 
   const [numberOfDays, setNumberOfDays] = useState(1);
   const [checkinDate, setCheckinDate] = useState("");
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  const bedRef = useRef(null);
+  const checkinDateRef = useRef(null);
+  const numberOfDaysRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -135,6 +141,7 @@ const ReserveSeatModal = ({ pg, sharingType: initialSharingType, selectedBeds = 
     setSelectedBedId(bedId);
     setSelectedSharing(sharingType);
     setShowBedPicker(false);
+    if (errors.bed) setErrors((prev) => ({ ...prev, bed: null }));
   };
 
   const totalStayAmount = useMemo(() => {
@@ -222,23 +229,39 @@ const ReserveSeatModal = ({ pg, sharingType: initialSharingType, selectedBeds = 
   };
 
   const submit = async () => {
+    const newErrors = {};
     if (!selectedFloorId || !selectedRoomId || !selectedBedId) {
-      toast("Please select a bed first.", { icon: "ℹ️" });
-      return;
+      newErrors.bed = "This field needs to be filled";
     }
     if (!checkinDate) {
-      toast("Please select a check-in date.", { icon: "ℹ️" });
-      return;
+      newErrors.checkinDate = "This field needs to be filled";
     }
     if (isDaily) {
-      if (!Number(selectedRoom?.dailyRent || 0)) {
-        toast("Daily pricing is not configured for this room yet. Please choose another bed or switch back to monthly.", { icon: "ℹ️" });
-        return;
-      }
       if (!numberOfDays || Number(numberOfDays) <= 0) {
-        toast("Please enter a valid number of days.", { icon: "ℹ️" });
-        return;
+        newErrors.numberOfDays = "This field needs to be filled";
       }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast("Please fill all required fields", { icon: <Info size={18} color="#6366f1" /> });
+      
+      setTimeout(() => {
+        if (newErrors.bed && bedRef.current) {
+          bedRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else if (newErrors.checkinDate && checkinDateRef.current) {
+          checkinDateRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else if (newErrors.numberOfDays && numberOfDaysRef.current) {
+          numberOfDaysRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 50);
+
+      return;
+    }
+
+    if (isDaily && !Number(selectedRoom?.dailyRent || 0)) {
+      toast("Daily pricing is not configured for this room yet. Please choose another bed or switch back to monthly.", { icon: <AlertTriangle size={18} color="#f59e0b" /> });
+      return;
     }
 
     setLoading(true);
@@ -319,15 +342,26 @@ const ReserveSeatModal = ({ pg, sharingType: initialSharingType, selectedBeds = 
             </div>
 
             {isDaily && (
-              <div>
+              <div ref={numberOfDaysRef}>
                 <label className="reserve-form-label">NUMBER OF DAYS</label>
-                <input type="number" min="1" className="reserve-input" value={numberOfDays} onChange={(e) => setNumberOfDays(e.target.value)} />
+                <input 
+                  type="number" 
+                  min="1" 
+                  className="reserve-input" 
+                  style={errors.numberOfDays ? { borderColor: 'red' } : {}}
+                  value={numberOfDays} 
+                  onChange={(e) => {
+                    setNumberOfDays(e.target.value);
+                    if (errors.numberOfDays) setErrors((prev) => ({ ...prev, numberOfDays: null }));
+                  }} 
+                />
+                {errors.numberOfDays && <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.numberOfDays}</div>}
               </div>
             )}
 
             <div className="reserve-divider" />
 
-            <div>
+            <div ref={bedRef}>
               <label className="reserve-form-label">BED SELECTION</label>
               {selectedBedId ? (
                 <div>
@@ -350,29 +384,59 @@ const ReserveSeatModal = ({ pg, sharingType: initialSharingType, selectedBeds = 
                   </div>
                 </div>
               ) : (
-                <button type="button" onClick={() => setShowBedPicker(true)} className="reserve-bed-pick-btn">
-                  🛏 Pick a Bed from Availability
-                </button>
+                <div>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowBedPicker(true)} 
+                    className="reserve-bed-pick-btn"
+                    style={errors.bed ? { borderColor: 'red' } : {}}
+                  >
+                    <BedIcon size={16} /> Pick a Bed from Availability
+                  </button>
+                  {errors.bed && <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.bed}</div>}
+                </div>
               )}
 
               {isDaily && roomMissingDailyPrice && (
                 <div className="reserve-price-warning">
-                  ⚠️ Daily pricing is missing for this room.
+                  <AlertTriangle size={16} color="#ef4444" style={{ marginRight: 6 }} /> Daily pricing is missing for this room.
                 </div>
               )}
             </div>
 
             <div className="reserve-divider" />
 
-            <div>
+            <div ref={checkinDateRef}>
               <label className="reserve-form-label">CHECK-IN DATE</label>
-              <input type="date" value={checkinDate} onChange={(e) => setCheckinDate(e.target.value)} className="reserve-input" min={new Date().toISOString().split("T")[0]} />
+              <input 
+                type="date" 
+                value={checkinDate} 
+                onChange={(e) => {
+                  setCheckinDate(e.target.value);
+                  if (errors.checkinDate) setErrors((prev) => ({ ...prev, checkinDate: null }));
+                }} 
+                className="reserve-input" 
+                style={errors.checkinDate ? { borderColor: 'red' } : {}}
+                min={new Date().toISOString().split("T")[0]} 
+              />
+              {errors.checkinDate && <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.checkinDate}</div>}
             </div>
 
             {isDaily && (
               <div>
                 <label className="reserve-form-label">NUMBER OF DAYS</label>
-                <input type="number" min="1" value={numberOfDays} onChange={(e) => setNumberOfDays(Number(e.target.value))} className="reserve-input" />
+                <input 
+                  type="number" 
+                  min="1" 
+                  value={numberOfDays} 
+                  onChange={(e) => {
+                    setNumberOfDays(Number(e.target.value));
+                    if (errors.numberOfDays) setErrors((prev) => ({ ...prev, numberOfDays: null }));
+                  }} 
+                  className="reserve-input" 
+                  style={errors.numberOfDays ? { borderColor: 'red' } : {}}
+                />
+                {errors.numberOfDays && <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.numberOfDays}</div>}
               </div>
             )}
 

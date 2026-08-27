@@ -34,6 +34,7 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
     email: "",
     adminNote: ""
   });
+  const [fetchedDetails, setFetchedDetails] = useState({ name: false, phone: false, email: false });
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -46,6 +47,11 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
           phone: u.phone || f.phone,
           email: u.email || f.email,
         }));
+        setFetchedDetails({
+          name: !!u.name,
+          phone: !!u.phone,
+          email: !!u.email,
+        });
       })
       .catch(() => {}); // silent — user just types manually
   }, [isAuthenticated]);
@@ -146,6 +152,7 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
           placeholder="Your Name"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value.trimStart() })}
+          disabled={fetchedDetails.name}
         />
 
         <input
@@ -155,6 +162,7 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
           placeholder="Phone Number"
           value={form.phone}
           onChange={e => setForm({ ...form, phone: digitsOnly(e.target.value).slice(0, 10) })}
+          disabled={fetchedDetails.phone}
         />
 
         <input
@@ -162,6 +170,7 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
           placeholder="Email (optional)"
           value={form.email}
           onChange={e => setForm({ ...form, email: e.target.value.trim() })}
+          disabled={fetchedDetails.email}
         />
 
         <textarea
