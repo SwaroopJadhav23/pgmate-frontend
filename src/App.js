@@ -122,6 +122,7 @@ function App() {
       <BrowserRouter>
         <Toaster
           position="top-right"
+          containerStyle={{ zIndex: 999999 }}
           toastOptions={{
             duration: 4000,
             className: "global-toast",

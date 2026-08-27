@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { MapPin, Home, MessageSquareMore } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 import api from "../../api/axios";
 import "../../CSS/pgDetail.css";
@@ -616,7 +617,7 @@ const PGDetail = () => {
               className="bc-enquiry-btn"
               onClick={() => setShowEnquiry(true)}
             >
-              <MessageSquareMore size={16} strokeWidth={2} /> Enquiry
+              <FaWhatsapp size={16} /> WhatsApp
             </button>
           </div>
 

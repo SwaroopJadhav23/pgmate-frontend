@@ -1,8 +1,8 @@
-import {useContext, useState} from "react";
-import {useNavigate, useLocation} from "react-router-dom";
+import { useContext, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
-import {AuthContext} from "../context/AuthContext";
-import {Eye, EyeOff} from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 import HomeLayout from "../layouts/HomeLayouts";
 import "./Login.css";
 
@@ -13,7 +13,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const {login} = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || null;
@@ -33,7 +33,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post("/auth/login", {identifier, password});
+      const res = await api.post("/auth/login", { identifier, password });
       login(res.data.token, res.data.role);
 
       if (res.data.role === "USER") {
@@ -43,7 +43,7 @@ const Login = () => {
           if (!profileRes.data.profileCompleted) {
             setSuccess(true);
             sessionStorage.setItem("justLoggedIn", "true");
-            navigate(from || "/", {replace: true});
+            navigate(from || "/", { replace: true });
             return;
           }
         } catch (err) {
@@ -52,12 +52,12 @@ const Login = () => {
         // ✅ Profile is compaleted → go back to PG page
         setSuccess(true);
         sessionStorage.setItem("justLoggedIn", "true");
-        navigate(from || "/", {replace: true});
+        navigate(from || "/", { replace: true });
         return;
       }
       if (res.data.role === "OWNER") {
         setSuccess(true);
-        navigate(from || "/owner/dashboard", {replace: true});
+        navigate(from || "/owner/dashboard", { replace: true });
       } else if (res.data.role === "PG_MANAGER") {
         setSuccess(true);
         navigate("/manager/dashboard");
@@ -70,7 +70,7 @@ const Login = () => {
       } else {
         setSuccess(true);
         console.log("Final redirect to:", from || "/");
-        navigate(from || "/", {replace: true});
+        navigate(from || "/", { replace: true });
       }
     } catch (err) {
       setSuccess(false);

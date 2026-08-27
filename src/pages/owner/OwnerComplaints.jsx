@@ -482,7 +482,7 @@ useEffect(() => {
               const sc = STATUS_COLOR[c.status] || STATUS_COLOR.PENDING;
               return (
                 <div key={c.id}>
-                  <div className="oc-table-row" style={{ background: idx % 2 === 0 ? "#fff" : "#f8fafc" }}>
+                  <div className="oc-table-row">
                     <div>
                       <p style={{ fontWeight: 600, color: "#1e1b4b", fontSize: "13px", margin: 0 }}>{c.subject}</p>
                       <p style={{ fontSize: "11px", color: "#94a3b8", margin: "2px 0 0" }}>
@@ -529,26 +529,23 @@ useEffect(() => {
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {c.status !== "IN_PROGRESS" && (
                         <button
-                          className="oc-action-btn"
+                          className="oc-action-btn oc-btn-in-progress"
                           onClick={() => handleUpdateStatus(c.id, "IN_PROGRESS", c.ownerResponse)}
-                          style={{ background: "#dbeafe", color: "#1d4ed8" }}
                         >
                           In Progress
                         </button>
                       )}
                       {c.status !== "RESOLVED" && (
                         <button
-                          className="oc-action-btn"
+                          className="oc-action-btn oc-btn-resolved"
                           onClick={() => handleUpdateStatus(c.id, "RESOLVED", c.ownerResponse)}
-                          style={{ background: "#dcfce7", color: "#166534" }}
                         >
                           Resolved
                         </button>
                       )}
                       <button
-                        className="oc-action-btn"
+                        className="oc-action-btn oc-btn-respond"
                         onClick={() => { setResponding(responding === c.id ? null : c.id); setResponseText(c.ownerResponse || ""); }}
-                        style={{ background: "#f1f5f9", color: "#475569" }}
                       >
                         <FaCommentDots /> Respond
                       </button>
@@ -556,8 +553,8 @@ useEffect(() => {
                   </div>
 
                   {c.ownerResponse && (
-                    <div style={{ padding: "0 20px 10px", background: idx % 2 === 0 ? "#fff" : "#f8fafc", borderBottom: "1px solid #f1f5f9" }}>
-                      <div style={{ background: "#f0fdf4", borderRadius: "8px", padding: "8px 14px", borderLeft: "3px solid #22c55e" }}>
+                    <div className="oc-response-container">
+                      <div className="oc-response-box">
                         <p style={{ fontSize: "11px", fontWeight: 700, color: "#166534", marginBottom: "2px" }}>Your Response</p>
                         <p style={{ fontSize: "12px", color: "#166534", margin: 0 }}>{c.ownerResponse}</p>
                       </div>
@@ -565,7 +562,7 @@ useEffect(() => {
                   )}
 
                   {responding === c.id && (
-                    <div style={{ padding: "0 20px 14px", background: idx % 2 === 0 ? "#fff" : "#f8fafc", borderBottom: "1px solid #f1f5f9" }}>
+                    <div className="oc-respond-form">
                       <textarea
                         rows={3}
                         placeholder="Type your response to the tenant..."
