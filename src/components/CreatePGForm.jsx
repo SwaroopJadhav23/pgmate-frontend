@@ -176,6 +176,12 @@ const CreatePGForm = ({ onSuccess, onCancel }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === "totalFloors" && value !== "") {
+      const val = parseInt(value, 10);
+      if (val > 100 || val < 1) return;
+    }
+    
     setFormData(prev => ({ ...prev, [name]: value }));
     if (formErrors[name]) {
       setFormErrors(prev => ({ ...prev, [name]: false }));
@@ -548,6 +554,7 @@ const removeCustomRule = (index) => {
                 value={formData.address}
                 onChange={handleInputChange}
                 required
+                maxLength={250}
               />
             </div>
 
@@ -560,6 +567,7 @@ const removeCustomRule = (index) => {
                 value={formData.aboutDescription}
                 onChange={handleInputChange}
                 rows={4}
+                maxLength={1000}
               />
             </div>
 
