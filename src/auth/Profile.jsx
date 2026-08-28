@@ -281,7 +281,9 @@ const Profile = () => {
             permanently deleted in <strong>{daysLeftToDelete()} day(s)</strong>.{" "}
             Want to restore your account or delete it right away?{" "}
             <a
-              href="mailto:support..pgmate@gmail.com"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=support.pgmate@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 color: "#991b1b",
                 textDecoration: "underline",
@@ -489,7 +491,9 @@ const Profile = () => {
           permanently deleted in <strong>{daysLeftToDelete()} day(s)</strong>.{" "}
           Want to restore your account or delete it right away?{" "}
           <a
-            href="mailto:support.pgmate@gmail.com"
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=support.pgmate@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               color: "#991b1b",
               textDecoration: "underline",

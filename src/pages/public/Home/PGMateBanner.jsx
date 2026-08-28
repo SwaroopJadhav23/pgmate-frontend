@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import api from "../../../api/axios";
 import { useCityFilter } from "../../../context/CityFilterContext";
+import { SORTED_INDIAN_CITIES } from "../../../constants/indianCities";
 
 const GENDER_OPTIONS = [
   { value: "MALE", label: "Men" },
@@ -72,11 +73,19 @@ export default function PGMateBanner({
       .then((res) => {
         if (mounted.current) {
           const cities = Array.isArray(res.data) ? res.data : [];
-          setCityCount(cities.length || null);
-          setCityOptions(cities);
+          const mappedCities = cities.map(c => 
+            (c.toLowerCase() === "gurugram" || c.toLowerCase() === "gurgaon") ? "Mumbai" : c
+          );
+          setCityCount(mappedCities.length || null);
+          const mergedCities = [...new Set([...mappedCities, ...SORTED_INDIAN_CITIES])].sort();
+          setCityOptions(mergedCities);
         }
       })
-      .catch(() => { });
+      .catch(() => {
+        if (mounted.current) {
+          setCityOptions(SORTED_INDIAN_CITIES);
+        }
+      });
     return () => {
       mounted.current = false;
     };
