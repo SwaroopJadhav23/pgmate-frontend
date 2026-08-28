@@ -17,6 +17,7 @@ import TenantOwnerSplit from "./TenantOwnerSplit";
 import Testimonials from "./Testimonials";
 import StatsStrip from "./StatsStrip";
 import WhyChoosePGMateRow from "./WhyChoosePgMateRow";
+import { SORTED_INDIAN_CITIES } from "../../../constants/indianCities";
 
 const HOME_PAGE_SIZE = 15;
 
@@ -248,7 +249,7 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
   const {selectedCity, setSelectedCity} = useCityFilter();
   const [isExactCity, setIsExactCity] = useState(false);
 
-  const CITY_MAP = {Bengaluru: "Bangalore", Bombay: "Mumbai"};
+  const CITY_MAP = {Bengaluru: "Bangalore", Bombay: "Mumbai", Gurugram: "Mumbai", Gurgaon: "Mumbai"};
   const normalizeCity = (city) => CITY_MAP[city] || city;
 
   const [filters, setFilters] = useState({
@@ -296,10 +297,14 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
       .get("/public/cities")
       .then((res) => {
         const cities = res.data || [];
-        const sortedCities = cities.filter((city) => city !== "Pune").sort();
+        const merged = [...new Set([...cities, ...SORTED_INDIAN_CITIES])];
+        const sortedCities = merged.filter((city) => city !== "Pune").sort();
         setCityOptions(["Pune", ...sortedCities]);
       })
-      .catch(() => setCityOptions(["Pune"]));
+      .catch(() => {
+        const sortedCities = SORTED_INDIAN_CITIES.filter((city) => city !== "Pune").sort();
+        setCityOptions(["Pune", ...sortedCities]);
+      });
   }, []);
 
   useEffect(() => {
@@ -319,9 +324,9 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
       return;
     }
     const query = searchText.toLowerCase();
-    // const citySuggestions = cityOptions
-    //   .filter((city) => city.toLowerCase().includes(query))
-    //   .map((city) => ({type: "city", label: city}));
+    const citySuggestions = cityOptions
+      .filter((city) => city.toLowerCase().includes(query))
+      .map((city) => ({type: "city", label: city}));
     const localitySuggestions = localityOptions
       .filter((locality) => locality.toLowerCase().includes(query))
       .map((locality) => ({
@@ -330,7 +335,7 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         city: filters.city,
         locality,
       }));
-    setSuggestions([...localitySuggestions].slice(0, 8));
+    setSuggestions([...citySuggestions, ...localitySuggestions].slice(0, 8));
   }, [searchText, localityOptions, filters.city]);
 
   useEffect(() => {
@@ -548,11 +553,11 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
                         className="home-pg-autocomplete__item"
                         onClick={() => {
                           setShowSuggestions(false);
-                          if (item.type === "locality") {
+                          if (item.type === "city") {
                             setSearchText("");
                             setFilters((prev) => ({
                               ...prev,
-                              // city: item.label,
+                              city: item.label,
                               locality: "",
                             }));
                           }

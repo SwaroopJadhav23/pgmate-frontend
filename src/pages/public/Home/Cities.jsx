@@ -12,6 +12,7 @@ import PGListingCard from "../PGListingCard";
 import "../../../CSS/publicPG.css";
 import "./Cities.css";
 import Swal from "sweetalert2";
+import { SORTED_INDIAN_CITIES } from "../../../constants/indianCities";
 
 import mumbaiImg from "../../../assets/Mumbai.jpg";
 import bangaloreImg from "../../../assets/Bangalore.jpg";
@@ -289,6 +290,7 @@ const Cities = () => {
   const [recentCities, setRecentCities] = useState([]);
   const [openFaq, setOpenFaq] = useState(null);
   const [search, setSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedPersona, setSelectedPersona] = useState(null);
   const [heroBgIndex, setHeroBgIndex] = useState(0);
@@ -359,7 +361,10 @@ const Cities = () => {
           const seen = new Set();
           const deduped = [];
           raw.forEach((c) => {
-            const name = getCityName(c.link, c.name);
+            let name = getCityName(c.link, c.name);
+            if (name.toLowerCase() === "gurugram" || name.toLowerCase() === "gurgaon") {
+              name = "Mumbai";
+            }
             const key = name.toLowerCase();
             if (seen.has(key)) return;
             seen.add(key);
@@ -376,9 +381,12 @@ const Cities = () => {
       .then((res) => {
         const list = res.data || [];
         setDbCityCount(list.length); // NEW — true count, isolated from card list
+        
+        const mergedList = [...new Set([...list, ...SORTED_INDIAN_CITIES])];
+
         setCities((prev) => {
           const have = new Set(prev.map((c) => c.name.toLowerCase()));
-          const extra = list
+          const extra = mergedList
             .filter((name) => name && !have.has(String(name).toLowerCase()))
             .map((name, i) => ({id: `plain-${i}`, name, image: FALLBACK_IMG}));
           return [...prev, ...extra];
@@ -387,6 +395,14 @@ const Cities = () => {
       .catch((err) => {
         console.error("cities fetch failed:", err);
         setDbCityCount(null);
+        
+        setCities((prev) => {
+          const have = new Set(prev.map((c) => c.name.toLowerCase()));
+          const extra = SORTED_INDIAN_CITIES
+            .filter((name) => name && !have.has(String(name).toLowerCase()))
+            .map((name, i) => ({id: `plain-${i}`, name, image: FALLBACK_IMG}));
+          return [...prev, ...extra];
+        });
       });
 
     api
@@ -566,6 +582,8 @@ const Cities = () => {
                 type="text"
                 placeholder="Search for a city..."
                 value={search}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && search.trim()) {
@@ -588,6 +606,36 @@ const Cities = () => {
                   </motion.button>
                 )}
               </AnimatePresence>
+
+              <AnimatePresence>
+                {showSuggestions && search.trim() && (
+                  <motion.div
+                    className="cities-search-dropdown"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    {filtered.length > 0 ? (
+                      filtered.slice(0, 8).map((city) => (
+                        <button
+                          key={city.id}
+                          type="button"
+                          className="cities-suggestion-item"
+                          onClick={() => handleCityClick(city.name)}
+                        >
+                          <MapPin size={15} />
+                          {city.name}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="cities-suggestion-empty">
+                        <MapPin size={15} /> "{search.trim()}" isn't available yet — Coming soon!
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
               <button
                 type="button"
                 className="cities-search-btn"
@@ -603,13 +651,22 @@ const Cities = () => {
               </button>
             </motion.div>
 
-            {!search && quickChips.length > 0 && (
-              <motion.div className="cities-quick-chips" variants={fadeUp}>
-                {quickChips.map((c) => (
-                  <button key={c.id} className="cities-chip" onClick={() => handleCityClick(c.name)}>
-                    {c.name}
-                  </button>
-                ))}
+            {quickChips.length > 0 && (
+              <motion.div variants={fadeUp}>
+                <div 
+                  className="cities-quick-chips" 
+                  style={{
+                    opacity: search ? 0 : 1,
+                    pointerEvents: search ? "none" : "auto",
+                    transition: "opacity 0.2s ease-out"
+                  }}
+                >
+                  {quickChips.map((c) => (
+                    <button key={c.id} className="cities-chip" onClick={() => handleCityClick(c.name)}>
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
               </motion.div>
             )}
 
