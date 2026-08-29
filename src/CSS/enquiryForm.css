@@ -12,6 +12,7 @@
   justify-content: center;
   z-index: 9999;
   animation: fadeIn 0.25s ease;
+  padding: 16px;
 }
 
 /* ===== Modal ===== */
@@ -24,6 +25,8 @@
   box-shadow: 0 32px 80px rgba(91, 91, 214, 0.18), 0 8px 24px rgba(0,0,0,0.10);
   animation: slideUp 0.3s cubic-bezier(0.34, 1.45, 0.64, 1);
   font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* Prevent any button from causing scrollbars */
+  box-sizing: border-box;
 }
 
 /* ===== Title ===== */
@@ -143,12 +146,42 @@
 /* ===== Mobile ===== */
 @media (max-width: 480px) {
   .enquiry-modal {
-    margin: 0 14px;
-    padding: 22px 18px 20px;
-    border-radius: 20px;
+    margin: 0;
+    padding: 14px 13px 14px;
+    border-radius: 16px;
+    width: calc(100% - 32px);
   }
   .enquiry-modal h3 {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+  .enquiry-modal input,
+  .enquiry-modal textarea {
+    padding: 8px 10px;
+    font-size: 0.84rem;
+    margin-bottom: 7px;
+    border-radius: 10px;
+  }
+  .enquiry-modal textarea {
+    height: 55px;
+  }
+  .enquiry-modal p {
+    font-size: 0.78rem;
+    margin: 2px 0;
+  }
+  /* Stack buttons one below the other */
+  .enquiry-modal .actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .enquiry-modal .actions button {
+    width: 100% !important;
+    flex: none !important;
+  }
+  /* Show the arrow on mobile since buttons are now full width */
+  .enquiry-modal .actions .wa-arrow {
+    display: block;
   }
 }
 
