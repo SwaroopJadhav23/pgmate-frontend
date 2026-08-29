@@ -322,6 +322,16 @@ const PGDetail = () => {
       navigate("/login", { state: { from: `/pg/${id}` } });
       return;
     }
+    if (role === "OWNER" || role === "SUPER_ADMIN" || role === "PG_MANAGER" || role === "SUB_ADMIN") {
+      Swal.fire({
+        title: "Reservation Not Allowed",
+        text: "You are logged in as an Owner or Admin. Please log in as a normal User to reserve a bed.",
+        icon: "warning",
+        confirmButtonText: "Got it",
+        confirmButtonColor: "#5B5BD6",
+      });
+      return;
+    }
     try {
       const res = await api.get("/user/pgs/my-active-reservation");
       if (res.data === true) {
@@ -647,6 +657,16 @@ const PGDetail = () => {
             setShowAvailability(false);
             if (!token) {
               navigate("/login", { state: { from: `/pg/${id}` } });
+              return;
+            }
+            if (role === "OWNER" || role === "SUPER_ADMIN" || role === "PG_MANAGER" || role === "SUB_ADMIN") {
+              Swal.fire({
+                title: "Reservation Not Allowed",
+                text: "You are logged in as an Owner or Admin. Please log in as a normal User to reserve a bed.",
+                icon: "warning",
+                confirmButtonText: "Got it",
+                confirmButtonColor: "#5B5BD6",
+              });
               return;
             }
             try {
