@@ -20,6 +20,11 @@ const OwnerEnquiries = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [summary, setSummary] = useState({ total: 0, NEW: 0, RESPONDED: 0, THIS_MONTH: 0 });
 
+  // Clear the dashboard notification pill when this page is visited
+  useEffect(() => {
+    localStorage.setItem("seen_enquiries_count", "999999");
+  }, []);
+
   const queryParams = useMemo(
     () => ({ search: searchTerm.trim(), status: statusFilter || undefined }),
     [searchTerm, statusFilter],

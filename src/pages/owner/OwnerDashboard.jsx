@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import pgmateLogo from "../../assets/PGMate.png";
 import api from "../../api/axios";
@@ -553,11 +553,59 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
   const animAvailableBeds = useCountUp(stats?.availableBeds ?? 0);
   const animTotalTenants = useCountUp(stats?.totalTenants ?? 0);
 
-  const unreadEnquiriesCount = stats?.unreadEnquiries ?? 0;
-  const [seenEnquiriesCount, setSeenEnquiriesCount] = useState(() => 
-    parseInt(localStorage.getItem("seen_enquiries_count") || "0", 10)
-  );
-  const showEnquiriesBadge = unreadEnquiriesCount > seenEnquiriesCount;
+  // ── Notification Pill Logic ───────────────────────────────────
+  // These are always read from localStorage so they update correctly
+  // whether the component mounts fresh OR was already mounted (SPA nav).
+  const unreadEnquiriesCount  = stats?.unreadEnquiries          ?? 0;
+  const unreadComplaintsCount = stats?.unreadComplaints         ?? 0;
+  const unreadDuesCount       = stats?.tenantsRemainingToPayCount ?? 0;
+  const unreadBookingsCount   = stats?.unreadBookings           ?? 0;
+
+  const [seenEnquiriesCount,  setSeenEnquiriesCount]  = useState(-1);
+  const [seenComplaintsCount, setSeenComplaintsCount] = useState(-1);
+  const [seenDuesCount,       setSeenDuesCount]       = useState(-1);
+  const [seenBookingsCount,   setSeenBookingsCount]   = useState(-1);
+
+  const location = useLocation();
+
+  // Re-read seen counts from localStorage every time the user navigates to this page.
+  // This ensures that if the user visits Enquiries/Complaints/Dues/Bookings pages
+  // (which stamp localStorage on mount), the pill disappears when they return.
+  useEffect(() => {
+    const read = (key) => parseInt(localStorage.getItem(key) ?? "-1", 10);
+    setSeenEnquiriesCount(read("seen_enquiries_count"));
+    setSeenComplaintsCount(read("seen_complaints_count"));
+    setSeenDuesCount(read("seen_dues_count"));
+    setSeenBookingsCount(read("seen_bookings_count"));
+  }, [location.pathname]);
+
+  // Seed on first-ever load so existing items don't show as new.
+  // Only seeds if the key has never been set (null in localStorage).
+  useEffect(() => {
+    if (!stats) return;
+    const seed = (key, val, setter) => {
+      if (localStorage.getItem(key) === null) {
+        localStorage.setItem(key, val.toString());
+        setter(val);
+      }
+    };
+    seed("seen_enquiries_count",  unreadEnquiriesCount,  setSeenEnquiriesCount);
+    seed("seen_complaints_count", unreadComplaintsCount, setSeenComplaintsCount);
+    seed("seen_dues_count",       unreadDuesCount,       setSeenDuesCount);
+    seed("seen_bookings_count",   unreadBookingsCount,   setSeenBookingsCount);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stats]);
+
+  // Compute new counts (how many arrived since last visit)
+  const newEnquiriesCount  = seenEnquiriesCount  < 0 ? 0 : Math.max(0, unreadEnquiriesCount  - seenEnquiriesCount);
+  const newComplaintsCount = seenComplaintsCount < 0 ? 0 : Math.max(0, unreadComplaintsCount - seenComplaintsCount);
+  const newDuesCount       = seenDuesCount       < 0 ? 0 : Math.max(0, unreadDuesCount       - seenDuesCount);
+  const newBookingsCount   = seenBookingsCount   < 0 ? 0 : Math.max(0, unreadBookingsCount   - seenBookingsCount);
+
+  const showEnquiriesBadge  = newEnquiriesCount  > 0;
+  const showComplaintsBadge = newComplaintsCount > 0;
+  const showDuesBadge       = newDuesCount       > 0;
+  const showBookingsBadge   = newBookingsCount   > 0;
 
   useEffect(() => {
     if (apiPrefix === "/owner") {
@@ -1774,8 +1822,17 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
             {apiPrefix === "/owner" && (
               <button
                 className="dash-quick-btn qb-red"
-                onClick={() => goTo("/owner/complaints")}
+                onClick={() => {
+                  localStorage.setItem("seen_complaints_count", unreadComplaintsCount.toString());
+                  setSeenComplaintsCount(unreadComplaintsCount);
+                  goTo("/owner/complaints");
+                }}
               >
+                {showComplaintsBadge && (
+                  <div className="dash-quick-badge">
+                    {newComplaintsCount > 99 ? '99+' : newComplaintsCount}
+                  </div>
+                )}
                 <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#EF4444" strokeWidth="1.3">
                   <circle cx="8" cy="8" r="6.5" />
                   <line x1="8" y1="4.5" x2="8" y2="8.7" />
@@ -1787,8 +1844,17 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
 
             <button
               className="dash-quick-btn qb-teal"
-              onClick={() => navTo("rent")}
+              onClick={() => {
+                localStorage.setItem("seen_dues_count", unreadDuesCount.toString());
+                setSeenDuesCount(unreadDuesCount);
+                navTo("rent");
+              }}
             >
+              {showDuesBadge && (
+                <div className="dash-quick-badge">
+                  {newDuesCount > 99 ? '99+' : newDuesCount}
+                </div>
+              )}
               <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#0D9488" strokeWidth="1.3">
                 <rect x="2" y="3" width="12" height="9" rx="1.2" />
                 <line x1="2" y1="6" x2="14" y2="6" />
@@ -1811,8 +1877,17 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
 
             <button
               className="dash-quick-btn qb-blue"
-              onClick={() => navTo("bookings")}
+              onClick={() => {
+                localStorage.setItem("seen_bookings_count", unreadBookingsCount.toString());
+                setSeenBookingsCount(unreadBookingsCount);
+                navTo("bookings");
+              }}
             >
+              {showBookingsBadge && (
+                <div className="dash-quick-badge">
+                  {newBookingsCount > 99 ? '99+' : newBookingsCount}
+                </div>
+              )}
               <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#2563EB" strokeWidth="1.3">
                 <rect x="2" y="3" width="12" height="10.5" rx="1.2" />
                 <line x1="2" y1="6.2" x2="14" y2="6.2" />
@@ -1844,7 +1919,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
             >
               {showEnquiriesBadge && (
                 <div className="dash-quick-badge">
-                  {unreadEnquiriesCount > 99 ? '99+' : unreadEnquiriesCount}
+                  {newEnquiriesCount > 99 ? '99+' : newEnquiriesCount}
                 </div>
               )}
               <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#0E7490" strokeWidth="1.3">

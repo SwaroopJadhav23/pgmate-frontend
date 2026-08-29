@@ -16,6 +16,11 @@ const TABS = ["ALL", "PENDING", "IN_PROGRESS", "RESOLVED"];
 const OwnerComplaints = () => {
   const { setTopbarProps } = useOutletContext();
 
+  // Clear the dashboard notification pill when this page is visited
+  useEffect(() => {
+    localStorage.setItem("seen_complaints_count", "999999");
+  }, []);
+
   const [pgs, setPgs] = useState([]);
   const [selectedPg, setSelectedPg] = useState("");
 
