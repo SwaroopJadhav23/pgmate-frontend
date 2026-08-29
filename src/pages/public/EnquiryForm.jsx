@@ -188,30 +188,26 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
           <button 
             onClick={onClose}
             style={{
-              background: "#ffffff",
-              border: "1px solid #e2e8f0",
+              background: "#f1f5f9",
+              border: "none",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontWeight: 600,
-              fontSize: "15px",
-              padding: "0 24px",
-              height: "46px", // matches WA button height
-              borderRadius: "12px", // matches WA button radius
+              fontSize: "14px",
+              padding: "0 20px",
+              height: "44px",
+              borderRadius: "10px",
               color: "#64748b",
               cursor: "pointer",
               transition: "all 0.2s",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+              whiteSpace: "nowrap",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background = "#ef4444";
-              e.currentTarget.style.borderColor = "#ef4444";
-              e.currentTarget.style.color = "#ffffff";
+              e.currentTarget.style.background = "#e2e8f0";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.background = "#ffffff";
-              e.currentTarget.style.borderColor = "#e2e8f0";
-              e.currentTarget.style.color = "#64748b";
+              e.currentTarget.style.background = "#f1f5f9";
             }}
             onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.97)"; }}
             onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
@@ -263,7 +259,7 @@ const EnquiryForm = ({ pgId, pgName, sharingType, roomTypeName, onClose }) => {
               </span>
             </div>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginLeft: "8px", flexShrink: 0 }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="wa-arrow" style={{ marginLeft: "8px", flexShrink: 0 }}>
               <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
             </svg>
           </button>
