@@ -140,9 +140,14 @@ const RevTooltip = ({ active, payload, label }) => {
   );
 };
 
+const allMonths = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+const nowMonth = new Date().getMonth();
+
 /* ─── Revenue Pulse Card — DYNAMIC ─────────────────────────── */
-const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
-  const [timeframe, setTimeframe] = useState("MONTH");
+const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired, timeframe, setTimeframe }) => {
 
   if (!stats) {
     return (
@@ -172,12 +177,6 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired }) => {
 
   const historyYear = Array.isArray(stats.revenueHistory) ? stats.revenueHistory : [];
   const historyMonth = Array.isArray(stats.revenueHistoryMonth) ? stats.revenueHistoryMonth : [];
-
-  const allMonths = [
-    "Jan","Feb","Mar","Apr","May","Jun",
-    "Jul","Aug","Sep","Oct","Nov","Dec",
-  ];
-  const nowMonth = new Date().getMonth();
 
   let chartData = [];
   if (timeframe === "YEAR") {
@@ -541,6 +540,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
   const [pgs, setPgs] = useState([]);
   const [selectedPgId, setSelectedPgId] = useState("ALL");
   const [subSummary, setSubSummary] = useState(null);
+  const [revenueTimeframe, setRevenueTimeframe] = useState("MONTH");
 
   const navigate = useNavigate();
   const { subscriptionExpired } = useContext(AuthContext);
@@ -772,14 +772,65 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       }
     };
 
-    /* ── Header ── */
-    pdf.setFillColor(230, 228, 250);
-    for (let r = 0; r < 4; r++) {
-      for (let c = 0; c < 5; c++) {
-        pdf.circle(W - 25 + c * 3, 3 + r * 3, 0.4, "F");
+    /* ── mini bar chart for revenue pulse ── */
+    const drawBarChart = (x, y, w, h, data, labels, color) => {
+      if (!data || !data.length) {
+        pdf.setTextColor(...GRAY);
+        pdf.setFontSize(8);
+        pdf.setFont("helvetica", "normal");
+        pdf.text("No history data yet", x + w / 2, y + h / 2, { align: "center" });
+        return;
       }
-    }
-    pdf.addImage(logoData, "PNG", 15, 10, 18, 18);
+      
+      const maxVal = Math.max(...data, 1);
+      const yTicks = 5;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6);
+      pdf.setTextColor(160, 160, 170);
+      pdf.setDrawColor(240, 240, 245);
+      pdf.setLineWidth(0.3);
+      pdf.setLineDashPattern([1, 1], 0);
+
+      for (let i = 0; i < yTicks; i++) {
+        const val = (maxVal * i) / (yTicks - 1);
+        const ty = y + h - (h * i) / (yTicks - 1);
+        const label = val >= 1000 ? Math.round(val / 1000) + "k" : Math.round(val);
+        pdf.text("Rs. " + label, x + 8, ty + 2, { align: "right" });
+        pdf.line(x + 10, ty, x + w, ty);
+      }
+      pdf.setLineDashPattern([], 0); // reset
+
+      // Draw Bars
+      const bars = data.length;
+      const barSpace = (w - 10) / bars;
+      const barW = Math.min(8, barSpace - 2);
+      
+      for (let i = 0; i < bars; i++) {
+        const val = data[i];
+        if (val > 0) {
+          const barH = Math.max(0.5, (val / maxVal) * h); // Ensure min height
+          const bx = x + 10 + i * barSpace + (barSpace - barW) / 2;
+          const by = y + h - barH;
+          
+          const label = val >= 1000 ? Math.round(val / 1000) + "k" : Math.round(val);
+          pdf.setTextColor(...DARK);
+          pdf.setFont("helvetica", "bold");
+          pdf.text("Rs. " + label, bx + barW / 2, by - 1, { align: "center" });
+          
+          pdf.setFillColor(...color);
+          pdf.rect(bx, by, barW, barH, "F");
+        }
+        
+        const bxLabel = x + 10 + i * barSpace + (barSpace - barW) / 2;
+        pdf.setTextColor(160, 160, 170);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(labels[i], bxLabel + barW / 2, y + h + 4, { align: "center" });
+      }
+    };
+
+
+    /* ── Header ── */
+    pdf.addImage(logoData, "PNG", 15, 12, 22, 14);
     pdf.setTextColor(...DARK);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(17);
@@ -951,87 +1002,132 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     /* ── Revenue & Collections + Bed Health row ── */
     y += cardH + 8;
     const colW = (W - 30 - 6) / 2;
-    const rowH = 78;
+    const rowH = 80; // Decreased height to remove whitespace
 
     // Revenue card
     pdf.setFillColor(255, 255, 255);
     pdf.setDrawColor(235, 235, 245);
     pdf.roundedRect(15, y, colW, rowH, 3, 3, "FD");
-    pdf.setTextColor(...PURPLE);
+    
+    // Title
+    pdf.setTextColor(...DARK);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
-    pdf.text("REVENUE & COLLECTIONS", 20, y + 8);
+    pdf.text("Revenue pulse", 20, y + 6);
 
-    const collected = stats.revenueCollected ?? 0;
+    const collected = revenueTimeframe === "MONTH" ? (stats.revenueCollected ?? 0) : (stats.totalAmountYear ?? 0);
     const pending = stats.revenuePending ?? 0;
     const overdue = stats.revenueOverdue ?? 0;
     const revTotal = collected + pending + overdue;
     const colRate = revTotal > 0 ? Math.round((collected / revTotal) * 100) : 0;
-    const history = Array.isArray(stats.revenueHistory)
-      ? stats.revenueHistory
-      : [];
+    const history = Array.isArray(stats.revenueHistory) ? stats.revenueHistory : [];
+    
+    let pdfChartData = [];
+    let pdfChartLabels = [];
+    
+    if (revenueTimeframe === "YEAR") {
+      const BUCKETS = 6;
+      const filled = Array(BUCKETS).fill(0);
+      history.slice(-BUCKETS).forEach((v, i) => {
+        filled[i + Math.max(0, BUCKETS - history.length)] = v;
+      });
+      pdfChartData = filled;
+      pdfChartLabels = filled.map((_, i) => allMonths[(nowMonth - (BUCKETS - 1 - i) + 12) % 12]);
+    } else {
+      const historyMonth = Array.isArray(stats.revenueHistoryMonth) ? stats.revenueHistoryMonth : [];
+      const weeklyData = [0, 0, 0, 0];
+      for (let i = 0; i < historyMonth.length; i++) {
+        if (i < 7) weeklyData[0] += historyMonth[i];
+        else if (i < 14) weeklyData[1] += historyMonth[i];
+        else if (i < 21) weeklyData[2] += historyMonth[i];
+        else weeklyData[3] += historyMonth[i];
+      }
+      pdfChartData = weeklyData;
+      pdfChartLabels = ["Week 1", "Week 2", "Week 3", "Week 4"];
+    }
 
     if (history.length >= 2) {
       const pctChange = Math.round(
         ((history[history.length - 1] - history[history.length - 2]) /
-          (history[history.length - 2] || 1)) *
-        100,
+          (history[history.length - 2] || 1)) * 100
       );
-      const badgeW = 26,
-        badgeX = 15 + colW - badgeW - 5;
+      const badgeW = 28, badgeX = 20 + 26;
       pdf.setFillColor(...(pctChange >= 0 ? [220, 252, 231] : [253, 226, 226]));
-      pdf.roundedRect(badgeX, y + 3, badgeW, 6, 1.5, 1.5, "F");
+      pdf.roundedRect(badgeX, y + 2.5, badgeW, 4.5, 1, 1, "F");
       pdf.setTextColor(...(pctChange >= 0 ? GREEN : RED_TXT));
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(6);
+      pdf.setFontSize(5);
       pdf.text(
-        `${pctChange >= 0 ? "Up" : "Down"} ${Math.abs(pctChange)}%`,
+        `${pctChange >= 0 ? "Up" : "Down"} ${Math.abs(pctChange)}% this ${revenueTimeframe === "YEAR" ? "yr." : "mo."}`,
         badgeX + badgeW / 2,
-        y + 7,
-        { align: "center" },
+        y + 5.5,
+        { align: "center" }
       );
     }
 
+    // Big Value (Potential Revenue)
     pdf.setTextColor(...DARK);
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
-    pdf.text(rs(collected), 20, y + 17);
+    pdf.setFontSize(16);
+    const maxPot = revenueTimeframe === "MONTH" ? (stats.maxPotentialRevenue ?? 0) : (stats.maxPotentialRevenue ?? 0) * 12;
+    pdf.text(rs(maxPot), 20, y + 14);
+    
     pdf.setTextColor(...GRAY);
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(7);
-    pdf.text("Collected this month", 20, y + 22);
+    pdf.text(`Collected This ${revenueTimeframe === "YEAR" ? "Year" : "Month"} (Potential Revenue)`, 20, y + 18);
 
-    drawLineChart(20, y + 26, colW - 10, 20, history, PURPLE);
+    // Bar Chart
+    drawBarChart(20, y + 22, colW - 10, 22, pdfChartData, pdfChartLabels, [129, 140, 248]);
 
-    pdf.setFillColor(...AMBER_BG);
-    pdf.roundedRect(20, y + 50, colW / 2 - 14, 12, 2, 2, "F");
-    pdf.setTextColor(...AMBER);
+    // 3 Cards below the chart
+    const cardY = y + 51;
+    const subCardW = (colW - 14) / 3;
+    
+    // TOTAL COLLECTED
+    pdf.setFillColor(243, 232, 255); // PURPLE_LIGHT
+    pdf.roundedRect(20, cardY, subCardW, 13, 1.5, 1.5, "F");
+    pdf.setTextColor(99, 91, 255); // PURPLE
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.5);
-    pdf.text("PENDING", 24, y + 56);
+    pdf.setFontSize(5.5);
+    pdf.text("TOTAL COLLECTED", 20 + 2, cardY + 4.5);
     pdf.setFontSize(9);
-    pdf.text(rs(pending), 24, y + 60);
+    pdf.text(rs(collected), 20 + 2, cardY + 10);
 
+    // PENDING
+    pdf.setFillColor(254, 243, 199); // AMBER_LIGHT
+    pdf.roundedRect(20 + subCardW + 3, cardY, subCardW, 13, 1.5, 1.5, "F");
+    pdf.setTextColor(217, 119, 6); // AMBER
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5.5);
+    pdf.text("PENDING", 20 + subCardW + 4, cardY + 4.5);
+    pdf.setFontSize(9);
+    pdf.text(rs(pending), 20 + subCardW + 4, cardY + 10);
+
+    // OVERDUE
     pdf.setFillColor(...RED_BG);
-    pdf.roundedRect(20 + colW / 2 - 10, y + 50, colW / 2 - 14, 12, 2, 2, "F");
+    pdf.roundedRect(20 + subCardW * 2 + 6, cardY, subCardW, 13, 1.5, 1.5, "F");
     pdf.setTextColor(...RED_TXT);
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.5);
-    pdf.text("OVERDUE", 24 + colW / 2 - 10, y + 56);
+    pdf.setFontSize(5.5);
+    pdf.text("OVERDUE", 20 + subCardW * 2 + 7, cardY + 4.5);
     pdf.setFontSize(9);
-    pdf.text(rs(overdue), 24 + colW / 2 - 10, y + 60);
+    pdf.text(rs(overdue), 20 + subCardW * 2 + 7, cardY + 10);
 
+    // Collection Rate
+    const crY = y + 70;
     pdf.setTextColor(...GRAY);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(7);
-    pdf.text("Collection Rate", 20, y + 68);
-    pdf.setTextColor(...PURPLE);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`${colRate}%`, 20 + colW - 20, y + 68);
+    pdf.setFontSize(7);
+    pdf.text("Collection rate", 20, crY);
+    pdf.setTextColor(99, 91, 255);
+    pdf.text(`${colRate}%`, 20 + colW - 10, crY, { align: "right" });
+    
+    // Progress Bar
     pdf.setFillColor(230, 228, 250);
-    pdf.roundedRect(20, y + 70, colW - 10, 2.5, 1, 1, "F");
-    pdf.setFillColor(...PURPLE);
-    pdf.roundedRect(20, y + 70, (colW - 10) * (colRate / 100), 2.5, 1, 1, "F");
+    pdf.roundedRect(20, crY + 3, colW - 10, 2, 1, 1, "F");
+    pdf.setFillColor(99, 91, 255);
+    pdf.roundedRect(20, crY + 3, (colW - 10) * (colRate / 100), 2, 1, 1, "F");
 
     // Bed Health card
     const bx = 15 + colW + 6;
@@ -1041,7 +1137,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     pdf.setTextColor(...PURPLE);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
-    pdf.text("BED HEALTH SCORE", bx + 5, y + 8);
+    pdf.text("BED HEALTH SCORE", bx + 5, y + 6);
 
     const totalBeds = stats.totalBeds ?? 0;
     const occ = stats.occupiedBeds ?? 0;
@@ -1071,10 +1167,10 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
 
     pdf.setDrawColor(230, 228, 250);
     pdf.setLineWidth(2.5);
-    pdf.circle(bx + 22, y + 30, 12, "S");
+    pdf.circle(bx + 22, y + 24, 12, "S");
     drawArc(
       bx + 22,
-      y + 30,
+      y + 24,
       12,
       -90,
       -90 + (score / 100) * 360,
@@ -1084,10 +1180,10 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     pdf.setTextColor(...scoreColor);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(11);
-    pdf.text(String(score), bx + 22, y + 31, { align: "center" });
+    pdf.text(String(score), bx + 22, y + 25, { align: "center" });
     pdf.setTextColor(...GRAY);
     pdf.setFontSize(6);
-    pdf.text("/100", bx + 22, y + 35, { align: "center" });
+    pdf.text("/100", bx + 22, y + 29, { align: "center" });
 
     const facts = [
       ["Avg. days vacant", avgVacant ? `${avgVacant}d` : "—"],
@@ -1095,7 +1191,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       ["Beds due service", String(dueService)],
       ["Long-vacant (>14d)", String(longVacant)],
     ];
-    let fy = y + 20;
+    let fy = y + 14;
     facts.forEach(([l, v]) => {
       pdf.setTextColor(...GRAY);
       pdf.setFont("helvetica", "normal");
@@ -1108,7 +1204,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     });
 
     pdf.setFillColor(...LIGHT_BG);
-    pdf.roundedRect(bx + 5, y + 48, colW - 10, 14, 2, 2, "F");
+    pdf.roundedRect(bx + 5, y + 42, colW - 10, 14, 2, 2, "F");
     pdf.setTextColor(...DARK);
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(6.5);
@@ -1117,18 +1213,18 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
         ? "Your beds are in great shape. Vacancy is low."
         : "Some beds need attention. Check pricing/listing.",
       bx + 8,
-      y + 55,
+      y + 49,
       { maxWidth: colW - 16 },
     );
 
     pdf.setTextColor(...GRAY);
     pdf.setFontSize(7);
-    pdf.text("Vacancy Pressure", bx + 5, y + 68);
+    pdf.text("Vacancy Pressure", bx + 5, y + 64);
     pdf.setTextColor(...DARK);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`${vacancyPressure}%`, bx + colW - 8, y + 68, { align: "right" });
+    pdf.text(`${vacancyPressure}%`, bx + colW - 8, y + 64, { align: "right" });
     pdf.setFillColor(230, 228, 250);
-    pdf.roundedRect(bx + 5, y + 70, colW - 10, 2.5, 1, 1, "F");
+    pdf.roundedRect(bx + 5, y + 67, colW - 10, 2.5, 1, 1, "F");
     pdf.setFillColor(
       ...(vacancyPressure > 60
         ? RED_TXT
@@ -1138,7 +1234,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     );
     pdf.roundedRect(
       bx + 5,
-      y + 70,
+      y + 67,
       (colW - 10) * (vacancyPressure / 100),
       2.5,
       1,
@@ -1319,7 +1415,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     if (perPgRows.length > 0) {
       pdf.addPage();
 
-      pdf.addImage(logoData, "PNG", 15, 10, 18, 18);
+      pdf.addImage(logoData, "PNG", 15, 12, 22, 14);
       pdf.setTextColor(...DARK);
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(15);
@@ -1333,7 +1429,7 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       pdf.line(15, 28, W - 15, 28);
 
       let py = 34;
-      const cardH = 32,
+      const cardH = 29,
         cardGap = 5,
         cardW = W - 30;
 
@@ -1349,20 +1445,20 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
 
         // icon badge — rounded square, matches Overview card icon style
         pdf.setFillColor(...INDIGO_BG);
-        pdf.roundedRect(20, py + 5, 9, 9, 2.5, 2.5, "F");
+        pdf.roundedRect(20, py + 3, 8, 8, 2, 2, "F");
         pdf.setDrawColor(...INDIGO);
         pdf.setFillColor(...INDIGO);
         pdf.setLineWidth(0.4);
-        pdf.rect(23, py + 7.3, 3.3, 4.8, "S");
-        pdf.rect(23.6, py + 8, 0.7, 0.7, "F");
-        pdf.rect(25, py + 8, 0.7, 0.7, "F");
-        pdf.rect(23.6, py + 9.4, 0.7, 0.7, "F");
+        pdf.rect(22.7, py + 4.8, 2.8, 4, "S");
+        pdf.rect(23.2, py + 5.4, 0.5, 0.5, "F");
+        pdf.rect(24.3, py + 5.4, 0.5, 0.5, "F");
+        pdf.rect(23.2, py + 6.5, 0.5, 0.5, "F");
 
         // PG name
         pdf.setTextColor(...DARK);
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(11);
-        pdf.text(row.name, 33, py + 10.5, { maxWidth: cardW - 55 });
+        pdf.setFontSize(10.5);
+        pdf.text(row.name, 31, py + 8.5, { maxWidth: cardW - 55 });
 
         // occupancy badge — fully rounded pill, like "Excellent" badge in Bed Health card
         const isGood = row.occupancyPercent >= 75;
@@ -1375,18 +1471,18 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
             ? "Moderate"
             : "Low Occupancy";
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(7);
-        const badgeW = pdf.getTextWidth(badgeLabel) + 8;
-        const badgeX = 15 + cardW - badgeW - 6;
+        pdf.setFontSize(6.5);
+        const badgeW = pdf.getTextWidth(badgeLabel) + 6;
+        const badgeX = 15 + cardW - badgeW - 5;
         pdf.setFillColor(...badgeBg);
-        pdf.roundedRect(badgeX, py + 5, badgeW, 7, 3.5, 3.5, "F");
+        pdf.roundedRect(badgeX, py + 3.5, badgeW, 6, 3, 3, "F");
         pdf.setTextColor(...badgeTxt);
-        pdf.text(badgeLabel, badgeX + badgeW / 2, py + 9.5, { align: "center" });
+        pdf.text(badgeLabel, badgeX + badgeW / 2, py + 7.7, { align: "center" });
 
         // divider line
         pdf.setDrawColor(240, 240, 245);
         pdf.setLineWidth(0.3);
-        pdf.line(20, py + 16, 15 + cardW - 6, py + 16);
+        pdf.line(20, py + 12.5, 15 + cardW - 6, py + 12.5);
 
         // property stats row
         const statItems = [
@@ -1401,12 +1497,12 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
           const sx = 20 + i * statColW;
           pdf.setTextColor(...GRAY);
           pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(6);
-          pdf.text(label.toUpperCase(), sx, py + 21);
+          pdf.setFontSize(5.5);
+          pdf.text(label.toUpperCase(), sx, py + 16.5);
           pdf.setTextColor(...INDIGO);
           pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(10);
-          pdf.text(String(val), sx, py + 27);
+          pdf.setFontSize(9);
+          pdf.text(String(val), sx, py + 21);
         });
 
         // revenue pills row — fully rounded, matching app pill style
@@ -1419,11 +1515,11 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
         revItems.forEach(([label, val, bg, txt], i) => {
           const px = 20 + i * (pillW + 4);
           pdf.setFillColor(...bg);
-          pdf.roundedRect(px, py + 29, pillW, 6, 3, 3, "F");
+          pdf.roundedRect(px, py + 22.5, pillW, 5, 2.5, 2.5, "F");
           pdf.setTextColor(...txt);
           pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(6.5);
-          pdf.text(`${label}: ${rs(val)}`, px + pillW / 2, py + 33, {
+          pdf.setFontSize(6);
+          pdf.text(`${label}: ${rs(val)}`, px + pillW / 2, py + 26, {
             align: "center",
           });
         });
@@ -1477,10 +1573,14 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
 
       // ── About + Thank you row (before footer) — only on the very last page ──
       const infoBoxH = 18;
-      if (py + infoBoxH + 8 > H - 18) {
+      const targetPy = H - 42; // Anchor exactly above the footer (H - 14 - 4 gap - 18 box - 6 line gap)
+      
+      if (py > targetPy) {
         drawFooter();
         pdf.addPage();
-        py = 20;
+        py = targetPy;
+      } else {
+        py = targetPy; // Push down to the bottom
       }
 
       pdf.setDrawColor(...PURPLE);
@@ -1531,26 +1631,27 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     setShowExport(false);
   };
 
-  const exportExcel = () => {
+  const exportExcel = async () => {
     if (!stats) return;
+    try {
+      const toastId = toast.loading("Generating Excel Export...");
+      const response = await api.get("/owner/dashboard/export-excel", {
+        params: { ownerName: ownerName, pgId: selectedPgId },
+        responseType: "blob" // Crucial for receiving binary data
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Owner_Dashboard_${selectedPgId !== 'ALL' ? selectedPgId + '_' : ''}${new Date().toISOString().slice(0,10)}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Export downloaded successfully!", { id: toastId });
+    } catch (error) {
+      toast.error("Failed to export Excel data.");
+    }
     setShowExport(false);
-    const data = [
-      ["Owner Dashboard Report"],
-      [],
-      ["Metric", "Value"],
-      ["Total PGs", stats.totalPgs ?? 0],
-      ["Total Beds", stats.totalBeds ?? 0],
-      ["Available Beds", stats.availableBeds ?? 0],
-      ["Total Floors", stats.totalFloors ?? 0],
-      ["Total Rooms", stats.totalRooms ?? 0],
-      ["Occupied Beds", stats.occupiedBeds ?? 0],
-      ["Total Tenants", stats.totalTenants ?? 0],
-    ];
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    ws["!cols"] = [{ wch: 40 }, { wch: 18 }];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
-    XLSX.writeFile(wb, "OwnerDashboard.xlsx");
   };
   // const exportWord = () => {
   //   if (!stats) return;
@@ -1967,6 +2068,8 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
                 stats={stats}
                 onNavigate={navTo}
                 subscriptionExpired={subscriptionExpired}
+                timeframe={revenueTimeframe}
+                setTimeframe={setRevenueTimeframe}
               />
               <BedHealthCard
                 stats={stats}
