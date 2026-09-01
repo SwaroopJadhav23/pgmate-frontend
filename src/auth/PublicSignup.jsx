@@ -102,6 +102,12 @@ const PublicSignup = () => {
   const submit = async (e) => {
     e.preventDefault();
 
+    const nameRegex = /^[A-Za-z\s]{1,50}$/;
+    if (!name.trim() || !nameRegex.test(name.trim())) {
+      toast("Full Name must be up to 50 characters and contain only letters and spaces.", { icon: "⚠️" });
+      return;
+    }
+
     if (role === "OWNER") {
       if (!isValidEmail(email)) {
         toast("Please enter a valid email address.", { icon: "⚠️" });
@@ -179,8 +185,8 @@ const PublicSignup = () => {
           </div>
 
           <form onSubmit={submit}>
-            <input className="form-control" placeholder="Full Name"
-              value={name} onChange={(e) => setName(e.target.value.trimStart())} required />
+            <input className="form-control" placeholder="Full Name" maxLength={50}
+              value={name} onChange={(e) => setName(e.target.value.replace(/[^A-Za-z\s]/g, '').trimStart())} required />
 
             {role === "OWNER" && (
               <>
