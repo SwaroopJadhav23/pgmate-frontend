@@ -1150,3 +1150,14 @@
   .pv-field-val { font-size: 13px; }
   .pv-section { padding: 14px 16px; }
 }
+
+/* Delete Account Modal - Better Field Spacing */
+
+.modal-box label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.modal-box .profile-input {
+  margin-bottom: 12px;
+}
