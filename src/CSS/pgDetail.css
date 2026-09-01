@@ -629,13 +629,14 @@ img, video { display: block; }
 
 .bc-enquiry-btn {
   flex: 1; padding: 11px 8px;
-  background: var(--white); border: 1.5px solid var(--border);
+  background: #25D366; border: 1.5px solid #25D366;
   border-radius: var(--radius-md);
-  font-size: 13px; font-weight: 700; color: var(--text);
+  font-size: 13px; font-weight: 700; color: white;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
   transition: all 0.15s; white-space: nowrap;
 }
 
-.bc-enquiry-btn:hover { border-color: var(--purple); color: var(--purple); }
+.bc-enquiry-btn:hover { background: #1ebd5a; border-color: #1ebd5a; color: white; }
 
 .bc-disclaimer {
   display: flex;

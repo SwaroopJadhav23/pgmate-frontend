@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { MapPin, Home, MessageSquareMore } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 import api from "../../api/axios";
 import "../../CSS/pgDetail.css";
@@ -321,6 +322,16 @@ const PGDetail = () => {
       navigate("/login", { state: { from: `/pg/${id}` } });
       return;
     }
+    if (role === "OWNER" || role === "SUPER_ADMIN" || role === "PG_MANAGER" || role === "SUB_ADMIN") {
+      Swal.fire({
+        title: "Reservation Not Allowed",
+        text: "You are logged in as an Owner or Admin. Please log in as a normal User to reserve a bed.",
+        icon: "warning",
+        confirmButtonText: "Got it",
+        confirmButtonColor: "#5B5BD6",
+      });
+      return;
+    }
     try {
       const res = await api.get("/user/pgs/my-active-reservation");
       if (res.data === true) {
@@ -616,7 +627,7 @@ const PGDetail = () => {
               className="bc-enquiry-btn"
               onClick={() => setShowEnquiry(true)}
             >
-              <MessageSquareMore size={16} strokeWidth={2} /> Enquiry
+              <FaWhatsapp size={16} /> WhatsApp
             </button>
           </div>
 
@@ -646,6 +657,16 @@ const PGDetail = () => {
             setShowAvailability(false);
             if (!token) {
               navigate("/login", { state: { from: `/pg/${id}` } });
+              return;
+            }
+            if (role === "OWNER" || role === "SUPER_ADMIN" || role === "PG_MANAGER" || role === "SUB_ADMIN") {
+              Swal.fire({
+                title: "Reservation Not Allowed",
+                text: "You are logged in as an Owner or Admin. Please log in as a normal User to reserve a bed.",
+                icon: "warning",
+                confirmButtonText: "Got it",
+                confirmButtonColor: "#5B5BD6",
+              });
               return;
             }
             try {

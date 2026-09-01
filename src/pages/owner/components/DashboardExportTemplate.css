@@ -1,0 +1,411 @@
+.export-template-wrapper {
+  width: 1400px;
+  background-color: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1e293b;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.export-template-wrapper * {
+  box-sizing: border-box;
+}
+
+/* Header */
+.export-header {
+  background-color: #2563eb;
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px 8px 0 0;
+}
+
+.export-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.export-header-right {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.export-header-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Main Content Area */
+.export-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Section Common */
+.export-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+}
+
+.export-section-header {
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.export-section-content {
+  padding: 16px;
+}
+
+/* Specific Section Colors */
+.header-blue { color: #2563eb; background-color: #eff6ff; }
+.header-green { color: #16a34a; background-color: #f0fdf4; }
+.header-orange { color: #ea580c; background-color: #fff7ed; }
+.header-purple { color: #7c3aed; background-color: #f5f3ff; }
+.header-pink { color: #db2777; background-color: #fdf2f8; }
+
+/* Grid Layouts */
+.export-grid-top {
+  display: grid;
+  grid-template-columns: 350px 1fr 350px;
+  gap: 20px;
+}
+
+.export-grid-middle {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.export-grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* Overview Cards */
+.overview-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.overview-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.overview-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #64748b;
+}
+.overview-card:nth-child(1) .overview-icon { color: #3b82f6; }
+.overview-card:nth-child(2) .overview-icon { color: #10b981; }
+.overview-card:nth-child(3) .overview-icon { color: #8b5cf6; }
+.overview-card:nth-child(4) .overview-icon { color: #f59e0b; }
+
+.overview-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.overview-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Revenue Pulse */
+.revenue-pulse-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.revenue-top-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.revenue-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.rev-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 24px;
+}
+
+.rev-stat-label {
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.rev-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.revenue-weeks {
+  flex: 1;
+  border-left: 1px solid #e2e8f0;
+  padding-left: 24px;
+}
+
+.rev-week-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rev-week-table th {
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.rev-week-table td {
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid #f1f5f9;
+}
+.rev-week-table td:last-child {
+  text-align: right;
+}
+
+.revenue-pills {
+  display: flex;
+  gap: 12px;
+}
+
+.rev-pill {
+  flex: 1;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rev-pill-purple { background-color: #f3e8ff; color: #6b21a8; }
+.rev-pill-amber { background-color: #fef3c7; color: #b45309; }
+.rev-pill-red { background-color: #fee2e2; color: #b91c1c; }
+
+.rev-pill-label { font-size: 12px; font-weight: 600; }
+.rev-pill-val { font-size: 18px; font-weight: 700; }
+
+
+/* Bed Health Insights */
+.health-content {
+  display: flex;
+  gap: 20px;
+}
+
+.health-stats {
+  flex: 3;
+}
+
+.health-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+}
+.health-stat-row:last-child {
+  border-bottom: none;
+}
+.health-stat-label {
+  color: #475569;
+  font-weight: 500;
+}
+.health-stat-value {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.health-insight-box {
+  flex: 2;
+  background-color: #fff7ed;
+  border: 1px solid #ffedd5;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.health-insight-title {
+  color: #ea580c;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.health-insight-text {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* Quick Action Summary */
+.quick-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.qa-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  padding: 8px;
+  border-right: 1px solid #e2e8f0;
+}
+.qa-item:last-child {
+  border-right: none;
+}
+
+.qa-icon {
+  font-size: 20px;
+  color: #7c3aed;
+  width: 24px;
+  text-align: center;
+}
+
+.qa-info {
+  display: flex;
+  flex-direction: column;
+}
+.qa-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+.qa-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Tables */
+.export-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.export-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.export-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.export-table tr.total-row td {
+  font-weight: 700;
+  background-color: #f8fafc;
+  border-top: 2px solid #e2e8f0;
+  color: #0f172a;
+}
+
+/* Overall Bed Summary */
+.overall-bed-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bed-summary-table {
+  flex: 1;
+}
+.bed-summary-table .health-stat-row {
+  padding: 12px 0;
+}
+
+.bed-chart-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 180px;
+}
+
+.bed-chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Footer */
+.export-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+  padding-top: 10px;
+}

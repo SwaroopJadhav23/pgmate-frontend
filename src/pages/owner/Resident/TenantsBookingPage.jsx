@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import api from "../../../api/axios";
 import Swal from "sweetalert2";
@@ -13,6 +13,11 @@ const ReservedResidentsPage = () => {
   const [selectedResident, setSelectedResident] = useState(null);
 
   const reloadList = () => setRefreshKey((prev) => prev + 1);
+
+  // Clear the dashboard notification pill when this page is visited
+  useEffect(() => {
+    localStorage.setItem("seen_bookings_count", "999999");
+  }, []);
 
   return (
     <DashboardLayout

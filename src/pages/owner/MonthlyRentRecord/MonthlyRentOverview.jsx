@@ -68,6 +68,11 @@ const MonthlyRentOverview = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [showAddDue, setShowAddDue] = useState(false);
 
+  // Clear the dashboard notification pill when this page is visited
+  useEffect(() => {
+    localStorage.setItem("seen_dues_count", "999999");
+  }, []);
+
   const [duesStats, setDuesStats] = useState({
     totalDues: 0,
     overdueAmount: 0,

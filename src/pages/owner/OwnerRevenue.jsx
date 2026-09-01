@@ -10,6 +10,8 @@ import { saveAs } from "file-saver";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import "./OwnerRevenue.css";
+import html2pdf from "html2pdf.js";
+import RevenueExportTemplate from "./components/RevenueExportTemplate";
 import {
   BarChart,
   Bar,
@@ -96,6 +98,7 @@ const OwnerRevenue = () => {
   const [showYearDropdown, setShowYearDropdown] = useState(false);
   const monthRef = useRef(null);
   const yearRef = useRef(null);
+  const exportTemplateRef = useRef(null);
   const yearOptions = useMemo(() => {
     const cy = new Date().getFullYear();
     return Array.from({ length: 7 }, (_, i) => cy - 5 + i);
@@ -551,7 +554,7 @@ const OwnerRevenue = () => {
   const getRevenueLabel = () => {
 
     if (startDate && endDate)
-      return `Revenue & Expenditure (${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")})`;
+      return `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`;
 
     if (filter === "DAY")
       return startDate
@@ -643,55 +646,15 @@ const OwnerRevenue = () => {
   ];
   /* ================= PDF ================= */
   const exportPDF = () => {
-
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
-    pdf.text("Revenue & Expenditure Report", 20, 20);
-
-    pdf.setFontSize(13);
-    pdf.text(getRevenueLabel(), 20, 30);
-
-    let y = 45;
-
-    pdf.setFontSize(14);
-    pdf.text("Summary Metrics", 20, y);
-    y += 12;
-
-    pdf.setFontSize(11);
-    pdf.setFont("helvetica", "normal");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-
-    const labelX = 25;              // left column
-    const valueX = pageWidth - 25;  // right column
-
-    reportRows.forEach((row) => {
-
-      let formatted;
-
-      if (row.type === "currency")
-        formatted = formatCurrencyPDF(row.value);
-      else if (row.type === "percentage")
-        formatted = `${row.value}%`;
-      else
-        formatted = row.value;
-
-      /* LEFT COLUMN */
-      pdf.text(row.label, labelX, y);
-
-      /* RIGHT COLUMN (PERFECT ALIGNMENT) */
-      pdf.text(
-        String(formatted),
-        valueX,
-        y,
-        { align: "right" }
-      );
-
-      y += 9;
-    });
-
-    pdf.save("RevenueAndExpenditure.pdf");
+    if (!exportTemplateRef.current) return;
+    const opt = {
+      margin: 0,
+      filename: 'Revenue_Expenditure_Invoice.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(exportTemplateRef.current).save();
     setShowExport(false);
   };
 
@@ -1165,13 +1128,8 @@ const OwnerRevenue = () => {
               />
 
               <KPI
-                title="Total Unpaid Rent"
-                value={<AnimatedNumber prefix="₹" value={stats?.revenuePending || 0} />}
-                subtitle={
-                  stats?.revenuePending === stats?.revenueOverdue && stats?.revenuePending > 0
-                    ? "100% of this amount is overdue"
-                    : <span>Includes <AnimatedNumber prefix="₹" value={stats?.revenueOverdue || 0} /> overdue</span>
-                }
+                title="Total Overdue"
+                value={<AnimatedNumber prefix="₹" value={stats?.revenueOverdue || 0} />}
                 icon="bi bi-hourglass-split"
                 color="kpi-orange"
                 trend={{ direction: 'down', value: '100%' }}
@@ -1703,6 +1661,33 @@ const OwnerRevenue = () => {
         );
       })()}
 
+      <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', pointerEvents: 'none' }}>
+        <RevenueExportTemplate 
+          ref={exportTemplateRef}
+          invoiceNo={`INV-REV-${new Date().getTime().toString().slice(-6)}`}
+          invoiceDate={format(new Date(), "dd MMM yyyy")}
+          dateRange={getRevenueLabel()}
+          pgDetails={selectedPgId === "ALL" ? { name: "Owner Dashboard" } : pgs.find(p => p.id === selectedPgId)}
+          summary={{
+            totalRevenue,
+            totalExpenses: totalExpensesAmount,
+            totalOverdue: stats?.revenueOverdue || 0,
+            collectionRate: colRate
+          }}
+          overview={{
+            totalRevenue,
+            rentCollected: totalRentCollected,
+            depositHeld: totalDepositHeld,
+            futureRefund: futureDepositRefund,
+            potentialRevenue,
+            totalExpenses: totalExpensesAmount,
+            totalOverdue: stats?.revenueOverdue || 0,
+            collectionRate: colRate
+          }}
+          occupancyRate={occupancyRate}
+          chartData={chartData}
+        />
+      </div>
     </DashboardLayout>
   );
 };

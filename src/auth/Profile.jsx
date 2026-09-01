@@ -584,130 +584,90 @@ const Profile = () => {
       !editMode
   ) {
     return (
-        <UserLayout>
-
-          {/* Deletion Pending Banner */}
-          {profile.deletionRequested && (
-              <div
-                  style={{
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 999,
-                    background: "#fef2f2",
-                    borderBottom:
-                        "2px solid #dc2626",
-                    color: "#991b1b",
-                    padding: "12px 20px",
-                    textAlign: "center",
-                    fontSize: "14px",
-                  }}
-              >
-                <strong>
-                  Account Deletion Pending:
-                </strong>{" "}
-                Your account will be permanently
-                deleted in{" "}
-                <strong>
-                  {daysLeftToDelete()} day(s)
-                </strong>
-                . You can continue using your
-                account during the grace period.
-                {" "}
-                <a
-                    href="mailto:support.pgmate@gmail.com"
-                    style={{
-                      color: "#991b1b",
-                      textDecoration:
-                          "underline",
-                      fontWeight: 600,
-                    }}
-                >
-                  Contact Admin
-                </a>
-              </div>
-          )}
-
-          <div className="profile-container">
-            <div className="profile-card">
-
-              {/* Header */}
-              <div className="pv-header">
-
-                <img
-                    className="pv-avatar"
-                    src={
-                      file
-                          ? URL.createObjectURL(
-                              file,
-                          )
-                          : profile.profilePicUrl ||
-                          "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                    }
-                    alt="User"
-                />
-
-                <div className="pv-info">
-                  <div className="pv-name">
-                    {profile.name}
-                  </div>
-
-                  <div className="pv-role">
-                    User
-                  </div>
-
-                  <div className="pv-since">
-                    Member since{" "}
-                    {new Date(
-                        profile.createdAt ||
-                        Date.now(),
-                    ).getFullYear()}
-                  </div>
+      <UserLayout>
+        {profile.deletionRequested && (
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 999,
+              background: "#fef2f2",
+              borderBottom: "2px solid #dc2626",
+              color: "#991b1b",
+              padding: "12px 20px",
+              textAlign: "center",
+              fontSize: "14px",
+            }}
+          >
+            <strong>Account Deletion Pending:</strong> Your account will be
+            permanently deleted in <strong>{daysLeftToDelete()} day(s)</strong>.{" "}
+            Want to restore your account or delete it right away?{" "}
+            <a
+              href="mailto:support..pgmate@gmail.com"
+              style={{
+                color: "#991b1b",
+                textDecoration: "underline",
+                fontWeight: 600,
+              }}
+            >
+              Contact Admin
+            </a>
+          </div>
+        )}
+        <div className="profile-container">
+          <div className="profile-card">
+            <div className="pv-header">
+              <img
+                className="pv-avatar"
+                src={
+                  file
+                    ? URL.createObjectURL(file)
+                    : profile.profilePicUrl ||
+                      "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                }
+                alt="User"
+              />
+              <div className="pv-info">
+                <div className="pv-name">{profile.name}</div>
+                <div className="pv-role">User</div>
+                <div className="pv-since">
+                  Member since{" "}
+                  {new Date(profile.createdAt || Date.now()).getFullYear()}
                 </div>
-
-                <svg
-                    width="72"
-                    height="72"
-                    viewBox="0 0 72 72"
-                >
-                  <circle
-                      cx="36"
-                      cy="36"
-                      r="30"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.25)"
-                      strokeWidth="6"
-                  />
-
-                  <circle
-                      cx="36"
-                      cy="36"
-                      r="30"
-                      fill="none"
-                      stroke="#ffffff"
-                      strokeWidth="6"
-                      strokeDasharray={188.5}
-                      strokeDashoffset={
-                          188.5 -
-                          (188.5 *
-                              completion) /
-                          100
-                      }
-                      strokeLinecap="round"
-                      transform="rotate(-90 36 36)"
-                  />
-
-                  <text
-                      x="36"
-                      y="41"
-                      textAnchor="middle"
-                      fontSize="13"
-                      fontWeight="700"
-                      fill="#ffffff"
-                  >
-                    {completion}%
-                  </text>
-                </svg>
               </div>
+              <svg width="72" height="72" viewBox="0 0 72 72">
+                <circle
+                  cx="36"
+                  cy="36"
+                  r="30"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.25)"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="36"
+                  cy="36"
+                  r="30"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="6"
+                  strokeDasharray={188.5}
+                  strokeDashoffset={188.5 - (188.5 * completion) / 100}
+                  strokeLinecap="round"
+                  transform="rotate(-90 36 36)"
+                />
+                <text
+                  x="36"
+                  y="41"
+                  textAnchor="middle"
+                  fontSize="13"
+                  fontWeight="700"
+                  fill="#ffffff"
+                >
+                  {completion}%
+                </text>
+              </svg>
+            </div>
 
               {/* Personal Info */}
               <div className="pv-section">
@@ -989,70 +949,49 @@ const Profile = () => {
      PROFILE EDIT / INCOMPLETE VIEW
   ======================================== */
   return (
-      <UserLayout>
-
-        {profile.deletionRequested && (
-            <div
-                style={{
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 999,
-                  background: "#fef2f2",
-                  borderBottom:
-                      "2px solid #dc2626",
-                  color: "#991b1b",
-                  padding: "12px 20px",
-                  textAlign: "center",
-                  fontSize: "14px",
-                }}
-            >
-              <strong>
-                Account Deletion Pending:
-              </strong>{" "}
-              Your account will be permanently
-              deleted in{" "}
-              <strong>
-                {daysLeftToDelete()} day(s)
-              </strong>
-              .{" "}
-              <a
-                  href="mailto:support.pgmate@gmail.com"
-                  style={{
-                    color: "#991b1b",
-                    textDecoration:
-                        "underline",
-                    fontWeight: 600,
-                  }}
-              >
-                Contact Admin
-              </a>
-            </div>
-        )}
-
-        <div className="profile-container">
-          <div className="profile-card">
-
-            {/* Avatar */}
-            <div className="profile-avatar-wrap">
-
-              <img
-                  className="profile-avatar"
-                  src={
-                    file
-                        ? URL.createObjectURL(
-                            file,
-                        )
-                        : profile.profilePicUrl ||
-                        "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                  }
-                  alt="User"
-              />
-
-              {completion === 100 && (
-                  <span
-                      className="profile-verified-dot"
-                      title="Profile complete"
-                  >
+    <UserLayout>
+      {profile.deletionRequested && (
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 999,
+            background: "#fef2f2",
+            borderBottom: "2px solid #dc2626",
+            color: "#991b1b",
+            padding: "12px 20px",
+            textAlign: "center",
+            fontSize: "14px",
+          }}
+        >
+          <strong>Account Deletion Pending:</strong> Your account will be
+          permanently deleted in <strong>{daysLeftToDelete()} day(s)</strong>.{" "}
+          Want to restore your account or delete it right away?{" "}
+          <a
+            href="mailto:support.pgmate@gmail.com"
+            style={{
+              color: "#991b1b",
+              textDecoration: "underline",
+              fontWeight: 600,
+            }}
+          >
+            Contact Admin
+          </a>
+        </div>
+      )}
+      <div className="profile-container">
+        <div className="profile-card">
+          <div className="profile-avatar-wrap">
+            <img
+              className="profile-avatar"
+              src={
+                profile.profilePicUrl ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              }
+              alt="User"
+            />
+            {completion === 100 && (
+              <span className="profile-verified-dot" title="Profile complete">
                 ✓
               </span>
               )}
