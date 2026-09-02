@@ -3,12 +3,12 @@
 ========================================= */
 
 .spon-stats-grid {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 14px;
-  margin-bottom: 24px;
-  overflow-x: auto;
-  overflow-y: hidden;
+ display: grid;
+ grid-template-columns: repeat(3, minmax(0, 1fr));
+ gap: 18px;
+ margin-bottom: 28px;
+ width: 100%;
+ overflow: visible;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -21,212 +21,338 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 18px;
-  border-radius: 14px;
+ padding: 18px 20px;
+ border-radius: 16px;
   background: #ffffff;
   border-left: 4px solid transparent;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s, box-shadow 0.2s;
-  flex: 0 0 200px;
-  min-width: 200px;
+ transition: transform 0.2s ease, box-shadow 0.2s ease;
+ min-height: 120px;
+ width: 100%;
+ box-sizing: border-box;
 }
 
 .spon-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.10);
+ transform: translateY(-3px);
+ box-shadow: 0 14px 32px rgba(0, 0, 0, 0.10);
 }
 
 /* Icon wrapper */
 .spon-stat-icon-wrap {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+ width: 48px;
+ height: 48px;
+ border-radius: 50%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-shrink: 0;
 }
 
 .spon-stat-icon {
-  width: 22px;
-  height: 22px;
+ width: 22px;
+ height: 22px;
 }
 
 /* Text block */
 .spon-stat-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+ display: flex;
+ flex-direction: column;
+ gap: 1px;
+ min-width: 0;
 }
 
 .spon-stat-value {
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 1.1;
-  color: #1e293b;
+ font-size: 1.7rem;
+ font-weight: 700;
+ line-height: 1.1;
+ color: #1e293b;
 }
 
 .spon-stat-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #374151;
-  margin-top: 2px;
+ font-size: 0.82rem;
+ font-weight: 600;
+ color: #374151;
+ margin-top: 2px;
 }
 
 .spon-stat-sub {
-  font-size: 0.72rem;
-  color: #9ca3af;
-  margin-top: 1px;
+ font-size: 0.72rem;
+ color: #9ca3af;
+ margin-top: 1px;
 }
 
 /* ── Colour themes ── */
 
 .spon-stat--total {
-  border-left-color: #6366f1;
+ border-left-color: #6366f1;
 }
 .spon-stat--total .spon-stat-icon-wrap {
-  background: #eef2ff;
+ background: #eef2ff;
 }
 .spon-stat--total .spon-stat-icon {
-  stroke: #6366f1;
+ stroke: #6366f1;
 }
 
 .spon-stat--approved {
-  border-left-color: #22c55e;
+ border-left-color: #22c55e;
 }
 .spon-stat--approved .spon-stat-icon-wrap {
-  background: #f0fdf4;
+ background: #f0fdf4;
 }
 .spon-stat--approved .spon-stat-icon {
-  stroke: #22c55e;
+ stroke: #22c55e;
 }
 
 .spon-stat--pending {
-  border-left-color: #f59e0b;
+ border-left-color: #f59e0b;
 }
 .spon-stat--pending .spon-stat-icon-wrap {
-  background: #fffbeb;
+ background: #fffbeb;
 }
 .spon-stat--pending .spon-stat-icon {
-  stroke: #f59e0b;
+ stroke: #f59e0b;
 }
 
 .spon-stat--rejected {
-  border-left-color: #ef4444;
+ border-left-color: #ef4444;
 }
 .spon-stat--rejected .spon-stat-icon-wrap {
-  background: #fef2f2;
+ background: #fef2f2;
 }
 .spon-stat--rejected .spon-stat-icon {
-  stroke: #ef4444;
+ stroke: #ef4444;
 }
 
 .spon-stat--expired {
-  border-left-color: #64748b;
+ border-left-color: #64748b;
 }
 .spon-stat--expired .spon-stat-icon-wrap {
-  background: #f1f5f9;
+ background: #f1f5f9;
 }
 .spon-stat--expired .spon-stat-icon {
-  stroke: #64748b;
+ stroke: #64748b;
 }
 
 .spon-stat--priority {
-  border-left-color: #a855f7;
+ border-left-color: #a855f7;
 }
 .spon-stat--priority .spon-stat-icon-wrap {
-  background: #faf5ff;
+ background: #faf5ff;
 }
 .spon-stat--priority .spon-stat-icon {
-  stroke: #a855f7;
+ stroke: #a855f7;
 }
 
 /* =========================================
    RESPONSIVE
 ========================================= */
 
+@media (max-width: 1024px) {
+ .spon-stats-grid {
+   grid-template-columns: repeat(2, minmax(0, 1fr));
+ }
+}
 
 @media (max-width: 768px) {
-  .spon-stats-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    flex-wrap: unset !important;
-    overflow-x: visible !important;
-    gap: 10px;
-  }
+ .spon-stats-grid {
+   display: grid !important;
+   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+   flex-wrap: unset !important;
+   overflow-x: visible !important;
+   gap: 10px;
+ }
 
-  .owner-sponsorship-page .steps-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* ✅ 2 cards per row */
-  gap: 10px;
-  padding: 2px;
-}
+ .owner-sponsorship-page .steps-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 10px;
+   padding: 2px;
+ }
 
-.owner-sponsorship-page .step-card {
-  width: 100%;
-  min-height: 136px;
-}
+ .owner-sponsorship-page .step-card {
+   width: 100%;
+   min-height: 136px;
+ }
 
-  .spon-stat-card {
-    flex: unset !important;
-    min-width: unset !important;
-    width: 100% !important;
-    padding: 12px 14px;
-    gap: 10px;
-  }
+ .spon-stat-card {
+   flex: unset !important;
+   min-width: unset !important;
+   width: 100% !important;
+   padding: 12px 14px;
+   gap: 10px;
+ }
 
-  .spon-stat-value {
-    font-size: 1.3rem;
+ .spon-stat-value {
+   font-size: 1.3rem;
   }
 }
 
 @media (max-width: 480px) {
-  .spon-stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
+ .spon-stats-grid {
+   grid-template-columns: 1fr;
+   gap: 8px;
+ }
 
-  .spon-stat-icon-wrap {
-    width: 38px;
-    height: 38px;
-  }
+ .spon-stat-icon-wrap {
+   width: 38px;
+   height: 38px;
+ }
 
-  .spon-stat-icon {
-    width: 18px;
-    height: 18px;
-  }
+ .spon-stat-icon {
+   width: 18px;
+   height: 18px;
+ }
 
-  .spon-stat-value {
-    font-size: 1.2rem;
-  }
+ .spon-stat-value {
+   font-size: 1.2rem;
+ }
 
-  .spon-stat-sub {
-    display: none;
-  }
+ .spon-stat-sub {
+   display: none;
+ }
 }
-
 
 /* Fix parent overflow blocking scroll — desktop only */
 @media (min-width: 769px) {
-  .spon-stats-grid {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-  }
+ .spon-stats-grid {
+   display: grid !important;
+   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+   overflow-x: visible !important;
+ }
 
-  .spon-stat-card {
-    flex: 0 0 200px !important;
-    min-width: 200px !important;
-  }
+ .spon-stat-card {
+   width: 100% !important;
+   min-width: 0 !important;
+ }
 }
 
 /* Override layout.css content overflow — scoped to this page only */
 @media (min-width: 769px) {
-  .content:has(.spon-stats-grid) {
-    overflow-x: visible !important;
-  }
+ .content:has(.spon-stats-grid) {
+   overflow-x: visible !important;
+ }
 }
 
+/* =========================================
+   HOW SPONSORSHIP WORKS
+========================================= */
+
+.steps-section {
+ background: transparent;
+ margin-top: 8px;
+}
+
+.steps-header {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 16px;
+ margin-bottom: 18px;
+}
+
+.sec-title {
+ margin: 0;
+ font-size: 1.05rem;
+ font-weight: 700;
+ color: #1f2937;
+ letter-spacing: -0.01em;
+}
+
+.steps-grid {
+ display: grid;
+ grid-template-columns: repeat(3, minmax(0, 1fr));
+ gap: 18px;
+ width: 100%;
+}
+
+.step-card {
+ position: relative;
+ padding: 22px 18px 18px;
+ border-radius: 16px;
+ background: linear-gradient(180deg, #ffffff 0%, #f9f7ff 100%);
+ border: 1px solid rgba(196, 184, 240, 0.7);
+ box-shadow: 0 8px 22px rgba(99, 102, 241, 0.08);
+ transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+ min-height: 180px;
+ display: flex;
+ flex-direction: column;
+ justify-content: flex-start;
+}
+
+.step-card:hover {
+ transform: translateY(-3px);
+ box-shadow: 0 14px 30px rgba(99, 102, 241, 0.12);
+ border-color: rgba(99, 102, 241, 0.35);
+}
+
+.step-top {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ min-height: 44px;
+ margin-bottom: 14px;
+}
+
+.step-icon {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ width: 38px;
+ height: 38px;
+ border-radius: 12px;
+ background: rgba(99, 102, 241, 0.08);
+ color: #4f46e5;
+ font-size: 1.05rem;
+ border: 1px solid rgba(99, 102, 241, 0.12);
+}
+
+.step-card h5 {
+ margin: 0 0 8px;
+ font-size: 1.02rem;
+ font-weight: 700;
+ color: #1f2937;
+}
+
+.step-card p {
+ margin: 0;
+ font-size: 0.9rem;
+ line-height: 1.6;
+ color: #4b5563;
+}
+
+@media (max-width: 1024px) {
+ .steps-grid {
+   grid-template-columns: repeat(2, minmax(0, 1fr));
+ }
+}
+
+@media (max-width: 768px) {
+ .steps-grid {
+   grid-template-columns: 1fr;
+   gap: 12px;
+ }
+
+ .step-card {
+   min-height: 150px;
+   padding: 18px 16px;
+ }
+
+ .step-icon {
+   width: 34px;
+   height: 34px;
+ }
+
+ .steps-header {
+   align-items: flex-start;
+   flex-direction: column;
+ }
+}
+
+@media (max-width: 480px) {
+ .steps-grid {
+   grid-template-columns: 1fr;
+ }
+}
 /* =========================================
    SPONSORSHIP TABLE — scoped mobile cards
    All classes prefixed spon- (table scope)
@@ -668,7 +794,37 @@
 }
 
 .step-number {
-  font-size: 22px;    /* shrink big faded number */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 64px !important;
+  height: 58px !important;
+  background: #e9e5ff !important;
+  border: 1px solid #b9adff !important;
+  border-radius: 14px !important;
+  color: #312e81 !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 999 !important;
+  text-indent: 0 !important;
+  overflow: visible !important;
+}
+
+.step-number-text {
+  display: block !important;
+  color: #312e81 !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-text-fill-color: #312e81 !important;
+  position: relative !important;
+  z-index: 1000 !important;
 }
 
 .step-icon {

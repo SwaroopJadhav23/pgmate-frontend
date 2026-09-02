@@ -529,7 +529,9 @@ const OwnerSponsorship = () => {
 const StepCard = ({ number, icon, title, text }) => (
   <div className="step-card">
     <div className="step-top">
-      <span className="step-number">{number}</span>
+      <div className="step-number">
+        <span className="step-number-text">{number}</span>
+      </div>
       <i className={`bi ${icon} step-icon`}></i>
     </div>
     <h5>{title}</h5>
