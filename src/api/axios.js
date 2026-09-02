@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL,
+  baseURL: process.env.REACT_APP_API_BASE_URL || "/api",
 });
 
 /* ================= REQUEST INTERCEPTOR ================= */
