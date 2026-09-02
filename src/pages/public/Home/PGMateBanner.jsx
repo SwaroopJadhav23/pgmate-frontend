@@ -39,6 +39,7 @@ export default function PGMateBanner({
   onMaxPriceChange,
   onSearch,
   onExactCitySelect,   // new
+  onEnterPress, // optional: called when Enter is pressed in input (home behavior)
 }) {
   const [pgCount, setPgCount] = useState(null);
   const [cityCount, setCityCount] = useState(null);
@@ -290,7 +291,16 @@ export default function PGMateBanner({
                 onFocus={() => {
                   if (suggestions.length > 0) setShowSuggestions(true);
                 }}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (typeof onEnterPress === "function") {
+                      onEnterPress();
+                    } else {
+                      handleSearch();
+                    }
+                  }
+                }}
               />
             </div>
 

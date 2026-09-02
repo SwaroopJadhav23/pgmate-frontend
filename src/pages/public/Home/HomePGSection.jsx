@@ -497,6 +497,10 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
                 maxPrice: val,
               }))
             }
+            onEnterPress={() => {
+              const el = document.getElementById('home-pg-results');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
           />
 
           <LookingForSection />
