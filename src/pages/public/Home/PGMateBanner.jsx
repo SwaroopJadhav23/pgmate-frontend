@@ -100,7 +100,15 @@ export default function PGMateBanner({
       return;
     }
 
-    const cityMatches = cityOptions.filter((c) => c.toLowerCase().includes(q));
+    const cityMatches = [...cityOptions]
+      .filter((city, index, cities) =>
+        city && cities.indexOf(city) === index && city.toLowerCase().startsWith(q),
+      )
+      .sort((firstCity, secondCity) => {
+        const firstStartsWithQuery = firstCity.toLowerCase().startsWith(q);
+        const secondStartsWithQuery = secondCity.toLowerCase().startsWith(q);
+        return Number(secondStartsWithQuery) - Number(firstStartsWithQuery);
+      });
     setSuggestions(cityMatches.slice(0, 8));
 
     if (cityMatches.length > 0) {
@@ -110,7 +118,7 @@ export default function PGMateBanner({
 
     // No city match — check locality (current city) and PG name before flagging "coming soon"
     const localityMatch = localityOptions.some((l) =>
-      l.toLowerCase().includes(q),
+      l.toLowerCase().startsWith(q),
     );
     if (localityMatch) {
       setHasNonCityMatch(true);

@@ -19,6 +19,7 @@ const PublicPGList = () => {
 
   const [pgs, setPgs] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [searchResultCount, setSearchResultCount] = useState(null);
   const [cityOptions, setCityOptions] = useState([]);
   const [localityOptions, setLocalityOptions] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
@@ -127,7 +128,7 @@ const PublicPGList = () => {
 
     setFilters((prev) => ({
       ...prev,
-      city: city || prev.city,
+      city: city || (search ? "" : prev.city),
       locality: locality || "",
       gender: gender || "",
       maxPrice: maxPrice ? Number(maxPrice) : prev.maxPrice,
@@ -136,6 +137,8 @@ const PublicPGList = () => {
     if (city) {
       setSelectedCity(city);
       localStorage.setItem("userCity", city);
+    } else if (search) {
+      setSelectedCity("");
     }
 
     if (search) {
@@ -230,6 +233,9 @@ const PublicPGList = () => {
         setPage(nextPage);
         setHasMore(nextPage + 1 < totalPages);
         setTotalCount(res.data?.totalElements || 0);
+        if (!append && currentSearch?.trim()) {
+          setSearchResultCount(res.data?.totalElements || 0);
+        }
       } catch (err) {
         if (axios.isCancel(err)) {
           return;
@@ -257,10 +263,12 @@ const PublicPGList = () => {
     
     if (!initialLoadDone.current) {
       lastFetchKey.current = null;
+      setSearchResultCount(null);
       fetchPGs(filters, searchQuery, 0, false);
       return;
     }
 
+    setSearchResultCount(null);
     searchDebounceRef.current = setTimeout(() => {
       lastFetchKey.current = null;
       fetchPGs(filters, searchQuery, 0, false);
@@ -354,6 +362,11 @@ const PublicPGList = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <div className="pg-search-actions">
+            {searchQuery.trim() && searchResultCount !== null && (
+              <span className="pg-search-count">
+                {searchResultCount} {searchResultCount === 1 ? "result" : "results"}
+              </span>
+            )}
             {isSearching && <Loader2 size={16} className="pg-search-spinner" />}
             {searchQuery && (
               <button

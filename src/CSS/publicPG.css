@@ -957,6 +957,12 @@
   gap: 6px;
 }
 
+.pg-search-count {
+  color: var(--text-muted);
+  font: 500 0.8rem var(--font);
+  white-space: nowrap;
+}
+
 .pg-search-spinner {
   color: var(--accent);
   animation: spin 1s linear infinite;

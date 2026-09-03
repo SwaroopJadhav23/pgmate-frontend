@@ -248,6 +248,11 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const {selectedCity, setSelectedCity} = useCityFilter();
   const [isExactCity, setIsExactCity] = useState(false);
+  const searchRequestRef = useRef(0);
+  const pendingSearchResultRef = useRef(null);
+  const searchTimerRef = useRef(null);
+  const searchTimerElapsedRef = useRef(false);
+  const searchLoadingRef = useRef(false);
 
   const CITY_MAP = {Bengaluru: "Bangalore", Bombay: "Mumbai", Gurugram: "Mumbai", Gurgaon: "Mumbai"};
   const normalizeCity = (city) => CITY_MAP[city] || city;
@@ -325,10 +330,10 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
     }
     const query = searchText.toLowerCase();
     const citySuggestions = cityOptions
-      .filter((city) => city.toLowerCase().includes(query))
+      .filter((city) => city.toLowerCase().startsWith(query))
       .map((city) => ({type: "city", label: city}));
     const localitySuggestions = localityOptions
-      .filter((locality) => locality.toLowerCase().includes(query))
+      .filter((locality) => locality.toLowerCase().startsWith(query))
       .map((locality) => ({
         type: "locality",
         label: `${locality}, ${filters.city}`,
@@ -360,6 +365,33 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
   }, []);
 
   const loadPGs = useCallback(async () => {
+    const requestId = ++searchRequestRef.current;
+    const isSearchRequest = Boolean(searchText.trim());
+
+    if (!isSearchRequest && searchLoadingRef.current) {
+      clearTimeout(searchTimerRef.current);
+      pendingSearchResultRef.current = null;
+      searchTimerElapsedRef.current = false;
+      searchLoadingRef.current = false;
+    }
+
+    if (isSearchRequest && !searchLoadingRef.current) {
+      searchLoadingRef.current = true;
+      pendingSearchResultRef.current = null;
+      searchTimerElapsedRef.current = false;
+      searchTimerRef.current = setTimeout(() => {
+        searchTimerElapsedRef.current = true;
+        const pendingResult = pendingSearchResultRef.current;
+        if (pendingResult && pendingResult.requestId === searchRequestRef.current) {
+          setPgs(pendingResult.content);
+          setTotalElements(pendingResult.content.length);
+          pendingSearchResultRef.current = null;
+          searchLoadingRef.current = false;
+          setLoading(false);
+        }
+      }, 3000);
+    }
+
     try {
       setLoading(true);
 
@@ -384,17 +416,43 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
       }
 
       const res = await api.get("/public/pgs/paged", {params});
+        if (requestId !== searchRequestRef.current) return;
       const content = res.data?.content || [];
+      if (isSearchRequest && searchLoadingRef.current) {
+        pendingSearchResultRef.current = {requestId, content};
+        if (searchTimerElapsedRef.current && requestId === searchRequestRef.current) {
+          setPgs(content);
+          setTotalElements(content.length);
+          pendingSearchResultRef.current = null;
+          searchLoadingRef.current = false;
+          setLoading(false);
+        }
+        return;
+      }
       setPgs(content);
       setTotalElements(content.length);
     } catch (err) {
       console.error(err);
+      if (requestId !== searchRequestRef.current) return;
+      if (isSearchRequest && searchLoadingRef.current) {
+        pendingSearchResultRef.current = {requestId, content: []};
+        if (searchTimerElapsedRef.current && requestId === searchRequestRef.current) {
+          setPgs([]);
+          setTotalElements(0);
+          pendingSearchResultRef.current = null;
+          searchLoadingRef.current = false;
+          setLoading(false);
+        }
+        return;
+      }
       setPgs([]);
       setTotalElements(0);
     } finally {
-      setLoading(false);
+      if (!isSearchRequest || !searchLoadingRef.current) setLoading(false);
     }
   }, [filters, searchText, isExactCity]);
+
+  useEffect(() => () => clearTimeout(searchTimerRef.current), []);
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -761,7 +819,7 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
               : `Available PGs in ${filters.city}`}
           </h2>
 
-          {loading ? (
+          {loading && pgs.length === 0 ? (
             <PGListingSkeleton count={15} />
           ) : (
             <>
@@ -772,7 +830,9 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
                 <strong>{pgs.length}</strong> verified PGs near you
               </p>
 
-              <div className="pg-results-grid home-pg-results-grid">
+              <div
+                className={`pg-results-grid home-pg-results-grid ${loading ? "is-loading" : ""}`}
+              >
                 {pgs.filter(Boolean).map((pg) => (
                   <PGListingCard
                     key={pg.id}
