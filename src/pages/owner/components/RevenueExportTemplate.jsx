@@ -250,9 +250,20 @@ const RevenueExportTemplate = forwardRef(({
                 <td>{row.title}</td>
                 <td>{row.paidTo}</td>
                 <td>
-                  <span className={`ret-eh-status-badge ${row.status === 'PAID' ? 'paid' : 'pending'}`}>
-                    {row.status}
-                  </span>
+                  {(() => {
+                    const s = (row.status || '').toUpperCase();
+                    let cls = 'paid';
+                    let text = 'PAID';
+                    if (s === 'PENDING') { cls = 'pending'; text = 'PENDING'; }
+                    else if (s === 'PARTIALLY_PAID') { cls = 'partial'; text = 'PARTIALLY PAID'; }
+                    else if (s === 'CANCELLED') { cls = 'cancelled'; text = 'CANCELLED'; }
+                    
+                    return (
+                      <span className={`ret-eh-status-badge ${cls}`}>
+                        {text}
+                      </span>
+                    );
+                  })()}
                 </td>
                 <td style={{ color: '#be123c', fontWeight: 600 }}>{formatCurrency(row.amount)}</td>
               </tr>
