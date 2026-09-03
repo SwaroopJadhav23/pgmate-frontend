@@ -344,6 +344,30 @@ const sortedResidents = useMemo(() => {
       </>
     )}
   </div>
+  <button
+    type="button"
+    aria-label="Send Reminder"
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '0 16px',
+      height: '38px',
+      border: 'none',
+      borderRadius: '999px',
+      background: 'linear-gradient(135deg, #25d366 0%, #1ea952 100%)',
+      color: '#fff',
+      fontSize: '14px',
+      fontWeight: 700,
+      boxShadow: '0 8px 18px rgba(37, 211, 102, 0.25)',
+      cursor: 'pointer',
+      whiteSpace: 'nowrap',
+      marginLeft: 'auto',
+    }}
+  >
+    <i className="bi bi-whatsapp" style={{ fontSize: '16px', lineHeight: 1 }}></i>
+    Send Reminder
+  </button>
 </div>
       <p className="search-result-count">Showing <strong>{residents.length}</strong> of {totalElements} residents</p>
 
