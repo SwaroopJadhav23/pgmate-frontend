@@ -15,7 +15,7 @@ const DonutBreakdownChart = ({ title, data, totalLabel, totalValue }) => {
   }
 
   // Sort data by value descending
-  const sortedData = [...data].sort((a, b) => b.value - a.value).filter(d => d.value > 0);
+  const sortedData = [...data].sort((a, b) => b.value - a.value);
 
   return (
     <div className="donut-breakdown-card">
@@ -24,14 +24,14 @@ const DonutBreakdownChart = ({ title, data, totalLabel, totalValue }) => {
         
         {/* Chart Section */}
         <div className="donut-chart-wrapper">
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
                 data={sortedData}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={75}
+                innerRadius={60}
+                outerRadius={85}
                 dataKey="value"
                 stroke="none"
               >

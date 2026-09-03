@@ -107,7 +107,12 @@ const OwnerRevenue = () => {
   const [chartMetric, setChartMetric] = useState("COLLECTED");
   const [pgs, setPgs] = useState([]);
   const [selectedPgId, setSelectedPgId] = useState("ALL");
-  const isMobile = window.innerWidth < 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [expenditures, setExpenditures] = useState([]);
   const [viewMode] = useState("month");
@@ -1467,6 +1472,8 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
                   <option value="ALL">All Status</option>
                   <option value="PAID">Paid</option>
                   <option value="PENDING">Pending</option>
+                  <option value="PARTIALLY_PAID">Partially Paid</option>
+                  <option value="CANCELLED">Cancelled</option>
                 </select>
                 <input
                   type="text"
@@ -1612,12 +1619,12 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
                     {filteredExpenses
                       .sort((a, b) => new Date(b.expenseDate || b.createdAt) - new Date(a.expenseDate || a.createdAt))
                       .map((exp, i) => {
-                      const isPending = (exp.paymentStatus || '').toUpperCase() === 'PENDING';
+                      const isPending = ['PENDING', 'PARTIALLY_PAID'].includes((exp.paymentStatus || '').toUpperCase());
                       const isMarkingThis = markingPaidId === exp.id;
 
                       return (
                         <Fragment key={exp.id || i}>
-                          <tr className="eh-row">
+                          <tr className={`eh-row ${isMarkingThis ? 'eh-row-active' : ''}`}>
                             <td data-label="Date">
                               <div className="eh-pg-name-cell">
                                 <div className="eh-avatar" style={{ background: '#f1f5f9', color: '#64748b' }}>
@@ -1633,17 +1640,21 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
                               ₹{Number(exp.amount || 0).toLocaleString()}
                             </td>
                             <td data-label="Status">
-                              {isPending
-                                ? <span className="rev-status-badge rev-status-pending">Pending</span>
-                                : <span className="rev-status-badge rev-status-paid">Paid</span>}
+                              {(() => {
+                                const s = (exp.paymentStatus || '').toUpperCase();
+                                if (s === 'PENDING') return <span className="rev-status-badge rev-status-pending">Pending</span>;
+                                if (s === 'PARTIALLY_PAID') return <span className="rev-status-badge" style={{ background: '#e0f2fe', color: '#0369a1' }}>Partially Paid</span>;
+                                if (s === 'CANCELLED') return <span className="rev-status-badge" style={{ background: '#f3f4f6', color: '#4b5563' }}>Cancelled</span>;
+                                return <span className="rev-status-badge rev-status-paid">Paid</span>;
+                              })()}
                             </td>
-                            <td data-label="Action">
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <td data-label="Action" className={isMarkingThis ? 'eh-td-active' : ''}>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end', width: '100%', position: 'relative' }}>
                                 {isPending && (
                                   <button
                                     onClick={() => setMarkingPaidId(isMarkingThis ? null : exp.id)}
                                     className="eh-btn-view"
-                                    style={{ background: isMarkingThis ? '#10b981' : '#ecfdf5', color: isMarkingThis ? '#fff' : '#10b981' }}
+                                    style={{ background: isMarkingThis ? '#ef4444' : '#059669', color: '#fff', whiteSpace: 'nowrap', padding: '6px 12px', border: 'none', borderRadius: '6px' }}
                                   >
                                     {isMarkingThis ? 'Cancel' : 'Mark Paid'}
                                   </button>
@@ -1653,52 +1664,58 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
                                   title="Delete Expense"
                                   style={{
                                     background: 'transparent', border: 'none', color: '#ef4444', 
-                                    cursor: 'pointer', padding: '4px', fontSize: '14px'
+                                    cursor: 'pointer', padding: '4px', fontSize: '14px', marginLeft: isPending ? '0' : 'auto'
                                   }}
                                 >
                                   <i className="bi bi-trash3"></i>
                                 </button>
+
+                                {isMarkingThis && (
+                                  <div style={{
+                                    position: 'absolute', top: '100%', right: '0', marginTop: '8px',
+                                    background: '#ffffff', padding: '16px', borderRadius: '12px',
+                                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)', border: '1px solid #e2e8f0',
+                                    zIndex: 50, display: 'flex', gap: '12px', alignItems: 'flex-end', minWidth: 'max-content'
+                                  }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', textAlign: 'left' }}>Payment Date</label>
+                                      <input
+                                        type="date"
+                                        value={markPaidForm.paymentDate}
+                                        onChange={e => setMarkPaidForm(f => ({ ...f, paymentDate: e.target.value }))}
+                                        className="eh-filter-input"
+                                        style={{ width: '140px', padding: '6px 12px' }}
+                                      />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', textAlign: 'left' }}>Method</label>
+                                      <select
+                                        value={markPaidForm.paymentMethod}
+                                        onChange={e => setMarkPaidForm(f => ({ ...f, paymentMethod: e.target.value }))}
+                                        className="eh-filter-select"
+                                        style={{ width: '130px', padding: '6px 12px' }}
+                                      >
+                                        {['CASH','UPI','BANK_TRANSFER','CREDIT_CARD','DEBIT_CARD','CHEQUE','NET_BANKING'].map(m => (
+                                          <option key={m} value={m}>{m.replace('_',' ')}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <button
+                                      onClick={() => handleMarkPaid(exp.id)}
+                                      disabled={updatingStatus}
+                                      style={{
+                                        background: '#059669', color: '#fff', border: 'none', borderRadius: '6px',
+                                        padding: '8px 16px', fontWeight: 600, cursor: 'pointer',
+                                        height: '35px', display: 'flex', alignItems: 'center'
+                                      }}
+                                    >
+                                      {updatingStatus ? 'Saving...' : 'Confirm'}
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </td>
                           </tr>
-                          {isMarkingThis && (
-                            <tr className="eh-row">
-                              <td colSpan="7" style={{ padding: '12px 24px', background: '#f8fffe' }}>
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>Payment Date:</label>
-                                  <input
-                                    type="date"
-                                    value={markPaidForm.paymentDate}
-                                    onChange={e => setMarkPaidForm(f => ({ ...f, paymentDate: e.target.value }))}
-                                    className="eh-filter-input"
-                                    style={{ width: '160px' }}
-                                  />
-                                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>Method:</label>
-                                  <select
-                                    value={markPaidForm.paymentMethod}
-                                    onChange={e => setMarkPaidForm(f => ({ ...f, paymentMethod: e.target.value }))}
-                                    className="eh-filter-select"
-                                    style={{ width: 'auto' }}
-                                  >
-                                    {['CASH','UPI','BANK_TRANSFER','CREDIT_CARD','DEBIT_CARD','CHEQUE','NET_BANKING'].map(m => (
-                                      <option key={m} value={m}>{m.replace('_',' ')}</option>
-                                    ))}
-                                  </select>
-                                  <button
-                                    onClick={() => handleMarkPaid(exp.id)}
-                                    disabled={updatingStatus}
-                                    style={{
-                                      padding: '7px 18px', borderRadius: '6px', border: 'none',
-                                      background: '#10b981', color: '#fff', fontWeight: 700,
-                                      fontSize: '13px', cursor: 'pointer',
-                                    }}
-                                  >
-                                    {updatingStatus ? 'Saving...' : 'Confirm Paid'}
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
                         </Fragment>
                       );
                     })}
