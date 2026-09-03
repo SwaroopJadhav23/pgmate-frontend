@@ -144,7 +144,6 @@ const allMonths = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
-const nowMonth = new Date().getMonth();
 
 /* ─── Revenue Pulse Card — DYNAMIC ─────────────────────────── */
 const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired, timeframe, setTimeframe }) => {
@@ -180,15 +179,10 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired, timeframe, s
 
   let chartData = [];
   if (timeframe === "YEAR") {
-    // Always produce exactly 6 monthly buckets (last 6 months) filled with 0
-    const BUCKETS = 6;
-    const filled = Array(BUCKETS).fill(0);
-    historyYear.slice(-BUCKETS).forEach((v, i) => {
-      filled[i + Math.max(0, BUCKETS - historyYear.length)] = v;
-    });
-    chartData = filled.map((v, i) => ({
-      label: allMonths[(nowMonth - (BUCKETS - 1 - i) + 12) % 12],
-      amount: v,
+    // Show all 12 calendar months: Jan to Dec
+    chartData = allMonths.map((m, i) => ({
+      label: m,
+      amount: historyYear[i] ?? 0,
     }));
   } else {
     // Always produce exactly 4 weekly buckets
@@ -262,9 +256,9 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired, timeframe, s
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
-              margin={{ top: 20, right: 8, left: -20, bottom: 0 }}
-              maxBarSize={40}
-              barCategoryGap="25%"
+              margin={{ top: 22, right: 10, left: 6, bottom: 0 }}
+              maxBarSize={timeframe === "YEAR" ? 24 : 38}
+              barCategoryGap={timeframe === "YEAR" ? "12%" : "25%"}
             >
               <CartesianGrid
                 strokeDasharray="4 4"
@@ -277,7 +271,7 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired, timeframe, s
                 axisLine={false}
                 tickLine={false}
                 interval={0}
-                dy={8}
+                dy={6}
               />
               <YAxis
                 tick={{ fill: "#94a3b8", fontSize: 10 }}
@@ -286,13 +280,13 @@ const RevenuePulseCard = ({ stats, onNavigate, subscriptionExpired, timeframe, s
                 tickFormatter={(v) =>
                   v >= 1000 ? `₹${Math.round(v / 1000)}k` : `₹${v}`
                 }
-                width={42}
+                width={50}
               />
               <Tooltip content={<RevTooltip />} cursor={{ fill: "rgba(99,102,241,0.06)" }} />
               <Bar
                 dataKey="amount"
                 fill="#818cf8"
-                radius={[5, 5, 0, 0]}
+                radius={[4, 4, 0, 0]}
               >
                 <LabelList 
                   dataKey="amount" 
@@ -1026,13 +1020,8 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
     let pdfChartLabels = [];
     
     if (revenueTimeframe === "YEAR") {
-      const BUCKETS = 6;
-      const filled = Array(BUCKETS).fill(0);
-      history.slice(-BUCKETS).forEach((v, i) => {
-        filled[i + Math.max(0, BUCKETS - history.length)] = v;
-      });
-      pdfChartData = filled;
-      pdfChartLabels = filled.map((_, i) => allMonths[(nowMonth - (BUCKETS - 1 - i) + 12) % 12]);
+      pdfChartData = allMonths.map((_, i) => history[i] ?? 0);
+      pdfChartLabels = allMonths;
     } else {
       const historyMonth = Array.isArray(stats.revenueHistoryMonth) ? stats.revenueHistoryMonth : [];
       const weeklyData = [0, 0, 0, 0];

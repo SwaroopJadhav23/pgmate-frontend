@@ -2,10 +2,9 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { useEffect, useMemo, useState, useCallback, useRef, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import toast from "react-hot-toast";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import { LabelList, Legend } from "recharts";
-import jsPDF from "jspdf";
-import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -260,7 +259,7 @@ const OwnerRevenue = () => {
       return new Date(y, m - 1, d);
     }
     // DateTime already has timezone offset (e.g. +05:30 or Z) — parse natively
-    if (/[Z+\-]\d{2}:\d{2}$/.test(str) || str.endsWith('Z')) {
+    if (/[-+Z]\d{2}:\d{2}$/.test(str) || str.endsWith('Z')) {
       return new Date(str);
     }
     // DateTime with no offset "2026-08-21T19:00:00" — treat as local (IST) time
@@ -289,52 +288,13 @@ const OwnerRevenue = () => {
     [fromDate, toDateFilter, startDate, endDate]
   );
 
-  const getRevenueDate = (r) => {
+  const getRevenueDate = useCallback((r) => {
     return toDate(
       r.onboardingPaymentDate || r.createdAt || r.checkinDate
     );
-  };
+  }, []);
 
 
-  /* ================= REVENUE ================= */
-  // collectionsInRange: all revenue within the selected filter range.
-  // Rent comes ONLY from rentRecords to avoid double-counting with onboarding.
-  // Deposit damage (checkout deductions) is counted separately as extra income.
-  const calculateRevenue = () => {
-    let total = 0;
-
-    // 1. Rent from rentRecords only (avoids double-counting with onboarding)
-    rentRecords.forEach((rec) => {
-      const paidDate = toDate(rec.paidDate);
-      if (rec.status === "PAID" && isDateInFilter(paidDate)) {
-        total += Number(rec.rentAmount || 0);
-      }
-    });
-
-    // 2. Deposit damage income (deductions kept at checkout)
-    residents.forEach((r) => {
-      const checkoutDate = toDate(r.actualCheckoutDate);
-      if (isDateInFilter(checkoutDate)) {
-        const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
-        if (damage > 0) total += damage;
-      }
-    });
-
-    return total;
-  };
-  const collectionsInRange = calculateRevenue();
-
-  //  MONTH COMPARISON + GROWTH DISABLED
-  /*
-  const previousMonthRevenue = calculateRevenue(previousMonthStart);
-
-  const growth =
-    previousMonthRevenue > 0
-      ? ((collectionsInRange - previousMonthRevenue) /
-          previousMonthRevenue) *
-        100
-      : 0;
-  */
 
   /* ================= RENT COLLECTED ================= */
   // Bug Fix 2: Only count paid rentRecords to avoid double-counting.
@@ -390,15 +350,6 @@ const OwnerRevenue = () => {
     return Math.round((occupiedBeds / totalBeds) * 100);
   }, [stats]);
 
-  // totalActiveResidents: count of ALL currently active residents (not date-filtered).
-  // We do NOT filter by revenue date here — an active resident is active regardless
-  // of when they joined. Date filtering only applies to payments, not headcount.
-  const totalActiveResidents = residents.filter((r) => r.status === "ACTIVE").length;
-
-  const avgRevenuePerResident =
-    totalActiveResidents > 0
-      ? Math.round(collectionsInRange / totalActiveResidents)
-      : 0;
 
   /* ================= CHART DATA ================= */
 
@@ -583,7 +534,7 @@ const OwnerRevenue = () => {
     const totalExpenseBreakdown = expenseBreakdown.reduce((acc, curr) => acc + curr.value, 0);
 
     return { revenueBreakdown, totalRevenueBreakdown, expenseBreakdown, totalExpenseBreakdown };
-  }, [rentRecords, residents, expenditures, isDateInFilter]);
+  }, [rentRecords, residents, expenditures, isDateInFilter, getRevenueDate]);
 
   const expenseHistoryExport = useMemo(() => {
     const dateFilteredExp = expenditures.filter(exp => {
@@ -667,177 +618,96 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
     if (filter === "WEEK")
       return "Revenue & Expenditure of Current Week";
 
-    if (filter === "MONTH")
-      return "Revenue & Expenditure of Current Month";
+    if (filter === "MONTH") {
+      const mName = MONTH_NAMES[selectedMonth] || "Month";
+      return `Revenue & Expenditure of ${mName} ${selectedYear}`;
+    }
 
     if (filter === "YEAR")
-      return "Revenue & Expenditure of Current Year";
+      return `Revenue & Expenditure of Year ${selectedYear}`;
 
     return "Revenue & Expenditure Report";
   };
 
-  /* ---------- CURRENCY FORMATTERS ---------- */
-
-  /* Used for WORD + EXCEL */
-  const formatCurrency = (value) =>
-    `₹${Number(value || 0).toLocaleString("en-IN")}`;
-
-  /*  Used ONLY for PDF  */
-  const formatCurrencyPDF = (value) =>
-    `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
-
-
-  /* ---------- RAW REPORT DATA (NO FORMAT HERE) ---------- */
-  /* VERY IMPORTANT → keep numbers RAW */
-
-  const reportRows = [
-    {
-      label: "Potential Revenue",
-      value: potentialRevenue,
-      type: "currency",
-    },
-    {
-      label: "Rent Collected",
-      value: totalRentCollected,
-      type: "currency",
-    },
-    {
-      label: "Security Deposits Held",
-      value: totalDepositHeld,
-      type: "currency",
-    },
-    {
-      label: "Total Income",
-      value: totalRevenue,
-      type: "currency",
-    },
-    {
-      label: "Total Unpaid Rent",
-      value: stats?.revenuePending || 0,
-      type: "currency",
-    },
-    {
-      label: "Of which is Overdue",
-      value: stats?.revenueOverdue || 0,
-      type: "currency",
-    },
-    {
-      label: "Future Deposit Refund",
-      value: futureDepositRefund,
-      type: "currency",
-    },
-    {
-      label: "Collection Rate",
-      value: colRate,
-      type: "percentage",
-    },
-    {
-      label: "Active Residents",
-      value: totalActiveResidents,
-      type: "number",
-    },
-    {
-      label: "Avg Revenue / Resident",
-      value: avgRevenuePerResident,
-      type: "currency",
-    },
-    {
-      label: "Occupancy Rate",
-      value: occupancyRate,
-      type: "percentage",
-    },
-  ];
   /* ================= PDF ================= */
-  const exportPDF = () => {
+  const exportPDF = async () => {
     if (!exportTemplateRef.current) return;
-    const opt = {
-      margin: 0,
-      filename: 'Revenue_Expenditure_Invoice.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(exportTemplateRef.current).save();
     setShowExport(false);
-  };
-
-  /* ================= EXCEL ================= */
-  const exportExcel = () => {
-
-    /* ---------- BUILD DATA ---------- */
-    const data = [
-      ["Revenue & Expenditure Report"],
-      [getRevenueLabel()],
-      [],
-      ["Metric", "Value"],
-
-      ...reportRows.map((row) => {
-
-        let formatted;
-
-        if (row.type === "currency")
-          formatted = formatCurrency(row.value);
-
-        else if (row.type === "percentage")
-          formatted = `${row.value}%`;
-
-        else
-          formatted = String(row.value);
-
-        return [row.label, formatted];
-      }),
-    ];
-
-    /* ---------- CREATE SHEET ---------- */
-    const ws = XLSX.utils.aoa_to_sheet(data);
-
-    /* ---------- COLUMN WIDTH ---------- */
-    ws["!cols"] = [
-      { wch: 38 }, // Metric column
-      { wch: 24 }, // Value column
-    ];
-
-    /* ---------- HEADER BOLD ---------- */
-    ws["A4"].s = { font: { bold: true } };
-    ws["B4"].s = { font: { bold: true } };
-
-    /* ---------- CREATE WORKBOOK ---------- */
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      wb,
-      ws,
-      "Revenue & Expenditure"
-    );
-
-    /* ---------- DOWNLOAD ---------- */
-    XLSX.writeFile(
-      wb,
-      "RevenueExpenditure.xlsx"
-    );
-
-    setShowExport(false);
-  };
-
-  /* ================= EXPENDITURE EXCEL ================= */
-  const exportExpenditureExcel = async () => {
+    const toastId = toast.loading("Generating PDF Report...");
     try {
-      const params = new URLSearchParams();
-      if (selectedPgId !== "ALL") params.append("pgId", selectedPgId);
-      if (startDate) params.append("startDate", format(startDate, "yyyy-MM-dd"));
-      if (endDate) params.append("endDate", format(endDate, "yyyy-MM-dd"));
-
-      const response = await api.get(`/owner/expenditures/export?${params.toString()}`, {
-        responseType: 'blob'
-      });
-      saveAs(response.data, "ExpenditureLedger.xlsx");
-      setShowExport(false);
+      const opt = {
+        margin: 0,
+        filename: 'Revenue_Expenditure_Invoice.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      await html2pdf().set(opt).from(exportTemplateRef.current).save();
+      toast.success("PDF report downloaded successfully!", { id: toastId });
     } catch (err) {
-      console.error("Failed to export expenditures", err);
+      console.error("Failed to export PDF", err);
+      toast.error("Failed to export PDF report.", { id: toastId });
     }
   };
 
+
+  const [exportingFinancialExcel, setExportingFinancialExcel] = useState(false);
+
+  /* ================= CFO FINANCIAL REPORT EXCEL ================= */
+  const exportFinancialExcel = async () => {
+    setShowExport(false);
+    const toastId = toast.loading("Generating Excel Financial Report...");
+    try {
+      setExportingFinancialExcel(true);
+      const params = new URLSearchParams();
+      if (selectedPgId && selectedPgId !== "ALL") params.append("propertyId", selectedPgId);
+      
+      if (startDate && endDate) {
+        params.append("startDate", format(startDate, "yyyy-MM-dd"));
+        params.append("endDate", format(endDate, "yyyy-MM-dd"));
+        params.append("reportType", "CUSTOM");
+      } else if (filter === "YEAR") {
+        const yr = selectedYear || new Date().getFullYear();
+        params.append("startDate", `${yr}-01-01`);
+        params.append("endDate", `${yr}-12-31`);
+        params.append("reportType", "YEAR");
+      } else {
+        // filter === "MONTH" or default
+        const yr = selectedYear || new Date().getFullYear();
+        const m = selectedMonth !== undefined ? selectedMonth : new Date().getMonth();
+        const start = new Date(yr, m, 1);
+        const end = new Date(yr, m + 1, 0);
+        params.append("startDate", format(start, "yyyy-MM-dd"));
+        params.append("endDate", format(end, "yyyy-MM-dd"));
+        params.append("reportType", "MONTH");
+      }
+
+      const response = await api.post(`/reports/financial/export?${params.toString()}`, {}, {
+        responseType: 'blob'
+      });
+
+      const contentDisposition = response.headers ? response.headers['content-disposition'] : null;
+      let filename = `PGMate_Financial_Report_${getRevenueLabel().replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^";]+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      saveAs(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), filename);
+      toast.success("Excel report downloaded successfully!", { id: toastId });
+    } catch (err) {
+      console.error("Failed to export financial report", err);
+      toast.error("Failed to export Excel report.", { id: toastId });
+    } finally {
+      setExportingFinancialExcel(false);
+    }
+  };
+
+
   /* ================= WORD ================= */
   const exportWord = async () => {
+    setShowExport(false);
+    const toastId = toast.loading("Generating Word Document...");
     try {
       await exportRevenueWord({
         invoiceNo: `INV-REV-${new Date().getTime().toString().slice(-6)}`,
@@ -866,10 +736,10 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
         expenseHistoryExport,
         logoUrl: logo
       });
+      toast.success("Word report downloaded successfully!", { id: toastId });
     } catch (err) {
       console.error("Failed to export Word document", err);
-    } finally {
-      setShowExport(false);
+      toast.error("Failed to export Word report.", { id: toastId });
     }
   };
   useEffect(() => {
@@ -915,8 +785,9 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
             <div className="dashboard-export-dropdown">
               <button onClick={exportPDF}>Export as PDF</button>
               <button onClick={exportWord}>Export as Word</button>
-              <button onClick={exportExcel}>Export Revenue Excel</button>
-              <button onClick={exportExpenditureExcel} style={{ color: '#ef4444', fontWeight: '600' }}>Export Expenditure</button>
+              <button onClick={exportFinancialExcel} disabled={exportingFinancialExcel}>
+                {exportingFinancialExcel ? "Generating Excel..." : "Export as Excel"}
+              </button>
             </div>
           )}
 
