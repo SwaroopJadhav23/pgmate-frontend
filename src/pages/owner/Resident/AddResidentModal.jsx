@@ -291,6 +291,27 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Reusable copy handler for PG link — centralised clipboard logic and toasts
+  const copyPgLink = async () => {
+    if (!form.pgId) return;
+    const link = `${window.location.origin}/pg/${form.pgId}`;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = link;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      toast.success('PG link copied');
+    } catch (err) {
+      toast.error('Failed to copy');
+    }
+  };
+
   // ── submit ────────────────────────────────────────────────────────
   const submit = async () => {
     if (!validateStep(4)) return;
@@ -848,11 +869,26 @@ const AddTenantPage = ({ onSuccess, prefill, apiPrefix }) => {
         </div>{/* end .arm-page-body */}
 
         {/* ── Footer (bottom save bar) ── */}
-        <div className="arm-page-actions" style={{ justifyContent: currentStep > 1 ? "space-between" : "flex-end" }}>
+        <div className="arm-page-actions" style={{ justifyContent: "space-between", alignItems: 'center', gap: 12 }}>
           {currentStep > 1 && (
             <button className="arm-btn-outline" onClick={prevStep}>Previous</button>
           )}
-          
+
+          {/* Left: Copy Link button (compact) */}
+          <div style={{ minWidth: 0, flex: '0 0 auto' }}>
+            <button
+              type="button"
+              className="arm-btn-outline"
+              onClick={copyPgLink}
+              aria-label="Copy PG link"
+              disabled={!form.pgId}
+              style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 8, opacity: form.pgId ? 1 : 0.6 }}
+            >
+              <i className="bi bi-clipboard" />
+              <span>Copy Link</span>
+            </button>
+          </div>
+
           <div style={{ display: 'flex', gap: '12px' }}>
             <button className="arm-btn-outline" onClick={() => navigate(-1)}>Cancel</button>
             {currentStep < 4 ? (
