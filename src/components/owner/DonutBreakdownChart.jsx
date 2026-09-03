@@ -41,7 +41,8 @@ const DonutBreakdownChart = ({ title, data, totalLabel, totalValue }) => {
               </Pie>
               <Tooltip 
                 formatter={(value) => `₹${value.toLocaleString()}`}
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 14px rgba(0,0,0,0.12)', backgroundColor: '#ffffff' }}
+                wrapperStyle={{ zIndex: 9999 }}
               />
             </PieChart>
           </ResponsiveContainer>

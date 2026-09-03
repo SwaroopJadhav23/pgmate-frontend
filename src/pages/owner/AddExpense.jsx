@@ -209,7 +209,7 @@ const AddExpense = () => {
                 setRooms([]);
                 window.scrollTo(0, 0);
             } else {
-                navigate('/owner/revenue');
+                navigate('/owner/ownerRevenue');
             }
         } catch (err) {
             setError(err.response?.data?.message || "Failed to save expense. Please try again.");
@@ -228,7 +228,7 @@ const AddExpense = () => {
             <div className="add-expense-container">
                 <div className="add-expense-header">
                     <div className="breadcrumb">
-                        <span onClick={() => navigate('/owner/revenue')} className="back-link">Revenue</span> 
+                        <span onClick={() => navigate('/owner/ownerRevenue')} className="back-link">Revenue</span> 
                         <span style={{ margin: '0 6px', color: '#cbd5e1' }}>/</span> 
                         <span>Log Expense</span>
                     </div>
@@ -483,7 +483,7 @@ const AddExpense = () => {
                     </div>
 
                     <div className="unified-footer">
-                        <button className="btn-cancel" onClick={() => navigate('/owner/revenue')} disabled={loading}>Cancel</button>
+                        <button className="btn-cancel" onClick={() => navigate('/owner/ownerRevenue')} disabled={loading}>Cancel</button>
                         <div className="footer-right-actions">
                             {/* Option to just save */}
                             {/* <button className="btn-save-only" onClick={() => submitExpense(false)} disabled={loading}>Save Only</button> */}
