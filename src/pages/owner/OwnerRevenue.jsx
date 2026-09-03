@@ -530,7 +530,103 @@ const OwnerRevenue = () => {
   // NOTE: Animations have been moved to the <AnimatedNumber /> component 
   // in the JSX to prevent the entire page from re-rendering 60 times a second.
 
-  const isAllPgsEh = expHistoryPgId === 'ALL';
+  
+  const breakdownData = useMemo(() => {
+    // Revenue Breakdown Data
+    const revenueBreakdown = [
+      { name: 'Rent Collected', value: 0, color: '#4f46e5' },
+      { name: 'Onboarding Rent', value: 0, color: '#fbbf24' },
+      { name: 'Deposit Deductions', value: 0, color: '#ef4444' }
+    ];
+
+    rentRecords.forEach((rec) => {
+      if (rec.status === "PAID" && isDateInFilter(toDate(rec.paidDate))) {
+        revenueBreakdown[0].value += Number(rec.rentAmount || 0);
+      }
+    });
+
+    residents.forEach((r) => {
+      if (isDateInFilter(getRevenueDate(r))) {
+        revenueBreakdown[1].value += Number(r.monthlyRent || 0);
+      }
+      const checkoutDate = toDate(r.actualCheckoutDate);
+      if (isDateInFilter(checkoutDate)) {
+        const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
+        if (damage > 0) revenueBreakdown[2].value += damage;
+      }
+    });
+
+    const totalRevenueBreakdown = revenueBreakdown.reduce((acc, curr) => acc + curr.value, 0);
+
+    // Expense Breakdown Data
+    const EXPENSE_COLORS = ['#ef4444', '#4f46e5', '#34d399', '#fbbf24', '#8b5cf6', '#ec4899', '#06b6d4'];
+    const expenseDataMap = {};
+    expenditures.filter(exp => isDateInFilter(toDate(exp.expenseDate || exp.date))).forEach(exp => {
+      const cat = (exp.category || 'Other').replace(/_/g, ' ');
+      if (!expenseDataMap[cat]) expenseDataMap[cat] = 0;
+      expenseDataMap[cat] += Number(exp.amount || 0);
+    });
+    
+    const expenseBreakdown = Object.keys(expenseDataMap).map((key, i) => ({
+      name: key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),
+      value: expenseDataMap[key],
+      color: EXPENSE_COLORS[i % EXPENSE_COLORS.length]
+    }));
+    
+    const totalExpenseBreakdown = expenseBreakdown.reduce((acc, curr) => acc + curr.value, 0);
+
+    return { revenueBreakdown, totalRevenueBreakdown, expenseBreakdown, totalExpenseBreakdown };
+  }, [rentRecords, residents, expenditures, isDateInFilter]);
+
+  const expenseHistoryExport = useMemo(() => {
+    const dateFilteredExp = expenditures.filter(exp => {
+      const dateMatch = isDateInFilter(toDate(exp.expenseDate || exp.date));
+      const pgMatch = selectedPgId === "ALL" || exp.pgId === selectedPgId;
+      return dateMatch && pgMatch;
+    });
+    
+    let totalTxs = dateFilteredExp.length;
+    let pendingAmt = dateFilteredExp.filter(e => (e.paymentStatus||'').toUpperCase() === 'PENDING').reduce((s, e) => s + (e.amount||0), 0);
+    let paidAmt = dateFilteredExp.filter(e => (e.paymentStatus||'').toUpperCase() !== 'PENDING').reduce((s, e) => s + (e.amount||0), 0);
+    let totalAmt = pendingAmt + paidAmt;
+
+    let rows = [];
+    if (selectedPgId === "ALL") {
+      rows = pgs.map(pg => {
+        const pgExps = dateFilteredExp.filter(e => e.pgId === pg.id);
+        const pgPending = pgExps.filter(e => (e.paymentStatus||'').toUpperCase() === 'PENDING').reduce((s, e) => s + (e.amount||0), 0);
+        const pgPaid = pgExps.filter(e => (e.paymentStatus||'').toUpperCase() !== 'PENDING').reduce((s, e) => s + (e.amount||0), 0);
+        return {
+          type: 'summary',
+          id: pg.id,
+          name: pg.name || pg.pgName,
+          totalTxs: pgExps.length,
+          pendingAmt: pgPending,
+          paidAmt: pgPaid,
+          totalAmt: pgPending + pgPaid
+        };
+      });
+    } else {
+      rows = dateFilteredExp.map(exp => ({
+        type: 'detail',
+        id: exp.id || Math.random().toString(),
+        date: exp.expenseDate || exp.date,
+        category: (exp.category || 'Other').replace(/_/g, ' '),
+        title: exp.title || exp.description || '-',
+        paidTo: exp.paidTo || '-',
+        status: (exp.paymentStatus || 'PAID').toUpperCase(),
+        amount: exp.amount || 0
+      })).sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    return {
+      isAllPgs: selectedPgId === "ALL",
+      kpis: { totalTxs, pendingAmt, paidAmt, totalAmt, activePgs: selectedPgId === "ALL" ? pgs.length : 1 },
+      rows
+    };
+  }, [expenditures, pgs, selectedPgId, isDateInFilter]);
+
+const isAllPgsEh = expHistoryPgId === 'ALL';
   const filteredExpensesForEh = useMemo(() => expenditures
     .filter(exp => isAllPgsEh || exp.pgId === expHistoryPgId)
     .filter(exp => expHistoryStatus === 'ALL' || (exp.paymentStatus || '').toUpperCase() === expHistoryStatus)
@@ -1280,67 +1376,20 @@ const OwnerRevenue = () => {
             </div>
 
             {/* BREAKDOWN CHARTS */}
-            {(() => {
-              // Revenue Breakdown Data
-              const revenueBreakdown = [
-                { name: 'Rent Collected', value: 0, color: '#4f46e5' },
-                { name: 'Onboarding Rent', value: 0, color: '#fbbf24' },
-                { name: 'Deposit Deductions', value: 0, color: '#ef4444' }
-              ];
-
-              rentRecords.forEach((rec) => {
-                if (rec.status === "PAID" && isDateInFilter(toDate(rec.paidDate))) {
-                  revenueBreakdown[0].value += Number(rec.rentAmount || 0);
-                }
-              });
-
-              residents.forEach((r) => {
-                if (isDateInFilter(getRevenueDate(r))) {
-                  revenueBreakdown[1].value += Number(r.monthlyRent || 0);
-                }
-                const checkoutDate = toDate(r.actualCheckoutDate);
-                if (isDateInFilter(checkoutDate)) {
-                  const damage = Number(r.deposit || 0) - Number(r.refundAmount || 0);
-                  if (damage > 0) revenueBreakdown[2].value += damage;
-                }
-              });
-
-              const totalRevenueBreakdown = revenueBreakdown.reduce((acc, curr) => acc + curr.value, 0);
-
-              // Expense Breakdown Data
-              const EXPENSE_COLORS = ['#ef4444', '#4f46e5', '#34d399', '#fbbf24', '#8b5cf6', '#ec4899', '#06b6d4'];
-              const expenseDataMap = {};
-              expenditures.filter(exp => isDateInFilter(new Date(exp.expenseDate || exp.date))).forEach(exp => {
-                const cat = (exp.category || 'Other').replace(/_/g, ' ');
-                if (!expenseDataMap[cat]) expenseDataMap[cat] = 0;
-                expenseDataMap[cat] += Number(exp.amount || 0);
-              });
-              
-              const expenseBreakdown = Object.keys(expenseDataMap).map((key, i) => ({
-                name: key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),
-                value: expenseDataMap[key],
-                color: EXPENSE_COLORS[i % EXPENSE_COLORS.length]
-              }));
-              
-              const totalExpenseBreakdown = expenseBreakdown.reduce((acc, curr) => acc + curr.value, 0);
-
-              return (
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px', marginTop: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px', marginTop: '24px', marginBottom: '24px' }}>
                   <DonutBreakdownChart 
                     title="Revenue Breakdown" 
-                    data={revenueBreakdown} 
+                    data={breakdownData.revenueBreakdown} 
                     totalLabel="Total Revenue" 
-                    totalValue={totalRevenueBreakdown} 
+                    totalValue={breakdownData.totalRevenueBreakdown} 
                   />
                   <DonutBreakdownChart 
                     title="Expense Breakdown" 
-                    data={expenseBreakdown} 
+                    data={breakdownData.expenseBreakdown} 
                     totalLabel="Total Expenses" 
-                    totalValue={totalExpenseBreakdown} 
+                    totalValue={breakdownData.totalExpenseBreakdown} 
                   />
                 </div>
-              );
-            })()}
           </>
         )}
       </div>
@@ -1686,6 +1735,8 @@ const OwnerRevenue = () => {
           }}
           occupancyRate={occupancyRate}
           chartData={chartData}
+          breakdownData={breakdownData}
+          expenseHistoryExport={expenseHistoryExport}
         />
       </div>
     </DashboardLayout>

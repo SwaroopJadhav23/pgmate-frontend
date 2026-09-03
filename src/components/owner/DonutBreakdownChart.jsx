@@ -24,14 +24,14 @@ const DonutBreakdownChart = ({ title, data, totalLabel, totalValue }) => {
         
         {/* Chart Section */}
         <div className="donut-chart-wrapper">
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={160}>
             <PieChart>
               <Pie
                 data={sortedData}
                 cx="50%"
                 cy="50%"
-                innerRadius={65}
-                outerRadius={95}
+                innerRadius={50}
+                outerRadius={75}
                 dataKey="value"
                 stroke="none"
               >
@@ -52,19 +52,18 @@ const DonutBreakdownChart = ({ title, data, totalLabel, totalValue }) => {
           </div>
         </div>
 
-        {/* Legend Section */}
-        <div className="donut-legend-wrapper">
+        <div className={`donut-legend-wrapper ${sortedData.length > 4 ? 'grid-layout' : 'list-layout'}`}>
           {sortedData.map((item, index) => {
             const percentage = ((item.value / totalValue) * 100).toFixed(1);
             return (
               <div key={index} className="donut-legend-item">
-                <div className="donut-legend-dot" style={{ backgroundColor: item.color }}></div>
-                <div className="donut-legend-info">
+                <div className="donut-legend-header">
+                  <div className="donut-legend-dot" style={{ backgroundColor: item.color }}></div>
                   <div className="donut-legend-name">{item.name}</div>
-                  <div className="donut-legend-stats">
-                    <span className="donut-legend-percent">{percentage}%</span>
-                    <span className="donut-legend-amount">(₹{item.value.toLocaleString()})</span>
-                  </div>
+                </div>
+                <div className="donut-legend-vals">
+                  <span className="donut-legend-perc">{percentage}%</span>
+                  <span className="donut-legend-amount">₹{item.value.toLocaleString()}</span>
                 </div>
               </div>
             );
