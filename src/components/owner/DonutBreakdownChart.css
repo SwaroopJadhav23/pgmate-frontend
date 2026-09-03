@@ -1,16 +1,18 @@
 .donut-breakdown-card {
   background: #ffffff;
   border-radius: 16px;
-  padding: 24px;
+  padding: 28px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border-color, #f1f5f9);
+  min-height: 340px;
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .donut-breakdown-card h3 {
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary, #0f172a);
@@ -30,7 +32,7 @@
   align-items: center;
   justify-content: flex-start;
   flex: 1;
-  gap: 20px;
+  gap: 24px;
 }
 
 .donut-chart-wrapper {
@@ -43,6 +45,16 @@
   justify-content: center;
 }
 
+.donut-chart-wrapper .recharts-responsive-container {
+  position: relative;
+  z-index: 10;
+}
+
+.donut-chart-wrapper .recharts-tooltip-wrapper {
+  z-index: 9999 !important;
+  pointer-events: none;
+}
+
 .donut-chart-center {
   position: absolute;
   top: 50%;
@@ -50,6 +62,7 @@
   transform: translate(-50%, -50%);
   text-align: center;
   pointer-events: none;
+  z-index: 1;
 }
 
 .donut-total-value {
@@ -72,12 +85,13 @@
 .donut-legend-wrapper.list-layout {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .donut-legend-wrapper.list-layout .donut-legend-item {
   border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
 }
 
 .donut-legend-wrapper.list-layout .donut-legend-item:last-child {
@@ -89,8 +103,9 @@
 .donut-legend-wrapper.grid-layout {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  column-gap: 8px;
-  row-gap: 16px;
+  column-gap: 10px;
+  row-gap: 14px;
+  align-content: center;
 }
 
 .donut-legend-item {

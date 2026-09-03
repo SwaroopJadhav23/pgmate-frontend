@@ -12,6 +12,8 @@ import "react-day-picker/dist/style.css";
 import "./OwnerRevenue.css";
 import html2pdf from "html2pdf.js";
 import RevenueExportTemplate from "./components/RevenueExportTemplate";
+import { exportRevenueWord } from "./utils/exportRevenueWord";
+import logo from "../../assets/PGMate.png";
 import {
   BarChart,
   Bar,
@@ -835,80 +837,40 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
   };
 
   /* ================= WORD ================= */
-  const exportWord = () => {
-    const rowsHTML = reportRows.map((row) => {
-
-      let formatted;
-
-      if (row.type === "currency")
-        formatted = formatCurrency(row.value);
-      else if (row.type === "percentage")
-        formatted = `${row.value}%`;
-      else
-        formatted = row.value;
-
-      return `
-    <tr>
-      <td>${row.label}</td>
-      <td style="text-align:right">${formatted}</td>
-    </tr>
-  `;
-    }).join("");
-
-    const htmlContent = `
-  <html>
-  <head>
-    <meta charset="utf-8"/>
-    <style>
-      body {
-        font-family: Calibri;
-        padding:40px;
-      }
-
-      h2 { margin-bottom:5px; }
-      h4 { margin-top:0; color:#555; }
-
-      table {
-        width:100%;
-        border-collapse:collapse;
-        margin-top:20px;
-      }
-
-      th, td {
-        border:1px solid #ccc;
-        padding:10px;
-      }
-
-      th {
-        background:#f3f4f6;
-        text-align:left;
-      }
-    </style>
-  </head>
-
-  <body>
-
-    <h2>Revenue & Expenditure Report</h2>
-    <h4>${getRevenueLabel()}</h4>
-
-    <table>
-      <tr>
-        <th>Metric</th>
-        <th style="text-align:right">Value</th>
-      </tr>
-      ${rowsHTML}
-    </table>
-
-  </body>
-  </html>
-  `;
-
-    const blob = new Blob(["\ufeff", htmlContent], {
-      type: "application/msword",
-    });
-
-    saveAs(blob, "RevenueAnalytics.doc");
-    setShowExport(false);
+  const exportWord = async () => {
+    try {
+      await exportRevenueWord({
+        invoiceNo: `INV-REV-${new Date().getTime().toString().slice(-6)}`,
+        invoiceDate: format(new Date(), "dd MMM yyyy"),
+        dateRange: getRevenueLabel(),
+        pgDetails: selectedPgId === "ALL" ? { name: "Owner Dashboard" } : pgs.find(p => p.id === selectedPgId),
+        summary: {
+          totalRevenue,
+          totalExpenses: totalExpensesAmount,
+          totalOverdue: stats?.revenueOverdue || 0,
+          collectionRate: colRate
+        },
+        overview: {
+          totalRevenue,
+          rentCollected: totalRentCollected,
+          depositHeld: totalDepositHeld,
+          futureRefund: futureDepositRefund,
+          potentialRevenue,
+          totalExpenses: totalExpensesAmount,
+          totalOverdue: stats?.revenueOverdue || 0,
+          collectionRate: colRate
+        },
+        occupancyRate,
+        chartData,
+        breakdownData,
+        expenseHistoryExport,
+        logoUrl: logo
+      });
+    } catch (err) {
+      console.error("Failed to export Word document", err);
+    } finally {
+      setShowExport(false);
+    }
   };
   useEffect(() => {
 
@@ -1381,7 +1343,7 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
             </div>
 
             {/* BREAKDOWN CHARTS */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px', marginTop: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px', marginTop: '24px', marginBottom: '0px' }}>
                   <DonutBreakdownChart 
                     title="Revenue Breakdown" 
                     data={breakdownData.revenueBreakdown} 
@@ -1648,8 +1610,8 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
                                 return <span className="rev-status-badge rev-status-paid">Paid</span>;
                               })()}
                             </td>
-                            <td data-label="Action" className={isMarkingThis ? 'eh-td-active' : ''}>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end', width: '100%', position: 'relative' }}>
+                            <td data-label="Action" className={`eh-action-cell ${isMarkingThis ? 'eh-td-active' : ''}`}>
+                              <div className="eh-action-btn-group">
                                 {isPending && (
                                   <button
                                     onClick={() => setMarkingPaidId(isMarkingThis ? null : exp.id)}
@@ -1669,51 +1631,40 @@ const isAllPgsEh = expHistoryPgId === 'ALL';
                                 >
                                   <i className="bi bi-trash3"></i>
                                 </button>
-
-                                {isMarkingThis && (
-                                  <div style={{
-                                    position: 'absolute', top: '100%', right: '0', marginTop: '8px',
-                                    background: '#ffffff', padding: '16px', borderRadius: '12px',
-                                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)', border: '1px solid #e2e8f0',
-                                    zIndex: 50, display: 'flex', gap: '12px', alignItems: 'flex-end', minWidth: 'max-content'
-                                  }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', textAlign: 'left' }}>Payment Date</label>
-                                      <input
-                                        type="date"
-                                        value={markPaidForm.paymentDate}
-                                        onChange={e => setMarkPaidForm(f => ({ ...f, paymentDate: e.target.value }))}
-                                        className="eh-filter-input"
-                                        style={{ width: '140px', padding: '6px 12px' }}
-                                      />
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', textAlign: 'left' }}>Method</label>
-                                      <select
-                                        value={markPaidForm.paymentMethod}
-                                        onChange={e => setMarkPaidForm(f => ({ ...f, paymentMethod: e.target.value }))}
-                                        className="eh-filter-select"
-                                        style={{ width: '130px', padding: '6px 12px' }}
-                                      >
-                                        {['CASH','UPI','BANK_TRANSFER','CREDIT_CARD','DEBIT_CARD','CHEQUE','NET_BANKING'].map(m => (
-                                          <option key={m} value={m}>{m.replace('_',' ')}</option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                    <button
-                                      onClick={() => handleMarkPaid(exp.id)}
-                                      disabled={updatingStatus}
-                                      style={{
-                                        background: '#059669', color: '#fff', border: 'none', borderRadius: '6px',
-                                        padding: '8px 16px', fontWeight: 600, cursor: 'pointer',
-                                        height: '35px', display: 'flex', alignItems: 'center'
-                                      }}
-                                    >
-                                      {updatingStatus ? 'Saving...' : 'Confirm'}
-                                    </button>
-                                  </div>
-                                )}
                               </div>
+
+                              {isMarkingThis && (
+                                <div className="mark-paid-popover">
+                                  <div className="mark-paid-field">
+                                    <label>Payment Date</label>
+                                    <input
+                                      type="date"
+                                      value={markPaidForm.paymentDate}
+                                      onChange={e => setMarkPaidForm(f => ({ ...f, paymentDate: e.target.value }))}
+                                      className="eh-filter-input"
+                                    />
+                                  </div>
+                                  <div className="mark-paid-field">
+                                    <label>Method</label>
+                                    <select
+                                      value={markPaidForm.paymentMethod}
+                                      onChange={e => setMarkPaidForm(f => ({ ...f, paymentMethod: e.target.value }))}
+                                      className="eh-filter-select"
+                                    >
+                                      {['CASH','UPI','BANK_TRANSFER','CREDIT_CARD','DEBIT_CARD','CHEQUE','NET_BANKING'].map(m => (
+                                        <option key={m} value={m}>{m.replace('_',' ')}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                  <button
+                                    onClick={() => handleMarkPaid(exp.id)}
+                                    disabled={updatingStatus}
+                                    className="mark-paid-confirm-btn"
+                                  >
+                                    {updatingStatus ? 'Saving...' : 'Confirm'}
+                                  </button>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         </Fragment>

@@ -261,6 +261,14 @@ function App() {
             }
           />{" "}
           <Route
+            path="/owner/revenue"
+            element={
+              <ProtectedRoute role="OWNER">
+                <OwnerRevenue />
+              </ProtectedRoute>
+            }
+          />{" "}
+          <Route
             path="/owner/revenue/add-expense"
             element={
               <ProtectedRoute role="OWNER">
