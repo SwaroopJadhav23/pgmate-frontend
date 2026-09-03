@@ -11,7 +11,7 @@ import "react-day-picker/dist/style.css";
 import "./OwnerRevenue.css";
 import html2pdf from "html2pdf.js";
 import RevenueExportTemplate from "./components/RevenueExportTemplate";
-import { exportRevenueWord } from "./utils/exportRevenueWord";
+import { exportRevenueWord } from "./utils/exportRevenueWord.js";
 import logo from "../../assets/PGMate.png";
 import {
   BarChart,

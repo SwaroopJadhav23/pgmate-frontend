@@ -23,7 +23,6 @@ import {
 import "../../layouts/layout.css";
 import "./OwnerDashboard.css";
 import jsPDF from "jspdf";
-import * as XLSX from "xlsx";
 // import { saveAs } from "file-saver";
 import { getApkDownloadUrl } from "../../utils/apk";
 import {
@@ -742,29 +741,6 @@ const OwnerDashboard = ({ apiPrefix = "/owner" }) => {
       }
     };
 
-    /* ── mini line chart (sparkline) ── */
-    const drawLineChart = (x, y, w, h, data, color) => {
-      if (!data.length) {
-        pdf.setTextColor(...GRAY);
-        pdf.setFontSize(8);
-        pdf.setFont("helvetica", "normal");
-        pdf.text("No history data yet", x + w / 2, y + h / 2, {
-          align: "center",
-        });
-        return;
-      }
-      const max = Math.max(...data, 1);
-      const stepX = w / Math.max(data.length - 1, 1);
-      pdf.setDrawColor(...color);
-      pdf.setLineWidth(0.6);
-      for (let i = 0; i < data.length - 1; i++) {
-        const x1 = x + i * stepX,
-          y1 = y + h - (data[i] / max) * h;
-        const x2 = x + (i + 1) * stepX,
-          y2 = y + h - (data[i + 1] / max) * h;
-        pdf.line(x1, y1, x2, y2);
-      }
-    };
 
     /* ── mini bar chart for revenue pulse ── */
     const drawBarChart = (x, y, w, h, data, labels, color) => {

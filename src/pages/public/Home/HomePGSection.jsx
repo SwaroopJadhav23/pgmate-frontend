@@ -8,8 +8,6 @@ import PGMateBanner from "./PGMateBanner";
 import {PGListingSkeleton} from "../Skeleton";
 import LocationModal from "../../../components/LocationModal";
 import {useCityFilter} from "../../../context/CityFilterContext";
-import WhyChoosePGMate from "./WhyChoosePgMate";
-import FeaturedPGs from "./FeaturedPgs";
 import PopularCities from "./PopularCities";
 import AppDownloadStrip from "./AppDownloadStrip";
 import LookingForSection from "./LookingForSection";
@@ -236,10 +234,6 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [totalElements, setTotalElements] = useState(0);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const searchWrapRef = useRef(null);
@@ -341,7 +335,7 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         locality,
       }));
     setSuggestions([...citySuggestions, ...localitySuggestions].slice(0, 8));
-  }, [searchText, localityOptions, filters.city]);
+  }, [searchText, localityOptions, filters.city, cityOptions]);
 
   useEffect(() => {
     const handlePointerDown = (event) => {
@@ -384,7 +378,6 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         const pendingResult = pendingSearchResultRef.current;
         if (pendingResult && pendingResult.requestId === searchRequestRef.current) {
           setPgs(pendingResult.content);
-          setTotalElements(pendingResult.content.length);
           pendingSearchResultRef.current = null;
           searchLoadingRef.current = false;
           setLoading(false);
@@ -422,7 +415,6 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         pendingSearchResultRef.current = {requestId, content};
         if (searchTimerElapsedRef.current && requestId === searchRequestRef.current) {
           setPgs(content);
-          setTotalElements(content.length);
           pendingSearchResultRef.current = null;
           searchLoadingRef.current = false;
           setLoading(false);
@@ -430,7 +422,6 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         return;
       }
       setPgs(content);
-      setTotalElements(content.length);
     } catch (err) {
       console.error(err);
       if (requestId !== searchRequestRef.current) return;
@@ -438,7 +429,6 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         pendingSearchResultRef.current = {requestId, content: []};
         if (searchTimerElapsedRef.current && requestId === searchRequestRef.current) {
           setPgs([]);
-          setTotalElements(0);
           pendingSearchResultRef.current = null;
           searchLoadingRef.current = false;
           setLoading(false);
@@ -446,7 +436,6 @@ const HomePGSection = ({setShowLocationModal, showLocationModal}) => {
         return;
       }
       setPgs([]);
-      setTotalElements(0);
     } finally {
       if (!isSearchRequest || !searchLoadingRef.current) setLoading(false);
     }
