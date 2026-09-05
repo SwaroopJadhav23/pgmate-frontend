@@ -9,6 +9,7 @@ import "./Resident.css";
 import "./Agreement.css";
 import AgreementSignaturePad from "./AgreementSignaturePad";
 import PoliceVerificationModal from "./PoliceVerificationModal";
+import SendRentReminderModal from "./SendRentReminderModal";
 
 const UploadSignatureModal = ({ resident, onClose, onSave, saving }) => {
   const [sigDataUrl, setSigDataUrl] = useState(null);
@@ -131,6 +132,9 @@ const SORT_OPTIONS = [
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loadingPaymentHistory, setLoadingPaymentHistory] = useState(false);
+
+  // Send Rent Reminder modal
+  const [showRentReminderModal, setShowRentReminderModal] = useState(false);
 
   const fetchPaymentHistory = async (resident) => {
     const residentId = resident.residentId;
@@ -344,30 +348,30 @@ const sortedResidents = useMemo(() => {
       </>
     )}
   </div>
-  <button
-    type="button"
-    aria-label="Send Reminder"
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '8px',
-      padding: '0 16px',
-      height: '38px',
-      border: 'none',
-      borderRadius: '999px',
-      background: 'linear-gradient(135deg, #25d366 0%, #1ea952 100%)',
-      color: '#fff',
-      fontSize: '14px',
-      fontWeight: 700,
-      boxShadow: '0 8px 18px rgba(37, 211, 102, 0.25)',
-      cursor: 'pointer',
-      whiteSpace: 'nowrap',
-      marginLeft: 'auto',
-    }}
-  >
-    <i className="bi bi-whatsapp" style={{ fontSize: '16px', lineHeight: 1 }}></i>
-    Send Reminder
-  </button>
+  {/* Send Rent Reminder Button — disabled until DLT API keys are received, displays Coming Soon popup */}
+  {isOwner && (
+    <button
+      type="button"
+      id="send-rent-reminder-btn"
+      aria-label="Send Rent Reminder"
+      className="send-rent-reminder-btn"
+      onClick={() => {
+        Swal.fire({
+          icon: "info",
+          title: "Coming Soon!",
+          text: "Send Bulk rent reminder coming soon.",
+          confirmButtonColor: "#5B5BD6",
+          confirmButtonText: "Got it",
+        });
+      }}
+    >
+      {/* SMS icon */}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Send Rent Reminder
+    </button>
+  )}
 </div>
       <p className="search-result-count">Showing <strong>{residents.length}</strong> of {totalElements} residents</p>
 
@@ -954,6 +958,14 @@ const sortedResidents = useMemo(() => {
       )}
       {policeResident && (
         <PoliceVerificationModal resident={policeResident} apiPrefix={apiPrefix} onClose={() => setPoliceResident(null)} />
+      )}
+
+      {/* Send Rent Reminder Modal */}
+      {showRentReminderModal && (
+        <SendRentReminderModal
+          totalCount={residents.length}
+          onClose={() => setShowRentReminderModal(false)}
+        />
       )}
     </>
   );
