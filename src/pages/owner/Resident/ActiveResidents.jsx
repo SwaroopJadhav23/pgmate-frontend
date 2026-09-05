@@ -264,8 +264,8 @@ const SORT_OPTIONS = [
 const sortedResidents = useMemo(() => {
   const arr = [...residents];
   switch (sortOption) {
-    case "az": return arr.sort((a, b) => a.name.localeCompare(b.name));
-    case "za": return arr.sort((a, b) => b.name.localeCompare(a.name));
+    case "az": return arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    case "za": return arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
     case "oldest": return arr.sort((a, b) => new Date(a.checkinDate) - new Date(b.checkinDate));
     case "newest":
     default: return arr.sort((a, b) => new Date(b.checkinDate) - new Date(a.checkinDate));
